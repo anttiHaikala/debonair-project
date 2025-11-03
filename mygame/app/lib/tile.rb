@@ -6,6 +6,15 @@ class Tile
     [:floor, :wall, :water, :staircase_up, :staircase_down, :chasm]
   end
 
+  def self.occupied?(x, y, args)
+    args.state.entities.each do |entity|
+      if entity.x == x && entity.y == y
+        return true
+      end
+    end
+    return false
+  end
+
   def self.draw_tiles args
     if args.state[:dungeon].nil?
       return
@@ -30,7 +39,7 @@ class Tile
     # base color
     color = case tile
       when :wall
-        Color.hsl_to_rgb(hue, 10, 20)
+        Color.hsl_to_rgb(hue, 10, 10)
       when :water
         { r: 0, g: 0, b: 255 }
       else
@@ -60,31 +69,33 @@ class Tile
         b: c[:b] 
       }
     end
-    if tile == :staircase_up
-      args.outputs.sprites << {
-        x: x_offset + x * tile_size,
-        y: y_offset + y * tile_size,
-        w: tile_size,
-        h: tile_size,
-        path: "mygame/sprites/simple-mood-16x16.png",
-        tile_x: 12*16,
-        tile_y: 3*16,
-        tile_w: 16,
-        tile_h: 16
-      }
-    end
-    if tile == :staircase_down
-      args.outputs.sprites << {
-        x: x_offset + x * tile_size,
-        y: y_offset + y * tile_size,
-        w: tile_size,
-        h: tile_size,
-        path: "mygame/sprites/simple-mood-16x16.png",
-        tile_x: 14*16,
-        tile_y: 3*16,
-        tile_w: 16,
-        tile_h: 16
-      }
+    unless Tile.occupied?(x, y, args)
+      if tile == :staircase_up
+        args.outputs.sprites << {
+          x: x_offset + x * tile_size,
+          y: y_offset + y * tile_size,
+          w: tile_size,
+          h: tile_size,
+          path: "mygame/sprites/simple-mood-16x16.png",
+          tile_x: 12*16,
+          tile_y: 3*16,
+          tile_w: 16,
+          tile_h: 16
+        }
+      end
+      if tile == :staircase_down
+        args.outputs.sprites << {
+          x: x_offset + x * tile_size,
+          y: y_offset + y * tile_size,
+          w: tile_size,
+          h: tile_size,
+          path: "mygame/sprites/simple-mood-16x16.png",
+          tile_x: 14*16,
+          tile_y: 3*16,
+          tile_w: 16,
+          tile_h: 16
+        }
+      end
     end
   end
 end

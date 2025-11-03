@@ -62,8 +62,8 @@ class GUI
           w: tile_size,
           h: tile_size,
           path: "mygame/sprites/simple-mood-16x16.png",
-          tile_x: 3*16,
-          tile_y: 3*16,
+          tile_x: 0*16,
+          tile_y: 4*16,
           tile_w: 16,
           tile_h: 16
         }
