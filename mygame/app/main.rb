@@ -24,6 +24,7 @@ def tick args
   GUI.handle_input args
   GUI.draw_background args
   GUI.draw_tiles args
+  GUI.update_entity_animations args
   GUI.draw_entities args
   GUI.draw_hud args
 end

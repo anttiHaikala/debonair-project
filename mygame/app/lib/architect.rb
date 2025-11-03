@@ -56,6 +56,7 @@ class Architect
     dungeon = args.state.dungeon
     hero = Hero.new(args.state.dungeon_entrance_x, args.state.dungeon_entrance_y)
     hero.level = 0
+    args.state.hero = hero
     args.state.entities << hero
   end
 end
