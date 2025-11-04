@@ -7,6 +7,7 @@ require 'app/lib/entity'
 require 'app/lib/hero'
 require 'app/lib/color_conversion'
 require 'app/lib/leaves'
+require 'app/lib/sound_fx'
 
 def boot args
   args.state = {}
@@ -22,12 +23,26 @@ def reset args
 end
 
 def tick args
+  args.state.scene ||= :gameplay
+  case args.state.scene
+  when :gameplay
+    gameplay_tick args
+  when :staircase
+    staircase_tick args
+  end
+end
+
+def gameplay_tick args
   GUI.handle_input args
   GUI.draw_background args
   GUI.draw_tiles args
   GUI.update_entity_animations args
   GUI.draw_entities args
-  GUI.draw_hud args
 end
 
-GTK.reset
+def staircase_tick args
+  GUI.draw_background args
+  GUI.draw_tiles args
+  GUI.draw_entities args
+  GUI.staircase_animation args
+end

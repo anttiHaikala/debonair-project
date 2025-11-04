@@ -11,6 +11,33 @@ class GUI
   @@hero_locked = false
   @@just_used_staircase = false
 
+  def self.staircase_animation args
+    duration_in_frames = 100
+    cutoff = 50
+    @@staircase_animation_frame ||= 0
+    if @@staircase_animation_frame == 0
+      SoundFX.play_sound(args, :staircase)
+    end
+    @@staircase_animation_frame += 1
+    if @@staircase_animation_frame < cutoff
+      alpha = @@staircase_animation_frame.to_f / cutoff.to_f
+    else
+      alpha = 1.0 - (@@staircase_animation_frame.to_f - cutoff.to_f) / (duration_in_frames.to_f - cutoff.to_f)
+    end
+    alpha = (alpha * 255).to_i.clamp(0, 255)
+    args.outputs.primitives << { x: 0, y: 0, w: 1280, h: 720, path: :solid, r: 0, g: 0, b: 0, a: alpha, blendmode_enum: 1 }
+    if @@staircase_animation_frame > cutoff && args.state.staircase
+      # actually change level now
+      args.state.hero.level += (args.state.staircase == :down ? 1 : -1)
+      args.state.current_level = args.state.hero.level
+      args.state.staircase = nil
+    end
+    if @@staircase_animation_frame >= duration_in_frames
+      args.state.scene = :gameplay
+      @@staircase_animation_frame = 0
+    end
+  end
+
   def self.handle_input args
 
     unless GUI.is_hero_locked? # already moving
@@ -153,6 +180,7 @@ class GUI
   def self.lock_hero
     @@hero_locked = true
     @@just_used_staircase = false
+    SoundFX.play_sound($gtk.args, :walk)
   end
 
   def self.unlock_hero(args)
@@ -164,17 +192,17 @@ class GUI
     dungeon = args.state.dungeon
     tile = dungeon.levels[level].tiles[y][x]
     unless @@just_used_staircase
-      if tile == :staircase_down
+      if tile == :staircase_down  
         if level < dungeon.levels.size - 1
-          args.state.current_level += 1
-          args.state.hero.level += 1
+          args.state.staircase = :down
           @@just_used_staircase = true
+          args.state.scene = :staircase
         end
       elsif tile == :staircase_up
         if level > 0
-          args.state.current_level -= 1
-          args.state.hero.level -= 1
+          args.state.staircase = :up
           @@just_used_staircase = true
+          args.state.scene = :staircase
         end
       end
     end
