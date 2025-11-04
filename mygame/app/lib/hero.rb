@@ -3,6 +3,9 @@ class Hero < Entity
     super(x, y)
     @kind = :pc
     @role = Hero.roles.sample
+    @species = Hero.species.sample
+    @trait = Hero.traits.sample
+    @age = Hero.age.sample
   end
 
   def self.roles
@@ -21,4 +24,45 @@ class Hero < Entity
       :warrior, # strength and bravery
     ]
   end
+
+  def self.species
+    [
+      :human,
+      :elf,
+      :dwarf,
+      :orc,
+      :gnome,
+      :halfling,
+      :dark_elf,
+      :goblin,
+      :troll,
+      :duck # glorantha style
+    ]
+  end
+
+  def self.age
+    [
+      :teen,
+      :adult,
+      :elder
+    ]
+  end
+
+  def self.traits
+    [
+      :undead,
+      :mutant,
+      :cyborg,      
+      :alien,
+      :robot,
+      :vampire,
+      :werewolf,
+      :zombie,
+      :demon,
+      :angel
+    ]
+  end
+
+
+
 end
