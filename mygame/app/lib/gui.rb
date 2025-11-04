@@ -1,4 +1,4 @@
-
+$debug = true
 $zoom = 0.7
 $pan_x = 0.0
 $pan_y = 0.0
@@ -10,6 +10,9 @@ class GUI
 
   @@hero_locked = false
   @@just_used_staircase = false
+  @@input_cooldown = 0
+  @@moving_frames = 0
+  @@standing_still_frames = 0
 
   def self.staircase_animation args
     duration_in_frames = 100
@@ -39,18 +42,35 @@ class GUI
   end
 
   def self.handle_input args
-
+    $input_frames ||= 0
+    $input_frames += 1
     unless GUI.is_hero_locked? # already moving
+      # add a slight cooldown to prevent rapid movement
+      @@input_cooldown ||= 0
+      if @@input_cooldown > 0
+        @@input_cooldown -= 1
+        @@moving_frames += 1
+      else
       # player movement
-      if args.inputs.keyboard.key_down.up
-        GUI.move_player(0, 1, args)
-      elsif args.inputs.keyboard.key_down.down
-        GUI.move_player(0, -1, args)
-      elsif args.inputs.keyboard.key_down.left
-        GUI.move_player(-1, 0, args)
-      elsif args.inputs.keyboard.key_down.right
-        GUI.move_player(1, 0, args)
+        if args.inputs.up
+          GUI.move_player(0, 1, args)
+        elsif args.inputs.down
+          GUI.move_player(0, -1, args)
+        elsif args.inputs.left
+          GUI.move_player(-1, 0, args)
+        elsif args.inputs.right
+          GUI.move_player(1, 0, args)
+        else
+          # standing still
+          @@standing_still_frames += 1
+          @@moving_frames = 0
+        end
       end
+
+    else
+      # hero is locked, ignore input
+      @@moving_frames += 1
+      @@standing_still_frames = 0
     end
 
     # zooming with mouse wheel
@@ -115,7 +135,29 @@ class GUI
   end
 
   def self.draw_hud args
-
+    hero = args.state.hero
+    args.outputs.labels << {
+      x: 10,
+      y: 700,
+      text: "#{hero.name}, a #{hero.age} #{hero.trait} #{hero.species} #{hero.role}",
+      size_enum: 1,
+      r: 255,
+      g: 255,
+      b: 255,
+      a: 255
+    }
+    if $debug
+      args.outputs.labels << {
+        x: 10,
+        y: 680,
+        text: "ticks: #{$args.state.tick_count} input_f #{$input_frames} standing_f: #{@@standing_still_frames}, moving_f: #{@@moving_frames}, input_cooldown: #{@@input_cooldown}, hero_locked: #{@@hero_locked}",
+        size_enum: 1,
+        r: 255,
+        g: 255,
+        b: 255,
+        a: 255
+      }
+    end
   end
 
   def self.draw_background args
@@ -124,6 +166,9 @@ class GUI
 
   def self.move_player dx, dy, args
     hero = args.state.hero
+    @@standing_still_frames = 0
+    @@moving_frames += 1
+    # boundary checks
     if hero.x + dx < 0 || hero.y + dy < 0
       return
     end
@@ -180,6 +225,16 @@ class GUI
   def self.lock_hero
     @@hero_locked = true
     @@just_used_staircase = false
+    # input cooldown depends on moving frames
+    if @@moving_frames > 200
+      @@input_cooldown = 2 # frames
+    elsif @@moving_frames > 60
+      @@input_cooldown = 6 # frames
+    elsif @@moving_frames > 20
+      @@input_cooldown = 10 # frames
+    else
+      @@input_cooldown = 20 # frames
+    end    
     SoundFX.play_sound($gtk.args, :walk)
   end
 

@@ -8,6 +8,7 @@ require 'app/lib/hero'
 require 'app/lib/color_conversion'
 require 'app/lib/leaves'
 require 'app/lib/sound_fx'
+require 'app/lib/utils'
 
 def boot args
   args.state = {}
@@ -38,6 +39,7 @@ def gameplay_tick args
   GUI.draw_tiles args
   GUI.update_entity_animations args
   GUI.draw_entities args
+  GUI.draw_hud args
 end
 
 def staircase_tick args
@@ -45,4 +47,5 @@ def staircase_tick args
   GUI.draw_tiles args
   GUI.draw_entities args
   GUI.staircase_animation args
+  GUI.draw_hud args
 end

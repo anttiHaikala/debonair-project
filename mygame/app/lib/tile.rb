@@ -1,6 +1,7 @@
 class Tile
 
   attr_accessor :type, :hue, :mossiness
+  @@tile_memory_per_level = []
 
   def self.tile_types
     [:floor, :wall, :water, :staircase_up, :staircase_down, :chasm]
@@ -28,20 +29,53 @@ class Tile
     y_offset = $pan_y + (720 - (level_height * tile_size)) / 2
     hue = level.floor_hue
 
+    # determine visible tiles (line of sight)
+    tile_visibility = []
+    for y in level.tiles.each_index
+      tile_visibility[y] ||= []
+      for x in level.tiles[y].each_index
+        if Utils::line_of_sight?(args.state.hero.x, args.state.hero.y, x, y, level)
+          tile_visibility[y][x] = true
+        else
+          tile_visibility[y][x] = false
+        end
+      end
+    end
+
+    @@tile_memory_per_level[args.state[:current_level]] ||= []
+    tile_memory = @@tile_memory_per_level[args.state[:current_level]] 
+
+    # update memory with currently visible tiles
+    for y in level.tiles.each_index
+      tile_memory[y] ||= []
+      for x in level.tiles[y].each_index
+        if tile_visibility[y][x]
+          tile_memory[y][x] = level.tiles[y][x]
+        end
+      end
+    end
+
     for y in level.tiles.each_index
       for x in level.tiles[y].each_index
-        Tile.draw(level.tiles[y][x], y, x, tile_size, x_offset, y_offset, hue, args)
+        if tile_visibility[y][x]
+          tile = level.tiles[y][x]
+        else
+          tile = tile_memory[y][x] || :unknown
+        end
+        Tile.draw(tile, y, x, tile_size, x_offset, y_offset, hue, tile_visibility[y][x], args)
       end
     end
   end
 
-  def self.draw(tile, y, x, tile_size, x_offset, y_offset, hue, args)
+  def self.draw(tile, y, x, tile_size, x_offset, y_offset, hue, visible, args)
     # base color
     color = case tile
       when :wall
         Color.hsl_to_rgb(hue, 10, 10)
       when :water
         { r: 0, g: 0, b: 255 }
+      when :unknown
+        { r: 0, g: 0, b: 0 }
       else
         Color.hsl_to_rgb(hue, 80, 30)  
       end

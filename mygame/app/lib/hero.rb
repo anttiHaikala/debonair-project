@@ -1,4 +1,7 @@
 class Hero < Entity
+
+  attr_reader :role, :species, :trait, :age, :name
+
   def initialize(x, y)
     super(x, y)
     @kind = :pc
@@ -6,6 +9,7 @@ class Hero < Entity
     @species = Hero.species.sample
     @trait = Hero.traits.sample
     @age = Hero.age.sample
+    @name = 'Jaakko'
   end
 
   def self.roles

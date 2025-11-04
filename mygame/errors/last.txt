@@ -1,19 +1,26 @@
 * EXCEPTION:
-* ERROR - :tiles method missing on ~NilClass~.
+* ERROR - :get_line method missing on ~Module~.
 
-#+begin_src ~NilClass#inspect~
-nil
-#+end_src ~NilClass#inspect~
+#+begin_src ~Module#inspect~
+Utils
+#+end_src ~Module#inspect~
 
-
+** Did you mean?
+Here's a list of methods that kind of look like :get_line.
+*** :line_of_sight?
 
 The method named
-  :tiles
-doesn't exist on [NilClass, NilClassFalseClass].
+  :get_line
+with args
+  [4, 0, 9, 0]
+doesn't exist on [Module, Utils].
 
 (suggestions above)
 ** Backtrace:
-*** app/lib/tile.rb:24:in draw_tiles
-*** app/lib/GUI.rb:85:in draw_tiles
-*** app/main.rb:45:in staircase_tick
-*** app/main.rb:31:in tick
+*** app/lib/utils.rb:4:in line_of_sight?
+*** app/lib/tile.rb:37:in draw_tiles
+*** app/lib/tile.rb:36:in draw_tiles
+*** app/lib/tile.rb:34:in draw_tiles
+*** app/lib/GUI.rb:104:in draw_tiles
+*** app/main.rb:39:in gameplay_tick
+*** app/main.rb:30:in tick
