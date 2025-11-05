@@ -15,6 +15,22 @@ class GUI
   @@standing_still_frames = 0
   @@tiles_observed = false
 
+  def self.standing_still_frames
+    return @@standing_still_frames
+  end
+
+  def self.moving_frames
+    return @@moving_frames
+  end
+
+  def self.input_cooldown
+    return @@input_cooldown
+  end
+
+  def self.hero_locked
+    return @@hero_locked
+  end
+
   def self.staircase_animation args
     duration_in_frames = 100
     cutoff = 50
@@ -138,33 +154,6 @@ class GUI
     end
   end
 
-  def self.draw_hud args
-    hero = args.state.hero
-    args.outputs.labels << {
-      x: 10,
-      y: 700,
-      text: "#{hero.name}, a #{hero.age.to_s.gsub('adult','')} #{hero.trait} #{hero.species} #{hero.role}".gsub('  ',' '),
-      size_enum: 1,
-      r: 255,
-      g: 255,
-      b: 255,
-      a: 255
-    }
-    if $debug
-      args.outputs.labels << {
-        x: 10,
-        y: 30,
-        text: "ticks: #{$args.state.tick_count} input_f #{$input_frames} standing_f: #{@@standing_still_frames}, moving_f: #{@@moving_frames}, input_cooldown: #{@@input_cooldown}, hero_locked: #{@@hero_locked}",
-        size_enum: 0,
-
-        r: 255,
-        g: 255,
-        b: 255,
-        a: 255
-      }
-    end
-  end
-
   def self.draw_background args
     args.outputs.solids << { x: 0, y: 0, w: 1280, h: 720, path: :solid, r: 0, g: 0, b: 0, a: 255 }
   end
@@ -236,7 +225,7 @@ class GUI
     elsif @@moving_frames > 60
       @@input_cooldown = 4 # frames
     elsif @@moving_frames > 20
-      @@input_cooldown = 6 # frames
+      @@input_cooldown = 4 # frames
     else
       @@input_cooldown = 8 # frames
     end    

@@ -79,15 +79,17 @@ class Tile
 
   def self.draw(tile, y, x, tile_size, x_offset, y_offset, hue, visible, args)
     # base color
+    saturation_modifier = visible ? 1.0 : 0.3
+    lightness_modifier = visible ? 1.0 : 0.4
     color = case tile
       when :wall
-        Color.hsl_to_rgb(hue, 20, 40)
+        Color.hsl_to_rgb(hue, 80 * saturation_modifier, 20 * lightness_modifier)
       when :water
         { r: 0, g: 0, b: 255 }
       when :unknown
         { r: 0, g: 0, b: 0 }
       else
-        Color.hsl_to_rgb(hue, 80, 30)  
+        Color.hsl_to_rgb(hue, 80 * saturation_modifier, 30 * lightness_modifier)
       end
     args.outputs.solids << { x: x_offset + x * tile_size,
       y: y_offset + y * tile_size,
@@ -101,7 +103,7 @@ class Tile
     # floor decoration
     if tile == :floor
       # highlight square
-      c = Color.hsl_to_rgb(hue, 80, 40)  
+      c = Color.hsl_to_rgb(hue, 80 * saturation_modifier, 40 * lightness_modifier)
       margin = tile_size * 0.075
       args.outputs.solids << { x: x_offset + margin + x * tile_size,
         y: y_offset + margin + y * tile_size,
@@ -116,9 +118,9 @@ class Tile
     # wall decoration
     if tile == :wall
       # highlight square
-      c = Color.hsl_to_rgb(hue, 20, 40)  
+      c = Color.hsl_to_rgb(hue, 80 * saturation_modifier, 10 * lightness_modifier)
       margin = tile_size * 0.075
-      args.outputs.borders << { x: x_offset + margin + x * tile_size,
+      args.outputs.solids << { x: x_offset + margin + x * tile_size,
         y: y_offset + margin + y * tile_size,
         w: tile_size - margin * 2,
         h: tile_size - margin * 2,
@@ -130,7 +132,7 @@ class Tile
     end
     unless Tile.occupied?(x, y, args)
       # special tiles
-      c = Color.hsl_to_rgb(hue, 80, 80)  
+      c = Color.hsl_to_rgb(hue, 80 * saturation_modifier, 80 * lightness_modifier)
       if tile == :staircase_up
         args.outputs.sprites << {
           x: x_offset + x * tile_size,

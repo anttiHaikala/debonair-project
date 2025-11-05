@@ -1,0 +1,49 @@
+class HUD
+    def self.draw args
+      hero = args.state.hero
+      args.outputs.labels << {
+        x: 10,
+        y: 40,
+        text: "#{hero.name}, a #{hero.age.to_s.gsub('adult','')} #{hero.trait} #{hero.species} #{hero.role}".gsub('  ',' ').gsub('_',''),
+        size_enum: 1,
+        r: 255,
+        g: 255,
+        b: 255,
+        a: 255
+      }
+      seed = args.state.seed || "unknown"
+      args.outputs.labels << {
+        x: 700,
+        y: 40,
+        text: "Seed: #{seed}",
+        size_enum: 0,
+        r: 255,
+        g: 255,
+        b: 255,
+        a: 255
+      }
+      if $debug
+        args.outputs.labels << {
+          x: 10,
+          y: 130,
+          text: "ticks: #{$args.state.tick_count} input_f #{$input_frames} standing_f: #{GUI.standing_still_frames}, moving_f: #{GUI.moving_frames}, input_cooldown: #{GUI.input_cooldown}, hero_locked: #{GUI.hero_locked}",
+          size_enum: 0,
+
+          r: 255,
+          g: 255,
+          b: 255,
+          a: 255
+        }
+        args.outputs.labels << {
+          x: 10,
+          y: 160,
+          text: "pos #{hero.x}, #{hero.y} level #{hero.level} tiletype: #{args.state.dungeon.levels[hero.level].tiles[hero.y][hero.x]}",
+          size_enum: 0,
+
+          r: 255,
+          g: 255,
+          b: 255,
+          a: 255
+        }    end
+    end
+end

@@ -4,12 +4,12 @@ class SoundFX
     when :walk
       variation = Numeric.rand(1..6)
       args.outputs.audio[:walk] = {
-        path: "sounds/walk-#{variation}.mp3",
+        input: "sounds/walk-#{variation}.mp3",
         volume: 0.5
       }
     when :staircase
       args.outputs.audio[:staircase] = {
-        path: "sounds/staircase.mp3",
+        input: "sounds/staircase.mp3",
         volume: 0.5
       }
     else

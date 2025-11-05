@@ -9,9 +9,14 @@ require 'app/lib/color_conversion'
 require 'app/lib/leaves'
 require 'app/lib/sound_fx'
 require 'app/lib/utils'
+require 'app/lib/hud'
+require 'app/lib/seeded_random'
 
 def boot args
   args.state = {}
+  Architect.create_seed(args)
+  Architect.set_seed(args, 'cute_bdfattle_below_the_dark_swamp') # for testing purposes
+  Architect.use_seed(args)
   Architect.instance.setup({})
   Architect.instance.architect_dungeon(args)
   args.state.current_level = 0
@@ -39,7 +44,7 @@ def gameplay_tick args
   GUI.draw_tiles args
   GUI.update_entity_animations args
   GUI.draw_entities args
-  GUI.draw_hud args
+  HUD.draw args
 end
 
 def staircase_tick args
@@ -47,5 +52,5 @@ def staircase_tick args
   GUI.draw_tiles args
   GUI.draw_entities args
   GUI.staircase_animation args
-  GUI.draw_hud args
+  HUD.draw args
 end

@@ -45,8 +45,8 @@ class Leaves
       new_leaf = new(kind)
       alkaloid = alkaloid_lottery.pop
       flavonoid = flavonoid_lottery.pop
-      new_leaf.alkaloid_scores[alkaloid] = Numeric.rand(1..3) if alkaloid
-      new_leaf.flavonoid_scores[flavonoid] = Numeric.rand(1..3) if flavonoid
+      new_leaf.alkaloid_scores[alkaloid] = args.state.rng.nxt_int(1,3) if alkaloid
+      new_leaf.flavonoid_scores[flavonoid] = args.state.rng.nxt_int(1,3) if flavonoid
       new_leaf.rarity = :common
       args.state.leaf_kinds << new_leaf
     end
@@ -56,13 +56,13 @@ class Leaves
       new_leaf = new(kind)
       alkaloid = alkaloid_lottery.pop
       flavonoid = flavonoid_lottery.pop
-      new_leaf.alkaloid_scores[alkaloid] = Numeric.rand(1..3) if alkaloid
-      new_leaf.flavonoid_scores[flavonoid] = Numeric.rand(1..3) if flavonoid
+      new_leaf.alkaloid_scores[alkaloid] = args.state.rng.nxt_int(1,3) if alkaloid
+      new_leaf.flavonoid_scores[flavonoid] = args.state.rng.nxt_int(1,3) if flavonoid
       new_leaf.rarity = :rare
       secondary_alkaloid = self.alkaloids.sample
-      new_leaf.alkaloid_scores[secondary_alkaloid] = Numeric.rand(1..3)
+      new_leaf.alkaloid_scores[secondary_alkaloid] = args.state.rng.nxt_int(1,3)
       secondary_flavonoid = self.flavonoids.sample
-      new_leaf.flavonoid_scores[secondary_flavonoid] = Numeric.rand(1..3)
+      new_leaf.flavonoid_scores[secondary_flavonoid] = args.state.rng.nxt_int(1,3)
       args.state.leaf_kinds << new_leaf
     end
   end
