@@ -2,6 +2,7 @@ class Tile
 
   attr_accessor :type, :hue, :mossiness
   @@tile_memory_per_level = []
+  @@tile_visibility_per_level = []
 
   def self.tile_types
     [:floor, :wall, :water, :staircase_up, :staircase_down, :chasm]
@@ -16,21 +17,12 @@ class Tile
     return false
   end
 
-  def self.draw_tiles args
-    if args.state[:dungeon].nil?
-      return
-    end
-    dungeon = args.state[:dungeon]
-    level = dungeon.levels[args.state[:current_level]]
-    level_height = dungeon.levels[args.state[:current_level]].tiles.size
-    level_width = dungeon.levels[args.state[:current_level]].tiles[0].size
-    tile_size = 40 * $zoom
-    x_offset = $pan_x + (1280 - (level_width * tile_size)) / 2
-    y_offset = $pan_y + (720 - (level_height * tile_size)) / 2
-    hue = level.floor_hue
+  def self.observe_tiles args
+    dungeon = args.state.dungeon
+    level = dungeon.levels[args.state.current_level]
 
     # determine visible tiles (line of sight)
-    tile_visibility = []
+    tile_visibility = @@tile_visibility_per_level[args.state.current_level] ||= []
     for y in level.tiles.each_index
       tile_visibility[y] ||= []
       for x in level.tiles[y].each_index
@@ -41,11 +33,12 @@ class Tile
         end
       end
     end
-
-    @@tile_memory_per_level[args.state[:current_level]] ||= []
-    tile_memory = @@tile_memory_per_level[args.state[:current_level]] 
+    @@tile_visibility_per_level[args.state.current_level] = tile_visibility
 
     # update memory with currently visible tiles
+    @@tile_memory_per_level[args.state.current_level] ||= []
+    tile_memory = @@tile_memory_per_level[args.state.current_level] 
+
     for y in level.tiles.each_index
       tile_memory[y] ||= []
       for x in level.tiles[y].each_index
@@ -55,8 +48,25 @@ class Tile
       end
     end
 
+    @@tile_memory_per_level[args.state.current_level] = tile_memory
+  end
+
+  def self.draw_tiles args
+    dungeon = args.state.dungeon
+    level = dungeon.levels[args.state.current_level]
+    level_height = dungeon.levels[args.state.current_level].tiles.size
+    level_width = dungeon.levels[args.state.current_level].tiles[0].size
+    tile_size = 40 * $zoom
+    x_offset = $pan_x + (1280 - (level_width * tile_size)) / 2
+    y_offset = $pan_y + (720 - (level_height * tile_size)) / 2
+    hue = level.floor_hue
+
+    tile_visibility = @@tile_visibility_per_level[args.state.current_level] || []
+    tile_memory = @@tile_memory_per_level[args.state.current_level] || []
+
     for y in level.tiles.each_index
       for x in level.tiles[y].each_index
+        tile_memory[y] ||= []
         if tile_visibility[y][x]
           tile = level.tiles[y][x]
         else
@@ -71,7 +81,7 @@ class Tile
     # base color
     color = case tile
       when :wall
-        Color.hsl_to_rgb(hue, 10, 10)
+        Color.hsl_to_rgb(hue, 20, 40)
       when :water
         { r: 0, g: 0, b: 255 }
       when :unknown
@@ -94,6 +104,21 @@ class Tile
       c = Color.hsl_to_rgb(hue, 80, 40)  
       margin = tile_size * 0.075
       args.outputs.solids << { x: x_offset + margin + x * tile_size,
+        y: y_offset + margin + y * tile_size,
+        w: tile_size - margin * 2,
+        h: tile_size - margin * 2,
+        path: :solid,
+        r: c[:r],
+        g: c[:g],
+        b: c[:b] 
+      }
+    end
+    # wall decoration
+    if tile == :wall
+      # highlight square
+      c = Color.hsl_to_rgb(hue, 20, 40)  
+      margin = tile_size * 0.075
+      args.outputs.borders << { x: x_offset + margin + x * tile_size,
         y: y_offset + margin + y * tile_size,
         w: tile_size - margin * 2,
         h: tile_size - margin * 2,

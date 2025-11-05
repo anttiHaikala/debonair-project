@@ -1,4 +1,4 @@
-$debug = true
+$debug = false
 $zoom = 0.7
 $pan_x = 0.0
 $pan_y = 0.0
@@ -13,6 +13,7 @@ class GUI
   @@input_cooldown = 0
   @@moving_frames = 0
   @@standing_still_frames = 0
+  @@tiles_observed = false
 
   def self.staircase_animation args
     duration_in_frames = 100
@@ -34,6 +35,7 @@ class GUI
       args.state.hero.level += (args.state.staircase == :down ? 1 : -1)
       args.state.current_level = args.state.hero.level
       args.state.staircase = nil
+      @@tiles_observed = false
     end
     if @@staircase_animation_frame >= duration_in_frames
       args.state.scene = :gameplay
@@ -101,6 +103,8 @@ class GUI
   end
 
   def self.draw_tiles args
+    Tile.observe_tiles args unless @@tiles_observed
+    @@tiles_observed = true
     Tile.draw_tiles args
   end
 
@@ -139,7 +143,7 @@ class GUI
     args.outputs.labels << {
       x: 10,
       y: 700,
-      text: "#{hero.name}, a #{hero.age} #{hero.trait} #{hero.species} #{hero.role}",
+      text: "#{hero.name}, a #{hero.age.to_s.gsub('adult','')} #{hero.trait} #{hero.species} #{hero.role}".gsub('  ',' '),
       size_enum: 1,
       r: 255,
       g: 255,
@@ -149,9 +153,10 @@ class GUI
     if $debug
       args.outputs.labels << {
         x: 10,
-        y: 680,
+        y: 30,
         text: "ticks: #{$args.state.tick_count} input_f #{$input_frames} standing_f: #{@@standing_still_frames}, moving_f: #{@@moving_frames}, input_cooldown: #{@@input_cooldown}, hero_locked: #{@@hero_locked}",
-        size_enum: 1,
+        size_enum: 0,
+
         r: 255,
         g: 255,
         b: 255,
@@ -229,17 +234,18 @@ class GUI
     if @@moving_frames > 200
       @@input_cooldown = 2 # frames
     elsif @@moving_frames > 60
-      @@input_cooldown = 6 # frames
+      @@input_cooldown = 4 # frames
     elsif @@moving_frames > 20
-      @@input_cooldown = 10 # frames
+      @@input_cooldown = 6 # frames
     else
-      @@input_cooldown = 20 # frames
+      @@input_cooldown = 8 # frames
     end    
     SoundFX.play_sound($gtk.args, :walk)
   end
 
   def self.unlock_hero(args)
     @@hero_locked = false
+    @@tiles_observed = false
     # check if we stepped on something?
     x = args.state.hero.x
     y = args.state.hero.y
