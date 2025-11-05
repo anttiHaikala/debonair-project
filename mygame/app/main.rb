@@ -15,7 +15,7 @@ require 'app/lib/seeded_random'
 def boot args
   args.state = {}
   Architect.create_seed(args)
-  Architect.set_seed(args, 'cute_bdfattle_below_the_dark_swamp') # for testing purposes
+  Architect.set_seed(args, 'cute_ffattle_below_the_dark_swamp') # for testing purposes
   Architect.use_seed(args)
   Architect.instance.setup({})
   Architect.instance.architect_dungeon(args)

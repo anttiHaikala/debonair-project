@@ -1,10 +1,12 @@
 class Room
-  attr_accessor :x, :y, :w, :h
+  attr_accessor :x, :y, :w, :h, :center_x, :center_y
   def initialize(x, y, w, h)
     @x = x
     @y = y
     @w = w
     @h = h
+    @center_x = (x + w / 2).to_i
+    @center_y = (y + h / 2).to_i
   end
 
   def intersects?(other)
@@ -35,11 +37,18 @@ class Level
     end
     # Code to create rooms in the level
     room_target = Numeric.rand(5..10)
+    safety = 0  
     while @rooms.size < room_target do
+      safety += 1
+      if safety > 500
+        printf "Could not create enough rooms after 500 tries, created %d out of %d\n" % [@rooms.size, room_target]
+        break
+      end
       width = Numeric.rand(3..7)
       height = Numeric.rand(3..7)
-      x = rand(@tiles[0].size - width)
-      y = rand(@tiles.size - height)
+      buffer = 1
+      x = rand(@tiles[0].size - width - buffer*2) + buffer
+      y = rand(@tiles.size - height - buffer*2) + buffer
       new_room = Room.new(x, y, width, height)
       if rooms.none? { |room| room.intersects?(new_room) }
         rooms << new_room
@@ -48,20 +57,40 @@ class Level
     @rooms.each do |room|
       for i in room.y...(room.y + room.h)
         for j in room.x...(room.x + room.w)
-          @tiles[i][j] = :floor
+          @tiles[i][j] = :floor if @tiles[i][j] == :wall
         end
       end
     end
   end
   
+  def dig_corridor(args, x1, y1, x2, y2)
+    current_x = x1
+    current_y = y1
+    while current_x != x2 || current_y != y2 do
+      @tiles[current_y][current_x] = :floor if @tiles[current_y][current_x] == :wall
+      if current_x < x2
+        current_x += 1
+      elsif current_x > x2
+        current_x -= 1
+      elsif current_y < y2
+        current_y += 1
+      elsif current_y > y2
+        current_y -= 1
+      end
+    end
+      @tiles[current_y][current_x] = :floor if @tiles[current_y][current_x] == :wall
+  end
 
   def create_corridors(args)
     # Code to create corridors between rooms
     # 
-    # every room has 1 to 3 corridors to other rooms
+    # first let's dig a corridor to exit
+
+    #
+    # every room has 1 to 2 corridors to other rooms
     # every corridor leads to a random point in another room
     @rooms.each do |room|
-      printf "Creating corridors for room at (%d,%d) size (%d,%d)\n" % [room.x, room.y, room.w, room.h]
+      #printf "Creating corridors for room at (%d,%d) size (%d,%d)\n" % [room.x, room.y, room.w, room.h]
       corridor_target = 1 || Numeric.rand(1..2)
       corridors = 0
       while corridors < corridor_target do
@@ -74,13 +103,13 @@ class Level
         # create a corridor from center of room to target_x, target_y
         current_x = room.x + (room.w / 2).to_i
         current_y = room.y + (room.h / 2).to_i
-        printf "  Corridor from (%d,%d) to (%d,%d)\n" % [current_x, current_y, target_x, target_y]
+        #printf "  Corridor from (%d,%d) to (%d,%d)\n" % [current_x, current_y, target_x, target_y]
         safety = 0
         horizontal_mode = [true, false].sample
         previous_x = current_x
         previous_y = current_y
         while current_x != target_x || current_y != target_y do
-          printf "    At (%d,%d)\n" % [current_x, current_y]
+          #printf "    At (%d,%d)\n" % [current_x, current_y]
           safety += 1
           if safety > 100 then
             printf "    Corridor creation aborted due to safety limit.\n"
@@ -106,7 +135,7 @@ class Level
               current_y -= 1
             end
           end
-          @tiles[current_y][current_x] = :floor
+          @tiles[current_y][current_x] = :floor if @tiles[current_y][current_x] == :wall
         end
         corridors += 1
       end

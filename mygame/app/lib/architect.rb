@@ -6,10 +6,9 @@ class Architect
 
   def setup(settings)
     @settings ||= {}
-    @settings[:levels] ||= 10
-    @settings[:level_width] ||= 36  
-    @settings[:level_height] ||= 24
-
+    @settings[:levels] ||= 3
+    @settings[:level_width] ||= 20   
+    @settings[:level_height] ||= 20
   end
 
   def self.create_seed(args)
@@ -63,23 +62,61 @@ class Architect
     staircase_y = rand(@settings[:level_height])
     args.state.dungeon_entrance_x = staircase_x
     args.state.dungeon_entrance_y = staircase_y
+    args.state.dungeon = dungeon
 
-    for i in 0..(@settings[:levels] - 1)
-      dungeon.levels[i] = create_level(args, i, :hack)
-      dungeon.levels[i].create_rooms(args)
-      dungeon.levels[i].create_corridors(args)
+    for depth in 0..(@settings[:levels] - 1)
+      level = create_level(args, depth, :hack)
+
+      dungeon.levels[depth] = level
 
       # add staircase up (entrance)
-      dungeon.levels[i].tiles[staircase_y][staircase_x] = :staircase_up
+      level.tiles[staircase_y][staircase_x] = :staircase_up
+      printf "Placed staircase up at (%d,%d) on level %d\n" % [staircase_x, staircase_y, depth]
+      
+      should_be_same = args.state.dungeon.levels[depth].tiles[staircase_y][staircase_x]
+
+      printf "Verified staircase up at (%d,%d) on level %d is %s\n" % [staircase_x, staircase_y, depth, should_be_same.to_s]  
+
+      # add rooms and corridors
+      level.create_rooms(args)
+      level.create_corridors(args)
+      
+      # dig corridor from staircase to entry room
+      entry_room = level.rooms.sample
+      level.dig_corridor(args, staircase_x, staircase_y, entry_room.center_x, entry_room.center_y)
 
 
-      # add staircase down
-      # sanity check to avoid overlapping staircases and staircases inside walls
-      while dungeon.levels[i].tiles[staircase_y][staircase_x] != :floor do
-        staircase_x = rand(@settings[:level_width])
-        staircase_y = rand(@settings[:level_height])
+      # finally place staircase down in a room
+      if depth < (@settings[:levels] - 1)
+        exit_room = level.rooms.sample
+        staircase_x = Numeric.rand(exit_room.x...(exit_room.x + exit_room.w)).to_i
+        staircase_y = Numeric.rand(exit_room.y...(exit_room.y + exit_room.h)).to_i        
+        safety = 0
+        while level.tiles[staircase_y][staircase_x] != :floor do
+          safety += 1
+          if safety > 1000
+            printf "Could not place staircase down after 1000 tries, placing in center of exit room\n"
+            staircase_x = exit_room.x + (exit_room.w / 2).to_i
+            staircase_y = exit_room.y + (exit_room.h / 2).to_i
+            break
+          end
+          staircase_x = Numeric.rand(exit_room.x...(exit_room.x + exit_room.w)).to_i
+          staircase_y = Numeric.rand(exit_room.y...(exit_room.y + exit_room.h)).to_i
+        end
+        level.tiles[staircase_y][staircase_x] = :staircase_down
+        printf "Placed staircase down at (%d,%d) on level %d\n" % [staircase_x, staircase_y, depth]
+      else
+        # last level has no staircase down
+        # it has the amulet!!!
+        # place amulet in a random room
+        # pick a room
+        # pick a position in the room
+        amulet_room = level.rooms.sample
+        amulet_x = Numeric.rand(amulet_room.x...(amulet_room.x + amulet_room.w)).to_i
+        amulet_y = Numeric.rand(amulet_room.y...(amulet_room.y + amulet_room.h)).to_i
+        level.tiles[amulet_y][amulet_x] = :water
       end
-      dungeon.levels[i].tiles[staircase_y][staircase_x] = :staircase_down if i < (@settings[:levels] - 1) 
+
     end
     args.state[:dungeon] = dungeon
   end
