@@ -1,3 +1,14 @@
+$debug = false
+$zoom = 0.7
+$pan_x = 0.0
+$pan_y = 0.0
+$zoom_speed = 0.0
+$max_zoom = 3.0
+$min_zoom = 0.2
+$tile_size = 40
+$gui_width = 1280
+$gui_height = 720
+
 require 'app/lib/architect'
 require 'app/lib/dungeon'
 require 'app/lib/level'
@@ -15,7 +26,7 @@ require 'app/lib/seeded_random'
 def boot args
   args.state = {}
   Architect.create_seed(args)
-  Architect.set_seed(args, 'cute_ffattle_below_the_dark_swamp') # for testing purposes
+  Architect.set_seed(args, 'cute_fandango_below_the_dark_swamp') # for testing purposes
   Architect.use_seed(args)
   Architect.instance.setup({})
   Architect.instance.architect_dungeon(args)
@@ -23,6 +34,8 @@ def boot args
   printf "Boot complete.\n"
   printf "Dungeon has %d levels.\n" % args.state.dungeon.levels.size
   printf "Dungeon has %d entities.\n" % args.state.entities.size
+
+  GTK.ffi_misc.add_controller_config "03000000c82d00001b30000001000000,8BitDo Ultimate 2C,a:b0,b:b1,back:b10,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b12,leftshoulder:b6,leftstick:b13,lefttrigger:a5,leftx:a0,lefty:a1,paddle1:b5,paddle2:b2,rightshoulder:b7,rightstick:b14,righttrigger:a4,rightx:a2,righty:a3,start:b11,x:b3,y:b4,platform:Mac OS X,"
 end
 
 def reset args
@@ -44,6 +57,7 @@ def gameplay_tick args
   GUI.draw_tiles args
   GUI.update_entity_animations args
   GUI.draw_entities args
+  GUI.pan_to_player args
   HUD.draw args
 end
 
@@ -52,5 +66,6 @@ def staircase_tick args
   GUI.draw_tiles args
   GUI.draw_entities args
   GUI.staircase_animation args
+  GUI.pan_to_player args
   HUD.draw args
 end

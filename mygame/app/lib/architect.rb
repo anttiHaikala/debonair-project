@@ -7,8 +7,8 @@ class Architect
   def setup(settings)
     @settings ||= {}
     @settings[:levels] ||= 3
-    @settings[:level_width] ||= 20   
-    @settings[:level_height] ||= 20
+    @settings[:level_width] ||= 80   
+    @settings[:level_height] ||= 40
   end
 
   def self.create_seed(args)
@@ -70,21 +70,19 @@ class Architect
       dungeon.levels[depth] = level
 
       # add staircase up (entrance)
+      previous_tile = level.tiles[staircase_y][staircase_x]
       level.tiles[staircase_y][staircase_x] = :staircase_up
-      printf "Placed staircase up at (%d,%d) on level %d\n" % [staircase_x, staircase_y, depth]
       
       should_be_same = args.state.dungeon.levels[depth].tiles[staircase_y][staircase_x]
-
-      printf "Verified staircase up at (%d,%d) on level %d is %s\n" % [staircase_x, staircase_y, depth, should_be_same.to_s]  
-
       # add rooms and corridors
       level.create_rooms(args)
+
+
       level.create_corridors(args)
       
-      # dig corridor from staircase to entry room
+      # dig corridor from staircase up to entry room
       entry_room = level.rooms.sample
       level.dig_corridor(args, staircase_x, staircase_y, entry_room.center_x, entry_room.center_y)
-
 
       # finally place staircase down in a room
       if depth < (@settings[:levels] - 1)
@@ -94,8 +92,8 @@ class Architect
         safety = 0
         while level.tiles[staircase_y][staircase_x] != :floor do
           safety += 1
-          if safety > 1000
-            printf "Could not place staircase down after 1000 tries, placing in center of exit room\n"
+          if safety > 10
+            printf "Could not place staircase down after 10 tries, placing in center of exit room\n"
             staircase_x = exit_room.x + (exit_room.w / 2).to_i
             staircase_y = exit_room.y + (exit_room.h / 2).to_i
             break
@@ -104,7 +102,6 @@ class Architect
           staircase_y = Numeric.rand(exit_room.y...(exit_room.y + exit_room.h)).to_i
         end
         level.tiles[staircase_y][staircase_x] = :staircase_down
-        printf "Placed staircase down at (%d,%d) on level %d\n" % [staircase_x, staircase_y, depth]
       else
         # last level has no staircase down
         # it has the amulet!!!
@@ -124,7 +121,6 @@ class Architect
   def populate_entities(args)
     # Code to add entities to the dungeon
     args.state.entities = []
-    dungeon = args.state.dungeon
     hero = Hero.new(args.state.dungeon_entrance_x, args.state.dungeon_entrance_y)
     hero.level = 0
     args.state.hero = hero

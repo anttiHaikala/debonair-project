@@ -36,14 +36,15 @@ class HUD
         }
         args.outputs.labels << {
           x: 10,
-          y: 160,
-          text: "pos #{hero.x}, #{hero.y} level #{hero.level} tiletype: #{args.state.dungeon.levels[hero.level].tiles[hero.y][hero.x]}",
+          y: 100,
+          text: "pos [#{hero.x}, #{hero.y}] level #{hero.level} tiletype: #{args.state.dungeon.levels[hero.level].tiles[hero.y][hero.x]}",
           size_enum: 0,
 
           r: 255,
           g: 255,
           b: 255,
           a: 255
-        }    end
+        }
+      end
     end
 end

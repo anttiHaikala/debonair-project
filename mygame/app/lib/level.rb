@@ -5,10 +5,10 @@ class Room
     @y = y
     @w = w
     @h = h
-    @center_x = (x + w / 2).to_i
-    @center_y = (y + h / 2).to_i
+    @center_x = (x + (w / 2)).to_i  
+    @center_y = (y + (h / 2)).to_i
   end
-
+  
   def intersects?(other)
     return !(@x + @w < other.x || other.x + other.w < @x ||
              @y + @h < other.y || other.y + other.h < @y)
@@ -32,7 +32,7 @@ class Level
     # first put some walls in there
     for y in 0...@tiles.size
       for x in 0...@tiles[y].size
-        @tiles[y][x] = :wall
+        @tiles[y][x] = :wall unless @tiles[y][x] == :staircase_up
       end
     end
     # Code to create rooms in the level
@@ -63,6 +63,15 @@ class Level
     end
   end
   
+  def has_staircase_up?
+    @tiles.each do |row|
+      row.each do |tile|
+        return true if tile == :staircase_up
+      end
+    end
+    return false
+  end
+
   def dig_corridor(args, x1, y1, x2, y2)
     current_x = x1
     current_y = y1
@@ -78,7 +87,7 @@ class Level
         current_y -= 1
       end
     end
-      @tiles[current_y][current_x] = :floor if @tiles[current_y][current_x] == :wall
+    @tiles[current_y][current_x] = :floor if @tiles[current_y][current_x] == :wall
   end
 
   def create_corridors(args)

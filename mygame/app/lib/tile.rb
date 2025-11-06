@@ -20,12 +20,17 @@ class Tile
   def self.observe_tiles args
     dungeon = args.state.dungeon
     level = dungeon.levels[args.state.current_level]
+    vision_range = args.state.hero.vision_range
 
     # determine visible tiles (line of sight)
     tile_visibility = @@tile_visibility_per_level[args.state.current_level] ||= []
     for y in level.tiles.each_index
       tile_visibility[y] ||= []
       for x in level.tiles[y].each_index
+        if Utils::distance(args.state.hero.x, args.state.hero.y, x, y) > vision_range
+          tile_visibility[y][x] = false
+          next
+        end
         if Utils::line_of_sight?(args.state.hero.x, args.state.hero.y, x, y, level)
           tile_visibility[y][x] = true
         else

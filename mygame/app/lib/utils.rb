@@ -1,5 +1,9 @@
 module Utils
 
+  def self.distance(x0, y0, x1, y1)
+    return Math.sqrt((x1 - x0)**2 + (y1 - y0)**2)
+  end
+
   def self.line_of_sight?(x0, y0, x1, y1, level)
     line_points = get_line(x0, x1, y0, y1)
     line_points.shift

@@ -67,6 +67,8 @@ class Hero < Entity
     ]
   end
 
-
+  def vision_range
+    return 7
+  end
 
 end

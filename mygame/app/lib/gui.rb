@@ -1,11 +1,3 @@
-$debug = false
-$zoom = 0.7
-$pan_x = 0.0
-$pan_y = 0.0
-$zoom_speed = 0.0
-$max_zoom = 3.0
-$min_zoom = 0.2
-
 class GUI
 
   @@hero_locked = false
@@ -130,11 +122,11 @@ class GUI
     end
     args.state.entities.each do |entity|
       if entity.level == args.state.current_level
-        tile_size = 40 * $zoom
+        tile_size = $tile_size * $zoom
         dungeon = args.state.dungeon
         level = dungeon.levels[args.state.current_level]
-        level_height = dungeon.levels[args.state.current_level].tiles.size
-        level_width = dungeon.levels[args.state.current_level].tiles[0].size
+        level_height = level.tiles.size
+        level_width = level.tiles[0].size
         x_offset = $pan_x + (1280 - (level_width * tile_size)) / 2
         y_offset = $pan_y + (720 - (level_height * tile_size)) / 2
         x = entity.visual_x
@@ -256,5 +248,35 @@ class GUI
         end
       end
     end
+  end
+
+  def self.pan_to_player args
+    hero = args.state.hero
+    tile_size = $tile_size * $zoom
+    dungeon = args.state.dungeon
+    level = dungeon.levels[args.state.current_level]
+    level_height = level.tiles.size
+    level_width = level.tiles[0].size
+    x_offset = $pan_x + ($gui_width - (level_width * tile_size)) / 2
+    y_offset = $pan_y + ($gui_height - (level_height * tile_size)) / 2
+    x = hero.x
+    y = hero.y
+    hero_center_x = x_offset + x * tile_size + tile_size / 2
+    hero_center_y = y_offset + y * tile_size + tile_size / 2
+
+    allowed_margin = 0.2 # percentage of screen size
+    if hero_center_x < $gui_width * allowed_margin || hero_center_x > $gui_width * (1 - allowed_margin)
+      # let's set a horizontal pan target
+      # desired x offset to center hero
+      desired_x_offset = $gui_width / 2 - (x * tile_size + tile_size / 2)
+      $pan_x += (desired_x_offset - x_offset) * 0.01
+    end
+    if hero_center_y < $gui_height * allowed_margin || hero_center_y > $gui_height * (1 - allowed_margin)
+      # let's set a vertical pan target
+      # desired y offset to center hero
+      desired_y_offset = $gui_height / 2 - (y * tile_size + tile_size / 2)
+      $pan_y += (desired_y_offset - y_offset) * 0.01
+    end
+    
   end
 end
