@@ -119,11 +119,10 @@ class Architect
   end
 
   def populate_entities(args)
-    # Code to add entities to the dungeon
-    args.state.entities = []
     hero = Hero.new(args.state.dungeon_entrance_x, args.state.dungeon_entrance_y)
     hero.level = 0
     args.state.hero = hero
-    args.state.entities << hero
+    args.state.dungeon.levels[0].entities << hero
+    NPC.populate_dungeon(args.state.dungeon, args)
   end
 end

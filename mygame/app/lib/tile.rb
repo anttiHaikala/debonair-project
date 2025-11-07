@@ -17,12 +17,13 @@ class Tile
   end
 
   def self.occupied?(x, y, args)
-    args.state.entities.each do |entity|
-      if entity.x == x && entity.y == y
-        return true
-      end
-    end
+    # deprecated!!!
     return false
+  end
+
+  def self.is_tile_visible?(x, y, args)
+    tile_visibility = @@tile_visibility_per_level[args.state.current_level] || []
+    return tile_visibility[y] && tile_visibility[y][x]
   end
 
   def self.observe_tiles args

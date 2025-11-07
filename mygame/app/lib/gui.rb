@@ -42,10 +42,14 @@ class GUI
     args.outputs.primitives << { x: 0, y: 0, w: 1280, h: 720, path: :solid, r: 0, g: 0, b: 0, a: alpha, blendmode_enum: 1 }
     if @@staircase_animation_frame > cutoff && args.state.staircase
       # actually change level now
+      old_level = args.state.dungeon.levels[args.state.current_level]
+      old_level.entities.delete(args.state.hero)
       args.state.hero.level += (args.state.staircase == :down ? 1 : -1)
       args.state.current_level = args.state.hero.level
       args.state.staircase = nil
       @@tiles_observed = false
+      new_level = args.state.dungeon.levels[args.state.current_level]
+      new_level.entities << args.state.hero
     end
     if @@staircase_animation_frame >= duration_in_frames
       args.state.scene = :gameplay
@@ -119,32 +123,40 @@ class GUI
   end
 
   def self.draw_entities args
-    if args.state.entities.nil?
-      return
-    end
-    args.state.entities.each do |entity|
-      if entity.level == args.state.current_level
-        tile_size = $tile_size * $zoom
-        dungeon = args.state.dungeon
-        level = dungeon.levels[args.state.current_level]
-        level_height = level.tiles.size
-        level_width = level.tiles[0].size
-        x_offset = $pan_x + (1280 - (level_width * tile_size)) / 2
-        y_offset = $pan_y + (720 - (level_height * tile_size)) / 2
-        x = entity.visual_x
-        y = entity.visual_y
-        args.outputs.sprites << {
-          x: x_offset + x * tile_size,
-          y: y_offset + y * tile_size,
-          w: tile_size,
-          h: tile_size,
-          path: "mygame/sprites/simple-mood-16x16.png",
-          tile_x: 0*16,
-          tile_y: 4*16,
-          tile_w: 16,
-          tile_h: 16
-        }
+    level = args.state.dungeon.levels[args.state.current_level]
+    return unless level
+    level.entities.each do |entity|
+      unless entity == args.state.hero
+        visible = Tile.is_tile_visible?(entity.x, entity.y, args)
+        if visible
+          entity.has_been_seen = true
+        end
+        next unless visible
       end
+      tile_size = $tile_size * $zoom
+      dungeon = args.state.dungeon
+      level = dungeon.levels[args.state.current_level]
+      level_height = level.tiles.size
+      level_width = level.tiles[0].size
+      x_offset = $pan_x + (1280 - (level_width * tile_size)) / 2
+      y_offset = $pan_y + (720 - (level_height * tile_size)) / 2
+      x = entity.visual_x
+      y = entity.visual_y
+      args.outputs.sprites << {
+        x: x_offset + x * tile_size,
+        y: y_offset + y * tile_size,
+        w: tile_size,
+        h: tile_size,
+        path: "mygame/sprites/simple-mood-16x16.png",
+        tile_x: entity.c[0]*16,
+        tile_y: entity.c[1]*16,
+        tile_w: 16,
+        tile_h: 16,
+        r: entity.color[0],
+        g: entity.color[1],
+        b: entity.color[2],
+        a: 255
+      }
     end
   end
 
@@ -175,7 +187,9 @@ class GUI
   end
 
   def self.update_entity_animations args
-    args.state.entities.each do |entity|
+    level = args.state.dungeon.levels[args.state.current_level]
+    return unless level
+    level.entities.each do |entity|
       if entity.visual_x < entity.x
         entity.visual_x += 0.2
         if entity.visual_x > entity.x

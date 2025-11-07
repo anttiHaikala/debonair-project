@@ -8,7 +8,19 @@ class SeededRandom
     @seed = (@seed * 1664525 + 1013904223) % 4294967296
     @seed / 4294967296.0
   end
-  
+
+  def d6
+    nxt_int(1, 6)
+  end
+
+  def d20
+    nxt_int(1, 20)
+  end
+
+  def nxt_bool
+    nxt < 0.5
+  end
+
   def nxt_int(min, max)
     (nxt * (max - min + 1)).floor + min
   end

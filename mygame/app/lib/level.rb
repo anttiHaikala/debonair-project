@@ -20,12 +20,14 @@ class Level
   attr_accessor :floor_hue # this determines the color scheme of the level
   attr_accessor :vibe # this is a placeholder for different styles of level
   attr_accessor :rooms
+  attr_accessor :entities
 
   def initialize
     @tiles = []
     @floor_hue = Numeric.rand(360)
     @vibe = :hack
     @rooms = []
+    @entities = []
   end
 
   def create_rooms(args)

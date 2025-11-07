@@ -54,6 +54,7 @@ class Hero < Entity
 
   def self.traits
     [
+      :none,
       :undead,
       :mutant,
       :cyborg,      
@@ -69,6 +70,10 @@ class Hero < Entity
 
   def vision_range
     return 7
+  end
+
+  def c
+    [0, 4]
   end
 
 end

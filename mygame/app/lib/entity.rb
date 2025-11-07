@@ -14,4 +14,8 @@ class Entity
     @visual_x = x
     @visual_y = y
   end
+  
+  def color
+    return [255, 255, 255]
+  end
 end

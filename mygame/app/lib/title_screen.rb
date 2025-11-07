@@ -22,7 +22,9 @@ class TitleScreen
       GUI.initialize_state args
       printf "Game start complete.\n"
       printf "Dungeon has %d levels.\n" % args.state.dungeon.levels.size
-      printf "Dungeon has %d entities.\n" % args.state.entities.size
+      args.state.dungeon.levels.each_with_index do |level, index|
+        printf " Level %d has %d rooms and %d entities.\n" % [index, level.rooms.size, level.entities.size]
+      end
       args.state.scene = :gameplay
   end
 end

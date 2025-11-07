@@ -4,7 +4,7 @@ class HUD
       args.outputs.labels << {
         x: 10,
         y: 40,
-        text: "#{hero.name}, a #{hero.age.to_s.gsub('adult','')} #{hero.trait} #{hero.species} #{hero.role}".gsub('  ',' ').gsub('_',''),
+        text: "#{hero.name}, #{hero.age.to_s.gsub('adult','')} #{hero.trait.to_s.gsub('none','')} #{hero.species} #{hero.role}".gsub('  ',' ').gsub('_',''),
         size_enum: 0,
         r: 255,
         g: 255,
