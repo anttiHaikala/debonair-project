@@ -19,7 +19,10 @@ class Kronos
     # note: currently only the entities in the current level are considered
     # we might change this pretty soon
     # every entity needs to be busy most of the time. even idling.
-    all_entities = args.state.dungeon.levels[args.state.current_level].entities
+    all_entities = []
+    for level in args.state.dungeon.levels
+      all_entities += level.entities
+    end
     min_busy_until = nil
     idle_entity = nil
     all_entities.each do |entity|
