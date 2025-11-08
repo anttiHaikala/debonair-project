@@ -30,6 +30,7 @@ require 'app/lib/title_screen'
 require 'app/lib/game_over_screen'
 require 'app/lib/npc'
 require 'app/lib/kronos'
+require 'app/lib/item'
 
 def boot args
   #GTK.ffi_misc.add_controller_config "03000000c82d00001b30000001000000,8BitDo Ultimate 2C,a:b0,b:b1,back:b10,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b12,leftshoulder:b6,leftstick:b13,lefttrigger:a5,leftx:a0,lefty:a1,paddle1:b5,paddle2:b2,rightshoulder:b7,rightstick:b14,righttrigger:a4,rightx:a2,righty:a3,start:b11,x:b3,y:b4,platform:Mac OS X,"
@@ -63,9 +64,10 @@ end
 def gameplay_tick args
   GUI.handle_input args
   args.state.kronos.advance_time args
+  GUI.update_entity_animations args
   GUI.draw_background args
   GUI.draw_tiles args
-  GUI.update_entity_animations args
+  GUI.draw_items args
   GUI.draw_entities args
   GUI.pan_to_player args
   HUD.draw args
@@ -74,6 +76,7 @@ end
 def staircase_tick args
   GUI.draw_background args
   GUI.draw_tiles args
+  GUI.draw_items args
   GUI.draw_entities args
   GUI.staircase_animation args
   GUI.pan_to_player args

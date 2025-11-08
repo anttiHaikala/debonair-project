@@ -1,22 +1,5 @@
-class Room
-  attr_accessor :x, :y, :w, :h, :center_x, :center_y
-  def initialize(x, y, w, h)
-    @x = x
-    @y = y
-    @w = w
-    @h = h
-    @center_x = (x + (w / 2)).to_i  
-    @center_y = (y + (h / 2)).to_i
-  end
-  
-  def intersects?(other)
-    return !(@x + @w < other.x || other.x + other.w < @x ||
-             @y + @h < other.y || other.y + other.h < @y)
-  end
-end
-
 class Level
-  attr_accessor :depth, :levels, :tiles
+  attr_accessor :depth, :levels, :tiles, :items
   attr_accessor :floor_hue # this determines the color scheme of the level
   attr_accessor :vibe # this is a placeholder for different styles of level
   attr_accessor :rooms
@@ -28,6 +11,7 @@ class Level
     @vibe = :hack
     @rooms = []
     @entities = []
+    @items = []
   end
 
   def create_rooms(args)
@@ -155,4 +139,22 @@ class Level
     end
   end
 
+end
+
+
+class Room
+  attr_accessor :x, :y, :w, :h, :center_x, :center_y
+  def initialize(x, y, w, h)
+    @x = x
+    @y = y
+    @w = w
+    @h = h
+    @center_x = (x + (w / 2)).to_i  
+    @center_y = (y + (h / 2)).to_i
+  end
+  
+  def intersects?(other)
+    return !(@x + @w < other.x || other.x + other.w < @x ||
+             @y + @h < other.y || other.y + other.h < @y)
+  end
 end

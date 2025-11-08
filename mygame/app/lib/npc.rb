@@ -1,5 +1,5 @@
 class NPC < Entity
-  attr_accessor :char, :species, :has_been_seen, :level
+  attr_accessor :char, :species, :has_been_seen, :level, :status
 
   def initialize(species, x = 0, y = 0, level_depth = 0)
     @kind = :npc
@@ -8,6 +8,7 @@ class NPC < Entity
     @home = [x, y]
     @home_level = level_depth
     @level = level_depth
+    @status = []
     super(x, y)
   end
 
@@ -81,6 +82,8 @@ class NPC < Entity
       return 0.7
     when :rat
       return 0.8
+    when :gelatinous_cube # these guys keep the dungeon clean??
+      return 5.0
     else
       return 1.0
     end
@@ -88,6 +91,7 @@ class NPC < Entity
 
   def take_action args
     # simple random walk AI
+    # check status for :fleeing_hero, :attacking_hero, etc.
     target_coordinates = nil
     case args.state.rng.d6
     when 1
@@ -113,7 +117,7 @@ class NPC < Entity
         @y = target_coordinates[1]
       end
     end
-    args.state.kronos.spend_time(self, self.walking_speed, args) # NPC spends 1 second per action
+    args.state.kronos.spend_time(self, self.walking_speed, args) 
   end
 
 end

@@ -1,6 +1,6 @@
 class Hero < Entity
 
-  attr_reader :role, :species, :trait, :age, :name
+  attr_reader :role, :species, :trait, :age, :name, :exhaustion, :hunger, :sleep_deprivation, :insanity, :carried_items
 
   def initialize(x, y)
     super(x, y)
@@ -10,6 +10,12 @@ class Hero < Entity
     @trait = Hero.traits.sample
     @age = Hero.age.sample
     @name = 'Jaakko'
+    @exhaustion = 0.2 # 0.0 = totally rested, 1.0 = totally exhausted
+    @hunger = 0.2 # 0.0 = satiated, 1.0 = starving
+    @sleep_deprivation = 0.2 # 0.0 = well-rested, 1.0 = totally sleep-deprived
+    @insanity = 0.0 # 0.0 = sane, 1.0 = totally insane
+    @stress = 0.0 # 0.0 = calm, 1.0 = totally stressed
+    @carried_items = []
   end
 
   def self.roles
@@ -99,6 +105,25 @@ class Hero < Entity
     return seconds_per_tile
   end
 
+  def pickup_speed
+    seconds_per_pickup = 1.0 # seconds to pick up items
+    if @species == :halfling || @species == :gnome
+      seconds_per_pickup -= 0.3
+    end
+    return seconds_per_pickup
+  end
+
+  def stealth_range
+    range = 10 # smaller is stealthier
+    if @role == :ninja || @role == :thief
+      range -= 3
+    end
+    if @species == :halfling || @species == :gnome
+      range -= 3
+    end
+    return range
+  end
+
   def c
     [0, 4]
   end
@@ -106,5 +131,14 @@ class Hero < Entity
   def take_action args
     # hero is controlled by player, so no AI here
   end 
+
+  def pick_up_item(item, level)
+    @carried_items << item
+    level.items.delete(item)
+    item.x = nil
+    item.y = nil
+    item.level = nil
+    printf "Picked up item: %s\n" % item.kind.to_s
+  end
 
 end

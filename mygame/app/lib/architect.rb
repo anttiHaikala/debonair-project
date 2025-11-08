@@ -45,6 +45,7 @@ class Architect
     Leaves.create_kinds(args)
     create_dungeon(args)
     populate_entities(args)
+    populate_items(args)
   end
 
   def create_level(args, depth, vibe)
@@ -105,13 +106,15 @@ class Architect
       else
         # last level has no staircase down
         # it has the amulet!!!
-        # place amulet in a random room
-        # pick a room
-        # pick a position in the room
         amulet_room = level.rooms.sample
         amulet_x = Numeric.rand(amulet_room.x...(amulet_room.x + amulet_room.w)).to_i
         amulet_y = Numeric.rand(amulet_room.y...(amulet_room.y + amulet_room.h)).to_i
-        level.tiles[amulet_y][amulet_x] = :water
+        level.tiles[amulet_y][amulet_x] = :floor
+        amulet_item = Item.new(:amulet_of_yendor, :amulet)
+        amulet_item.level = depth
+        amulet_item.x = amulet_x
+        amulet_item.y = amulet_y
+        level.items << amulet_item
       end
 
     end
@@ -124,5 +127,9 @@ class Architect
     args.state.hero = hero
     args.state.dungeon.levels[0].entities << hero
     NPC.populate_dungeon(args.state.dungeon, args)
+  end
+
+  def populate_items(args)
+    Item.populate_dungeon(args.state.dungeon, args)
   end
 end

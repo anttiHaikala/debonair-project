@@ -14,7 +14,7 @@ class TitleScreen
 
   def self.start_new_game args
       Architect.create_seed(args)
-      #Architect.set_seed(args, 'jolly developeeers III') # for testing purposes
+      Architect.set_seed(args, 'jolly developers XVI') # for testing purposes
       Architect.use_seed(args)
       Architect.instance.setup({})
       Architect.instance.architect_dungeon(args)
@@ -24,7 +24,7 @@ class TitleScreen
       printf "Game start complete.\n"
       printf "Dungeon has %d levels.\n" % args.state.dungeon.levels.size
       args.state.dungeon.levels.each_with_index do |level, index|
-        printf " Level %d has %d rooms and %d entities.\n" % [index, level.rooms.size, level.entities.size]
+        printf " Level %d has %d rooms and %d entities and %d items.\n" % [index, level.rooms.size, level.entities.size, level.items.size]
       end
       args.state.scene = :gameplay
   end

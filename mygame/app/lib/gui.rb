@@ -80,6 +80,17 @@ class GUI
           # standing still
           @@standing_still_frames += 1
           @@moving_frames = 0
+          if args.inputs.keyboard.key_down.space
+            # pick up item(s) on the current tile
+            # check for items
+            hero = args.state.hero
+            level = args.state.dungeon.levels[hero.level]
+            items_on_tile = level.items.select { |item| item.x == hero.x && item.y == hero.y }
+            items_on_tile.each do |item|
+              hero.pick_up_item(item, level)
+              SoundFX.play_sound(args, :pick_up)
+            end
+          end
         end
       end
 
@@ -120,6 +131,37 @@ class GUI
     Tile.observe_tiles args unless @@tiles_observed
     @@tiles_observed = true
     Tile.draw_tiles args
+  end
+
+  def self.draw_items args
+    level = args.state.dungeon.levels[args.state.current_level]
+    return unless level
+    tile_size = $tile_size * $zoom
+    dungeon = args.state.dungeon
+    level_height = level.tiles.size
+    level_width = level.tiles[0].size
+    x_offset = $pan_x + (1280 - (level_width * tile_size)) / 2
+    y_offset = $pan_y + (720 - (level_height * tile_size)) / 2
+
+    level.items.each do |item|
+      visible = Tile.is_tile_visible?(item.x, item.y, args)
+      next unless visible
+      args.outputs.sprites << {
+        x: x_offset + item.x * tile_size,
+        y: y_offset + item.y * tile_size,
+        w: tile_size,
+        h: tile_size,
+        path: "mygame/sprites/simple-mood-16x16.png",
+        tile_x: item.c[0]*16,
+        tile_y: item.c[1]*16,
+        tile_w: 16,
+        tile_h: 16,
+        r: item.color[0],
+        g: item.color[1],
+        b: item.color[2],
+        a: 255
+      }
+    end
   end
 
   def self.draw_entities args
@@ -187,7 +229,7 @@ class GUI
     GUI.lock_hero
     hero.x += dx # logical position is updated first, visual changes later
     hero.y += dy
-    args.state.kronos.spend_time(hero, hero.walking_speed, args) # spending 1 second per move
+    args.state.kronos.spend_time(hero, hero.walking_speed, args) 
   end
 
   def self.update_entity_animations args
