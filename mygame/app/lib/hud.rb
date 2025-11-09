@@ -23,8 +23,7 @@ class HUD
     end
   end
 
-    def self.draw args
-      self.draw_items args
+  def self.draw_hero_info args
       hero = args.state.hero
       args.outputs.labels << {
         x: 10,
@@ -37,18 +36,33 @@ class HUD
         a: 255,
         font: "fonts/olivetti.ttf"
       }
-      seed = args.state.seed || "unknown"
-      args.outputs.labels << {
-        x: 700,
-        y: 40,
-        text: "Seed: #{seed} World Time: #{args.state.kronos.world_time.to_i}",
-        size_enum: 0,
-        r: 255,
-        g: 255,
-        b: 255,
-        a: 255,
-        font: "fonts/olivetti.ttf"
-      }
+  end
+
+  def self.draw_seed args
+    seed = args.state.seed || "unknown"
+    args.outputs.labels << {
+      x: 700,
+      y: 40,
+      text: "Seed: #{seed} World Time: #{args.state.kronos.world_time.to_i}",
+      size_enum: 0,
+      r: 255,
+      g: 255,
+      b: 255,
+      a: 255,
+      font: "fonts/olivetti.ttf"
+    }
+  end
+
+    def self.draw args
+      self.draw_items args
+      self.draw_hero_info args
+      self.draw_seed args
+      self.debug_info args if $debug
+    end
+
+    def self.debug_info args  
+      hero = args.state.hero
+
       if $debug
         args.outputs.labels << {
           x: 10,
@@ -64,7 +78,7 @@ class HUD
         args.outputs.labels << {
           x: 10,
           y: 100,
-          text: "pos [#{hero.x}, #{hero.y}] level #{hero.level} tiletype: #{args.state.dungeon.levels[hero.level].tiles[hero.y][hero.x]}",
+          text: "pos [#{hero.x}, #{hero.y}] level #{hero.level} tiletype: #{args.state.dungeon.levels[hero.level].tiles[hero.y][hero.x]} auto_move: #{GUI.auto_move}",
           size_enum: 0,
 
           r: 255,

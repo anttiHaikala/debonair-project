@@ -1,6 +1,7 @@
 class GUI
 
   def self.initialize_state args
+    @@auto_move = nil
     @@hero_locked = false
     @@just_used_staircase = true
     @@input_cooldown = 0
@@ -76,6 +77,12 @@ class GUI
           GUI.move_player(-1, 0, args)
         elsif args.inputs.right
           GUI.move_player(1, 0, args)
+        elsif @@auto_move
+          dx, dy = @@auto_move
+          moved = GUI.move_player(dx, dy, args)
+          unless moved
+            @@auto_move = nil # stop auto moving if blocked
+          end
         else
           # standing still
           @@standing_still_frames += 1
@@ -206,30 +213,35 @@ class GUI
     args.outputs.solids << { x: 0, y: 0, w: 1280, h: 720, path: :solid, r: 0, g: 0, b: 0, a: 255 }
   end
 
+  # return false if move not possible
   def self.move_player dx, dy, args
     hero = args.state.hero
+    if args.inputs.keyboard.key_held.shift
+      @@auto_move = [dx, dy] # move until blocked
+    end
     @@standing_still_frames = 0
     @@moving_frames += 1
     # boundary checks
     if hero.x + dx < 0 || hero.y + dy < 0
-      return
+      return false
     end
     if hero.x + dx >= args.state.dungeon.levels[hero.level].tiles[0].size ||
        hero.y + dy >= args.state.dungeon.levels[hero.level].tiles.size
-      return
+      return false
     end
     target_tile = args.state.dungeon.levels[hero.level].tiles[hero.y + dy][hero.x + dx]
     unless Tile.is_walkable?(target_tile, args)
-      return
+      return false
     end
     if Tile.occupied?(hero.x + dx, hero.y + dy, args)
-      return
+      return false
     end
     # we are cleared to move
     GUI.lock_hero
     hero.x += dx # logical position is updated first, visual changes later
     hero.y += dy
     args.state.kronos.spend_time(hero, hero.walking_speed, args) 
+    return true
   end
 
   def self.update_entity_animations args
@@ -343,5 +355,9 @@ class GUI
       $pan_y += (desired_y_offset - y_offset) * $auto_pan_speed
     end
     
+  end
+
+  def self.auto_move
+    return @@auto_move
   end
 end

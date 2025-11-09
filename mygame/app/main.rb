@@ -1,6 +1,6 @@
 #$gtk.trace_nil_punning!
 
-$debug = false
+$debug = true
 $zoom = 0.7
 $pan_x = 0.0
 $pan_y = 0.0
