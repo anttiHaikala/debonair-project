@@ -141,4 +141,11 @@ class Hero < Entity
     printf "Picked up item: %s\n" % item.kind.to_s
   end
 
+  def has_item?(item_kind)
+    @carried_items.each do |item|
+      return true if item.kind == item_kind
+    end
+    return false
+  end
+
 end
