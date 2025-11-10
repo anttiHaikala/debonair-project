@@ -62,12 +62,16 @@ class HUD
 
     def self.debug_info args  
       hero = args.state.hero
-
+      time_now = Time.now.to_f
+      last_tick_time = args.state.last_tick_time
+      delta_time = last_tick_time ? time_now - last_tick_time : 0
+      args.state.last_tick_time = time_now
+      millisecs = (delta_time * 1000).to_i
       if $debug
         args.outputs.labels << {
           x: 10,
           y: 130,
-          text: "ticks: #{$args.state.tick_count} input_f #{$input_frames} standing_f: #{GUI.standing_still_frames}, moving_f: #{GUI.moving_frames}, input_cooldown: #{GUI.input_cooldown}, hero_locked: #{GUI.hero_locked}",
+          text: "ticks: #{$args.state.tick_count} framerate: #{args.gtk.current_framerate} delta: #{millisecs} input_f #{$input_frames} standing_f: #{GUI.standing_still_frames}, moving_f: #{GUI.moving_frames}, input_cooldown: #{GUI.input_cooldown}, hero_locked: #{GUI.hero_locked}",
           size_enum: 0,
 
           r: 255,

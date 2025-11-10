@@ -221,6 +221,10 @@ class GUI
     end
     @@standing_still_frames = 0
     @@moving_frames += 1
+    # auto move end check
+    if @@auto_move != [dx, dy]
+      @@auto_move = nil
+    end
     # boundary checks
     if hero.x + dx < 0 || hero.y + dy < 0
       return false
@@ -245,27 +249,28 @@ class GUI
   end
 
   def self.update_entity_animations args
+    animation_speed = 0.2 # tiles per frame
     level = args.state.dungeon.levels[args.state.current_level]
     return unless level
     level.entities.each do |entity|
       if entity.visual_x < entity.x
-        entity.visual_x += 0.2
+        entity.visual_x += animation_speed
         if entity.visual_x > entity.x
           entity.visual_x = entity.x
         end
       elsif entity.visual_x > entity.x
-        entity.visual_x -= 0.2
+        entity.visual_x -= animation_speed
         if entity.visual_x < entity.x
           entity.visual_x = entity.x
         end
       end
       if entity.visual_y < entity.y
-        entity.visual_y += 0.2
+        entity.visual_y += animation_speed
         if entity.visual_y > entity.y
           entity.visual_y = entity.y
         end
       elsif entity.visual_y > entity.y
-        entity.visual_y -= 0.2
+        entity.visual_y -= animation_speed
         if entity.visual_y < entity.y
           entity.visual_y = entity.y
         end

@@ -1,6 +1,6 @@
 #$gtk.trace_nil_punning!
 
-$debug = true
+$debug = false
 $zoom = 0.7
 $pan_x = 0.0
 $pan_y = 0.0
@@ -16,7 +16,7 @@ $auto_pan_speed = 0.016
 require 'app/lib/architect'
 require 'app/lib/dungeon'
 require 'app/lib/level'
-require 'app/lib/GUI'
+require 'app/lib/gui'
 require 'app/lib/tile'
 require 'app/lib/entity'
 require 'app/lib/hero'
@@ -42,6 +42,19 @@ def reset args
 end
 
 def tick args
+
+  if (!args.inputs.keyboard.has_focus &&
+      Kernel.tick_count != 0)
+    args.outputs.background_color = [0, 0, 0]
+    args.outputs.labels << { x: 640,
+                             y: 360,
+                             text: "Game paused while window is not in focus.",
+                             alignment_enum: 1,
+                             r: 255, g: 255, b: 255 }
+    return
+  end
+
+
   args.state.scene ||= :title_screen
   case args.state.scene
   when :gameplay
