@@ -25,6 +25,11 @@ class SoundFX
         input: "sounds/punch.mp3",
         gain: @@fx_volume
       }
+    when :pick_up
+      args.outputs.audio[:pick_up] = {
+        input: "sounds/pick_up.mp3",
+        gain: @@fx_volume
+      }
     else
       puts "Sound #{kind} not found!"
     end

@@ -34,6 +34,7 @@ class Trauma
     trauma = Trauma.new(kind, category)
     trauma.instance_variable_set(:@hit_location, hit_location)  
     entity.traumas << trauma
+    entity.increase_need(:avoid_being_hit)
     printf "Inflicted #{kind} trauma to #{entity.class} at #{hit_location}. Has now #{entity.traumas.size} traumas.\n"
     return trauma
   end

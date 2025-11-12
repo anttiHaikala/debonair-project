@@ -1,5 +1,8 @@
 class NPC < Entity
-  attr_accessor :char, :species, :has_been_seen, :level, :status
+
+  include Needy
+
+  attr_accessor :char, :species, :has_been_seen, :level, :status, :behaviours
 
   def initialize(species, x = 0, y = 0, level_depth = 0)
     @kind = :npc
@@ -10,6 +13,9 @@ class NPC < Entity
     @level = level_depth
     @status = []
     super(x, y)
+    initialize_needs
+    @behaviours = []
+    Behaviour.setup_for_npc(self)
   end
 
   def name
@@ -74,6 +80,14 @@ class NPC < Entity
       when 3
         npc = NPC.new(:rat, room.center_x, room.center_y, level.depth)
         level.entities << npc
+        if args.state.rng.d6 > 3
+          npc2 = NPC.new(:rat, room.center_x + 1, room.center_y, level.depth)
+          level.entities << npc2
+        end
+        if args.state.rng.d6 == 6
+          npc3 = NPC.new(:rat, room.center_x - 1, room.center_y, level.depth)
+          level.entities << npc3
+        end
       end
     end
   end
@@ -94,38 +108,8 @@ class NPC < Entity
   end
 
   def take_action args
-    # simple random walk AI
-    # check status for :fleeing_hero, :attacking_hero, etc.
-    target_coordinates = nil
-    case args.state.rng.d6
-    when 1
-      # move up
-      target_coordinates = [@x, @y + 1]
-    when 2
-      # move down
-      target_coordinates = [@x, @y - 1]
-    when 3
-      # move left
-      target_coordinates = [@x - 1, @y]
-    when 4
-      # move right
-      target_coordinates = [@x + 1, @y]
-    else
-      # do nothing
-    end
-    if target_coordinates
-      level = args.state.dungeon.levels[self.level]
-      target_tile = level.tiles[target_coordinates[1]][target_coordinates[0]]
-      if Tile.is_walkable?(target_tile, args) && !Tile.occupied?(target_coordinates[0], target_coordinates[1], args)
-        @x = target_coordinates[0]
-        @y = target_coordinates[1]
-      end
-      if target_coordinates[0] == args.state.hero.x && target_coordinates[1] == args.state.hero.y && self.level == args.state.hero.level
-        # attack hero
-        Combat.resolve_attack(self, args.state.hero, args)
-      end
-    end
-    args.state.kronos.spend_time(self, self.walking_speed, args) # todo fix speed depending on action
+    printf "NPC #{@species} at (#{@x}, #{@y}) taking action at time #{args.state.kronos.world_time.to_i}\n"
+    Behaviour.select_for_npc(self).execute(args)
   end
 
 end

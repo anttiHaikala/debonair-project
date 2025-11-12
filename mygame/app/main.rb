@@ -13,6 +13,7 @@ $gui_height = 720
 $auto_pan_margin = 0.333 # percentage of screen size
 $auto_pan_speed = 0.016
 
+require 'app/lib/need'
 require 'app/lib/architect'
 require 'app/lib/dungeon'
 require 'app/lib/level'
@@ -37,8 +38,10 @@ require 'app/lib/combat'
 require 'app/lib/species'
 require 'app/lib/trauma'
 require 'app/lib/run'
+require 'app/lib/behaviour'
 
 def boot args
+  args.state = {}
   #GTK.ffi_misc.add_controller_config "03000000c82d00001b30000001000000,8BitDo Ultimate 2C,a:b0,b:b1,back:b10,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b12,leftshoulder:b6,leftstick:b13,lefttrigger:a5,leftx:a0,lefty:a1,paddle1:b5,paddle2:b2,rightshoulder:b7,rightstick:b14,righttrigger:a4,rightx:a2,righty:a3,start:b11,x:b3,y:b4,platform:Mac OS X,"
 end
 
@@ -51,7 +54,6 @@ def reset args
 end
 
 def tick args
-
   if (!args.inputs.keyboard.has_focus &&
       Kernel.tick_count != 0)
     args.outputs.background_color = [0, 0, 0]
@@ -62,7 +64,6 @@ def tick args
                              r: 255, g: 255, b: 255 }
     return
   end
-
 
   args.state.scene ||= :title_screen
   case args.state.scene

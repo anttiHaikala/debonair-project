@@ -1,0 +1,12 @@
+TODO LIST
+---------
+
+- show wounds
+- wield items
+- wield armor
+- wield rings
+- drop stuff
+- inventory 
+- npc behaviours
+- needs
+- lichen

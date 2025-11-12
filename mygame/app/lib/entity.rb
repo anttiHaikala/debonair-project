@@ -3,6 +3,10 @@ class Entity
   # visual_x and visual_y are used for smooth movement animations
   attr_accessor :level, :x, :y, :kind, :visual_x, :visual_y, :busy_until, :traumas, :perished, :reason_of_death, :species
 
+  attr_accessor :enemies
+  attr_accessor :allies
+  attr_accessor :needs
+
   def self.kinds
     [:generic, :item, :pc, :npc, :plant, :furniture]
   end
@@ -14,6 +18,9 @@ class Entity
     @visual_x = x
     @visual_y = y
     @traumas = []
+    @enemies = []
+    @allies = []
+    @needs = []
     @perished = false
     @reason_of_death = nil
   end

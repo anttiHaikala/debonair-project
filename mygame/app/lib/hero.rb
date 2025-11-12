@@ -1,9 +1,12 @@
 class Hero < Entity
 
+  include Needy
+
   attr_reader :role, :species, :trait, :age, :name, :exhaustion, :hunger, :sleep_deprivation, :insanity, :carried_items
 
   def initialize(x, y)
     super(x, y)
+    initialize_needs
     @kind = :pc
     @role = Hero.roles.sample
     @species = Hero.species.sample

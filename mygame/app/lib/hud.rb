@@ -121,7 +121,7 @@ class HUD
       args.state.hud_messages << { text: message, time: args.state.kronos.world_time }
       # keep only last 5 messages
       if args.state.hud_messages.size > 5
-        args.state.hud_messages.shift
+        args.state.hud_messages.shift 
       end
     end 
 end

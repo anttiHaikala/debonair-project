@@ -24,7 +24,7 @@ class Combat
     hit_severity = :moderate
     hit_kind = :bruise
     Trauma.inflict(defender, hit_location, hit_kind)
-    SoundFX.play_sound(:punch, args)
+    SoundFX.play_sound(:hit, args)
     HUD.output_message args, "#{aname} bruises #{dname}'s #{hit_location.to_s.gsub('_', ' ')}."
     # todo: inflict "shaken" effects to make the target miss some time due to receiving trauma
     # todo: check for death
