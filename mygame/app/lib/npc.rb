@@ -92,7 +92,7 @@ class NPC < Entity
     end
   end
 
-  def walking_speed
+  def walking_speed # separate to attack speed later
     case @species
     when :goblin
       return 1.4 # seconds per tile

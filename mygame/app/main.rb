@@ -98,6 +98,7 @@ def gameplay_tick args
   GUI.draw_items args
   GUI.draw_entities args
   GUI.pan_to_player args
+  GUI.update_screen_flash args
   HUD.draw args
 end
 

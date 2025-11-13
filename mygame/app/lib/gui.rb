@@ -8,6 +8,7 @@ class GUI
     @@moving_frames = 0
     @@standing_still_frames = 0
     @@tiles_observed = false
+    @@color_flash = nil
   end
 
   def self.standing_still_frames
@@ -61,6 +62,8 @@ class GUI
   def self.handle_input args
     $input_frames ||= 0
     $input_frames += 1
+    # inventory management can happen in parallel
+    self.handle_inventory_input args
     unless GUI.is_hero_locked? # already moving
       # add a slight cooldown to prevent rapid movement
       @@input_cooldown ||= 0
@@ -400,5 +403,57 @@ class GUI
 
   def self.auto_move
     return @@auto_move
+  end
+
+  def self.flash_screen color, args
+    @@color_flash = [color, 25, 0] # color and duration in frames
+  end
+
+  def self.update_screen_flash args
+    return unless @@color_flash
+    color_flash = @@color_flash
+    duration = color_flash[1]
+    frames_used = color_flash[2]
+    frames_used += 1
+    if frames_used >= duration
+      @@color_flash = nil
+    else
+      @@color_flash[2] = frames_used
+    end
+    alpha = ((duration - frames_used).to_f / duration.to_f * 100.0).to_i.clamp(0, 100)
+    if color_flash[0] == :red
+      args.outputs.primitives << { x: 0, y: 0, w: 1280, h: 720, path: :solid, r: 200, g: 0, b: 0, a: alpha, blendmode_enum: 1 }
+    end
+  end
+
+  def self.handle_inventory_input args
+    hero = args.state.hero
+    return unless hero
+    if args.inputs.controller_one.key_held.r2
+      args.state.selected_item_index ||= 0
+    else
+      args.state.selected_item_index = nil
+    end 
+    if args.state.selected_item_index
+      if args.inputs.up
+        args.state.selected_item_index -= 1
+        if args.state.selected_item_index < 0
+          args.state.selected_item_index = 0
+        end
+      elsif args.inputs.down
+        args.state.selected_item_index += 1
+        if args.state.selected_item_index >= hero.carried_items.size
+          args.state.selected_item_index = hero.carried_items.size - 1
+        end
+      elsif args.inputs.controller_one.key_down.a || args.inputs.keyboard.key_down.space
+        # use selected item
+        selected_index = args.state.selected_item_index
+        if selected_index >= 0 && selected_index < hero.carried_items.size
+          item = hero.carried_items[selected_index]
+          hero.use_item(item, args)
+          SoundFX.play_sound(:use_item, args)
+        end
+      end
+    end
   end
 end

@@ -28,6 +28,7 @@ class Combat
     # defender attempts to dodge
     if !attacker.invisible?
       dodge_roll = args.state.rng.d20
+      dodge_roll -= 3 # just to make it a bit less likely to dodge  
       if dodge_roll > attack_roll
         HUD.output_message args, "#{aname} attacks #{dname} but #{dname} dodges."
         SoundFX.play_sound(:miss, args)
@@ -52,11 +53,19 @@ class Combat
         args.state.hero.reason_of_death = " combat against #{aname}"
         return
       else
+        SoundFX.play_sound(:npc_death, args)
         # remove defender from level
         level = args.state.dungeon.levels[defender.level]
         level.entities.delete(defender)
       end
-    end
+    else
+      if defender == args.state.run.hero
+        GUI.flash_screen(:red, args)
+        SoundFX.play_sound(:hero_hurt, args)
+      else
+        SoundFX.play_sound(:npc_hurt, args)
+      end
+    end    
   end
 
   def self.hit_severity(attacker, defender, attack_roll, args)

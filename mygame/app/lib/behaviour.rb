@@ -28,13 +28,14 @@ class Behaviour
     @kind = kind
     @npc = npc
     @destination = nil
+    @target = nil
   end
 
   def self.setup_for_npc(npc)
     species = npc.species
     case species
     when :goblin
-      npc.behaviours << Behaviour.new(:wander, npc)
+      npc.behaviours << Behaviour.new(:fight, npc)
       # npc.behaviours << Behaviour.new(:attack, npc)
       # npc.behaviours << Behaviour.new(:escape, npc)
     when :grid_bug
@@ -56,11 +57,66 @@ class Behaviour
   end
 
   def execute args
-    #printf "Executing behaviour #{@kind} for NPC #{@npc.species} at (#{@npc.x}, #{@npc.y})\n"
+    if args.state.hero.sees?(@npc, args)
+      printf "Executing behaviour #{@kind} for NPC #{@npc.species} at (#{@npc.x}, #{@npc.y}) - level #{@npc.level} - time #{args.state.kronos.world_time}\n"  
+    end
     method_name = @kind.to_s
     if self.respond_to?(method_name)
       self.send(method_name, args)
     end
+  end
+
+  def fight args
+    # find target (e.g., hero) and move towards it
+    npc = @npc
+    hero = args.state.hero
+    if hero && hero.level == npc.level
+      dx = hero.x - npc.x
+      dy = hero.y - npc.y
+      distance = Math.sqrt(dx * dx + dy * dy)
+      if distance < 20 # aggro range
+        if npc.sees?(hero, args)          
+          # move towards hero
+          if dy.abs < dx.abs || hero.y == npc.y # north-south movement
+            step_x = dx > 0 ? 1 : -1
+            step_y = 0
+          else
+            step_y = dy > 0 ? 1 : -1
+            step_x = 0
+          end
+          target_x = npc.x + step_x
+          target_y = npc.y + step_y
+          printf "Target x,y: #{target_x}, #{target_y}, hero x,y #{hero.x}, #{hero.y}, npc x,y #{npc.x}, #{npc.y}\n"
+          level = args.state.dungeon.levels[npc.level]
+          target_tile = level.tiles[target_y][target_x]
+          if Tile.is_walkable?(target_tile, args) 
+            if Tile.occupied?(target_x, target_y, args)
+              if hero.x == target_x && hero.y == target_y
+                # occupied, attack!
+                Combat.resolve_attack(npc, hero, args)
+                args.state.kronos.spend_time(npc, npc.walking_speed, args)
+                return
+              else
+                # occupied by something else, idle
+                args.state.kronos.spend_time(npc, npc.walking_speed, args)
+                return
+              end
+            else
+              npc.x = target_x
+              npc.y = target_y
+              args.state.kronos.spend_time(npc, npc.walking_speed, args)
+              return
+            end
+          else
+            # cannot move towards hero, idle
+            args.state.kronos.spend_time(npc, npc.walking_speed, args)
+            return
+          end
+        end
+      end
+    end
+    # sensible default - wander
+    wander args
   end
 
   def wander args

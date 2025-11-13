@@ -72,4 +72,17 @@ class Entity
     end
     return invisibility
   end
+
+  def sees?(other_entity, args)
+    dx = other_entity.x - self.x
+    dy = other_entity.y - self.y
+    distance = Math.sqrt(dx * dx + dy * dy)
+    if distance > 15
+      return false
+    end
+    if other_entity.invisible?
+      return false
+    end
+    return Utils.line_of_sight?(self.x, self.y, other_entity.x, other_entity.y, args.state.dungeon.levels[self.level])
+  end
 end
