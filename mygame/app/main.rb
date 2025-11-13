@@ -13,6 +13,7 @@ $gui_height = 720
 $auto_pan_margin = 0.333 # percentage of screen size
 $auto_pan_speed = 0.016
 
+require 'app/vendor/perlin_noise'
 require 'app/lib/need'
 require 'app/lib/architect'
 require 'app/lib/dungeon'

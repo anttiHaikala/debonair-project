@@ -22,5 +22,7 @@ class TitleScreen
         printf " Level %d has %d rooms and %d entities and %d items.\n" % [index, level.rooms.size, level.entities.size, level.items.size]
       end
       args.state.scene = :gameplay
+      SoundFX.play_sound(:staircase, args)
+      HUD.output_message args, "You enter the dungeon seeking the legendary Amulet of Skandor. Good luck!"
   end
 end

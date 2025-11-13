@@ -87,7 +87,7 @@ class GUI
           # standing still
           @@standing_still_frames += 1
           @@moving_frames = 0
-          if args.inputs.keyboard.key_down.space
+          if args.inputs.keyboard.key_down.space || args.inputs.controller_one.key_down.a
             # pick up item(s) on the current tile
             # check for items
             hero = args.state.hero
@@ -227,7 +227,7 @@ class GUI
   # return false if move not possible
   def self.move_player dx, dy, args
     hero = args.state.hero
-    if args.inputs.keyboard.key_held.shift
+    if args.inputs.keyboard.key_held.shift || args.inputs.controller_one.key_held.r1
       @@auto_move = [dx, dy] # move until blocked
     end
     @@standing_still_frames = 0

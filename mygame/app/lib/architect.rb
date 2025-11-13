@@ -110,7 +110,7 @@ class Architect
         amulet_x = Numeric.rand(amulet_room.x...(amulet_room.x + amulet_room.w)).to_i
         amulet_y = Numeric.rand(amulet_room.y...(amulet_room.y + amulet_room.h)).to_i
         level.tiles[amulet_y][amulet_x] = :floor
-        amulet_item = Item.new(:amulet_of_yendor, :amulet)
+        amulet_item = Item.new(:amulet_of_skandor, :amulet)
         amulet_item.level = depth
         amulet_item.x = amulet_x
         amulet_item.y = amulet_y

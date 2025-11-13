@@ -67,6 +67,27 @@ class Level
     return false
   end
 
+  def add_foliage(args)
+
+    # add some foliage to the level based on vibe
+    foliage_types = []
+    case @vibe
+    when :lush
+      foliage_types = [:lichen, :moss, :fungus, :small_plant, :puddle]
+    when :swamp
+      foliage_types = [:moss, :fungus, :small_plant]
+    else
+      foliage_types = [:puddle, :lichen]
+    end
+    @tiles.each_index do |y|
+      @tiles[y].each_index do |x|
+        if @tiles[y][x] == :floor && args.state.rng.d20 == 1
+          @tiles[y][x] = foliage_types.sample
+        end
+      end
+    end
+  end
+
   def dig_corridor(args, x1, y1, x2, y2)
     current_x = x1
     current_y = y1

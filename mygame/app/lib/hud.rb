@@ -1,11 +1,27 @@
 class HUD
 
+  def self.draw_health args
+    hero = args.state.hero
+    hero.traumas.each_with_index do |trauma, index|
+      args.outputs.labels << {
+        x: 1020,
+        y: 660 - index * 20,
+        text: "#{trauma.kind.to_s.gsub('_',' ')} on #{trauma.body_part.to_s.gsub('_',' ')} (severity: #{trauma.severity})",
+        size_enum: 0,
+        r: 255,
+        g: 0,
+        b: 0,
+        a: 255,
+        font: "fonts/olivetti.ttf"
+      }
+    end
+  end
   def self.draw_items args
     hero = args.state.hero
     return unless hero && hero.carried_items.any?
     carried_items = hero.carried_items
-    x = 900
-    y = 700
+    x = 1020
+    y = 500
     item_size = 20
     carried_items.each_with_index do |item, index|
       args.outputs.labels << {
@@ -26,9 +42,9 @@ class HUD
   def self.draw_hero_info args
       hero = args.state.hero
       args.outputs.labels << {
-        x: 10,
-        y: 40,
-        text: "#{hero.name}, #{hero.age.to_s.gsub('adult','')} #{hero.trait.to_s.gsub('none','')} #{hero.species} #{hero.role}".gsub('  ',' ').gsub('_',''),
+        x: 1020,
+        y: 700,
+        text: "#{hero.name}",
         size_enum: 0,
         r: 255,
         g: 255,
@@ -36,14 +52,24 @@ class HUD
         a: 255,
         font: "fonts/olivetti.ttf"
       }
-  end
+      args.outputs.labels << {
+        x: 1020,
+        y: 670,
+        text: "#{hero.age.to_s.gsub('adult','')} #{hero.trait.to_s.gsub('none','')} #{hero.species} #{hero.role}".gsub('  ',' ').gsub('_',''),
+        size_enum: 0,
+        r: 255,
+        g: 255,
+        b: 255,
+        a: 255,
+        font: "fonts/olivetti.ttf"
+      }  end
 
   def self.draw_seed args
     seed = args.state.seed || "unknown"
     args.outputs.labels << {
-      x: 700,
+      x: 10,
       y: 40,
-      text: "Seed: #{seed} World Time: #{args.state.kronos.world_time.to_i}",
+      text: "seed: #{seed} time: #{args.state.kronos.world_time.to_i}",
       size_enum: 0,
       r: 255,
       g: 255,
@@ -77,6 +103,7 @@ class HUD
 
     def self.draw args
       self.draw_items args
+      self.draw_health args
       self.draw_hero_info args
       self.draw_seed args
       self.draw_messages args
