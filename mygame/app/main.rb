@@ -10,8 +10,8 @@ $min_zoom = 0.2
 $tile_size = 40
 $gui_width = 1280
 $gui_height = 720
-$auto_pan_margin = 0.333 # percentage of screen size
-$auto_pan_speed = 0.016
+$auto_pan_margin = 0.444 # percentage of screen size
+$auto_pan_speed = 0.026
 
 require 'app/vendor/perlin_noise'
 require 'app/lib/need'

@@ -107,10 +107,18 @@ class GUI
       @@standing_still_frames = 0
     end
 
-    # zooming with mouse wheel
-    zoom_acceleration = 0.2
+    # zooming with mouse wheel or right analog
+    zoom_acceleration = 0.01  
     if args.inputs.mouse.wheel
-      zoom_input = args.inputs.mouse.wheel.y
+      zoom_input = args.inputs.mouse.wheel.y 
+      if zoom_input > 0
+        $zoom_speed += zoom_acceleration
+      elsif zoom_input < 0
+        $zoom_speed -= zoom_acceleration
+      end
+    end
+    if args.inputs.controller_one.right_analog_y_perc.abs > 0.1
+      zoom_input = args.inputs.controller_one.right_analog_y_perc
       if zoom_input > 0
         $zoom_speed += zoom_acceleration
       elsif zoom_input < 0
@@ -118,7 +126,7 @@ class GUI
       end
     end
     $zoom_speed *= 0.8 # deceleration
-    if $zoom_speed.abs < 0.1
+    if $zoom_speed.abs < 0.001
       $zoom_speed = 0
     end
     zoom_delta = $zoom_speed
@@ -369,18 +377,23 @@ class GUI
     hero_center_x = x_offset + x * tile_size + tile_size / 2
     hero_center_y = y_offset + y * tile_size + tile_size / 2
 
+    pan_speed = $auto_pan_speed
+    if $zoom_speed.abs > 0
+      pan_speed *= 6 # faster panning when zooming
+    end
+
     if hero_center_x < $gui_width * $auto_pan_margin || hero_center_x > $gui_width * (1 - $auto_pan_margin)
       # let's set a horizontal pan target
       # desired x offset to center hero
       desired_x_offset = $gui_width / 2 - (x * tile_size + tile_size / 2)
-      $pan_x += (desired_x_offset - x_offset) * $auto_pan_speed
+      $pan_x += (desired_x_offset - x_offset) * pan_speed
     end
 
     if hero_center_y < $gui_height * $auto_pan_margin || hero_center_y > $gui_height * (1 - $auto_pan_margin)
       # let's set a vertical pan target
       # desired y offset to center hero
       desired_y_offset = $gui_height / 2 - (y * tile_size + tile_size / 2)
-      $pan_y += (desired_y_offset - y_offset) * $auto_pan_speed
+      $pan_y += (desired_y_offset - y_offset) * pan_speed
     end
     
   end
