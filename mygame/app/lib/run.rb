@@ -6,12 +6,14 @@ class Run
   end
 
   def setup args
+    printf "Setting up new run...\n"
     Architect.create_seed(args)
     if $fixed_seed
       seed = $fixed_seed
       Architect.set_seed(args, seed) # for testing purposes
     end
-    Architect.use_seed(args)
+    Architect.apply_seed(args)
+    printf "Dungeon seed: %s\n" % args.state.dungeon_seed
     Architect.instance.setup({})
     Architect.instance.architect_dungeon(args)
     @dungeon = args.state.dungeon # TODO: should we only access these things below the :run attribute?

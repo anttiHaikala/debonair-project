@@ -8,7 +8,7 @@ class Architect
     @settings ||= {}
     @settings[:levels] ||= 20
     @settings[:level_width] ||= 20   
-    @settings[:level_height] ||= 100
+    @settings[:level_height] ||= 20
   end
 
   def self.create_seed(args)
@@ -33,8 +33,8 @@ class Architect
     args.state.seed = seed
   end
 
-  def self.use_seed(args)
-    printf "Using seed: %s\n" % args.state.seed
+  def self.apply_seed(args)
+    printf "Applying seed: %s\n" % args.state.seed
     hash = args.state.seed.hash
     printf "Seed hash: %d\n" % hash
     args.state.rng = SeededRandom.new(hash)

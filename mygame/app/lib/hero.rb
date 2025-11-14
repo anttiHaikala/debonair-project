@@ -15,6 +15,7 @@ class Hero < Entity
     @name = 'Jaakko'
     @exhaustion = 0.2 # 0.0 = totally rested, 1.0 = totally exhausted
     @hunger = 0.2 # 0.0 = satiated, 1.0 = starving
+    @hunger_level = :okay
     @sleep_deprivation = 0.2 # 0.0 = well-rested, 1.0 = totally sleep-deprived
     @insanity = 0.0 # 0.0 = sane, 1.0 = totally insane
     @stress = 0.0 # 0.0 = calm, 1.0 = totally stressed
@@ -100,11 +101,18 @@ class Hero < Entity
       seconds_per_tile += 0.1
     end
     if @trait == :cyborg 
-      seconds_per_tile -= 0.3
+      seconds_per_tile -= 0.1
     end
     if @species == :duck
-      seconds_per_tile += 0.3
+      seconds_per_tile += 0.2
     end
+    if @species == :elf || @species == :dark_elf
+      seconds_per_tile -= 0.2
+    end
+    if @role == :ninja || @role == :thief
+      seconds_per_tile -= 0.2
+    end
+    #Ex:- :default =>''
     return seconds_per_tile
   end
 
@@ -114,6 +122,10 @@ class Hero < Entity
       seconds_per_pickup -= 0.3
     end
     return seconds_per_pickup
+  end
+
+  def rest(args)
+    args.state.kronos.spend_time(self, 1.0, args)
   end
 
   def stealth_range
@@ -150,5 +162,31 @@ class Hero < Entity
     end
     return false
   end
-
+  
+  def apply_hunger args
+    hunger_increase = 0.001 # per kronos tick
+    @hunger += hunger_increase
+    hunger_level_before = @hunger_level
+    if @hunger >= 0.8
+      @hunger_level = :starving
+    elsif @hunger >= 0.5
+      @hunger_level = :hungry
+    elsif @hunger >= 0.2
+      @hunger_level = :okay
+    else
+      @hunger_level = :satiated
+    end
+    if hunger_level_before != @hunger_level
+      case @hunger_level
+      when :satiated
+        HUD.output_message("You feel satiated.", args)
+      when :okay
+        HUD.output_message("You feel okay.", args)
+      when :hungry
+        HUD.output_message("You feel hungry.", args)
+      when :starving
+        HUD.output_message("You feel starving!", args)
+      end
+    end      
+  end
 end

@@ -17,7 +17,6 @@ end
 
 class Kronos
   # the timekeeper
-  @world_time = 0 # in simulation seconds since game start
   attr_reader :world_time
   
   def self.initialize args
@@ -26,6 +25,7 @@ class Kronos
 
   def initialize
     @world_time = 0 # simulation seconds since game start
+    @continuous_effects_applied_until = 0
   end
 
   def spend_time entity, seconds, args
@@ -53,6 +53,32 @@ class Kronos
       end
     end
     @world_time = min_busy_until unless min_busy_until < @world_time # time cannot go backwards
+    if self.should_continous_effects_be_applied?
+      self.apply_continuous_effects args
+    end
     idle_entity.take_action args 
   end
+
+  def should_continous_effects_be_applied?
+    return @world_time > @continuous_effects_applied_until
+  end
+  
+  def apply_continuous_effects args
+    # apply continuous effects like hunger, ring depletion, etc.
+    hero = args.state.hero
+    # hunger
+    hero.apply_hunger args
+    # worn rings
+    hero.worn_items.each do |item|
+      if item.category == :ring
+        item.usage += 1
+        if item.usage >= item.max_usage
+          HUD.output_message args, "Your #{item.title} crumbles to dust!"
+          hero.worn_items.delete(item)
+        end
+        item.apply_continuous_effect(hero, args)
+      end
+    end
+    @continuous_effects_applied_until = @world_time + 1 # apply once every 1 world time unit
+  end 
 end

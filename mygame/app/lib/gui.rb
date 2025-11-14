@@ -57,12 +57,20 @@ class GUI
     if @@staircase_animation_frame >= duration_in_frames
       args.state.scene = :gameplay
       @@staircase_animation_frame = 0
+      HUD.output_message args, "You enter level #{args.state.current_level + 1} of the dungeon."
     end
   end
 
   def self.handle_input args
     $input_frames ||= 0
     $input_frames += 1
+
+    if args.state.hero.perished
+      if args.inputs.keyboard.key_down.space || args.inputs.controller_one.key_down.a
+        args.state.scene = :game_over
+      end
+      return
+    end
     # inventory management can happen in parallel
     self.handle_inventory_input args
     unless GUI.is_hero_locked? # already moving
@@ -73,13 +81,13 @@ class GUI
         @@moving_frames += 1
       else
       # player movement
-        if args.inputs.up
+        if args.inputs.up && !args.controller_one.key_held.r2 && !args.keyboard.key_held.shift
           GUI.move_player(0, 1, args)
-        elsif args.inputs.down
+        elsif args.inputs.down && !args.controller_one.key_held.r2 && !args.keyboard.key_held.shift
           GUI.move_player(0, -1, args)
-        elsif args.inputs.left
+        elsif args.inputs.left && !args.controller_one.key_held.r2 && !args.keyboard.key_held.shift 
           GUI.move_player(-1, 0, args)
-        elsif args.inputs.right
+        elsif args.inputs.right && !args.controller_one.key_held.r2 && !args.keyboard.key_held.shift
           GUI.move_player(1, 0, args)
         elsif @@auto_move
           dx, dy = @@auto_move
@@ -97,10 +105,44 @@ class GUI
             hero = args.state.hero
             level = args.state.dungeon.levels[hero.level]
             items_on_tile = level.items.select { |item| item.x == hero.x && item.y == hero.y }
-            items_on_tile.each do |item|
-              hero.pick_up_item(item, level)
-              SoundFX.play_sound(:pick_up, args)
+            # if there are items:
+            if items_on_tile && items_on_tile.size > 0
+              items_on_tile.each do |item|
+                hero.pick_up_item(item, level)
+                SoundFX.play_sound(:pick_up, args)
+                return
+              end
             end
+            tile = level.tiles[hero.y][hero.x]
+            if tile == :staircase_down || tile == :staircase_up 
+              unless args.inputs.keyboard.key_held.shift || args.inputs.controller_one.key_held.r2
+                unless @@just_used_staircase
+                  # staircase? use if one is present
+                  
+                  printf "Hero is using staircase on tile #{tile} x,y: #{hero.x},#{hero.y}\n"
+                  if tile == :staircase_down
+                    args.state.staircase = :down
+                    args.state.scene = :staircase
+                    @@just_used_staircase = true
+                    @@staircase_animation_frame = 0
+                  elsif tile == :staircase_up
+                    if hero.level > 0
+                      args.state.staircase = :up
+                      args.state.scene = :staircase
+                      @@just_used_staircase = true
+                      @@staircase_animation_frame = 0
+                    else
+                      args.state.scene = :game_over
+                    end
+                  end
+                end
+              end
+            end
+          end
+          if args.inputs.keyboard.key_held.space || args.inputs.controller_one.key_held.a
+            # rest
+            args.state.hero.rest(args)
+            SoundFX.play_sound(:rest, args)
           end
         end
       end
@@ -239,7 +281,12 @@ class GUI
   # return false if move not possible
   def self.move_player dx, dy, args
     hero = args.state.hero
-    if args.inputs.keyboard.key_held.shift || args.inputs.controller_one.key_held.r1
+    if hero.has_status?(:shock)
+      HUD.output_message args, "You are shocked and cannot move!"
+      args.state.kronos.spend_time(hero, hero.walking_speed * 4, args)
+      return true
+    end
+    if args.inputs.keyboard.key_held.alt || args.inputs.controller_one.key_held.r1
       @@auto_move = [dx, dy] # move until blocked
     end
     @@standing_still_frames = 0
@@ -347,24 +394,6 @@ class GUI
     level = args.state.hero.level
     dungeon = args.state.dungeon
     tile = dungeon.levels[level].tiles[y][x]
-    unless @@just_used_staircase
-      if tile == :staircase_down  
-        if level < dungeon.levels.size - 1
-          args.state.staircase = :down
-          @@just_used_staircase = true
-          args.state.scene = :staircase
-        end
-      elsif tile == :staircase_up
-        if level > 0
-          args.state.staircase = :up
-          @@just_used_staircase = true
-          args.state.scene = :staircase
-        else
-          # reached the surface, game over          
-          args.state.scene = :game_over
-        end
-      end
-    end
   end
 
   def self.pan_to_player args
@@ -434,7 +463,7 @@ class GUI
       @@menu_cooldown -= 1
     end
     return unless hero
-    if args.inputs.controller_one.key_held.r2
+    if args.inputs.controller_one.key_held.r2 || args.inputs.keyboard.key_held.shift
       args.state.selected_item_index ||= 0
     else
       args.state.selected_item_index = nil
@@ -444,7 +473,7 @@ class GUI
         if @@menu_cooldown <= 0
           args.state.selected_item_index -= 1
           if args.state.selected_item_index < 0
-            args.state.selected_item_index = 0
+            args.state.selected_item_index = hero.carried_items.size - 1
           end
           @@menu_cooldown = 5
         end
@@ -452,7 +481,7 @@ class GUI
         if @@menu_cooldown <= 0
           args.state.selected_item_index += 1
           if args.state.selected_item_index >= hero.carried_items.size
-            args.state.selected_item_index = hero.carried_items.size - 1
+            args.state.selected_item_index = 0
           end
           @@menu_cooldown = 5
         end
@@ -464,6 +493,11 @@ class GUI
           hero.use_item(item, args)
           SoundFX.play_sound(:use_item, args)
         end
+      elsif
+        args.inputs.controller_one.key_down.b || args.inputs.keyboard.key_down.enter
+        # drop selected item
+        selected_index = args.state.selected_item_index
+        hero.drop_item(hero.carried_items[selected_index], args)
       end
     end
   end

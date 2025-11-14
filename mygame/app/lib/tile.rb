@@ -1,6 +1,7 @@
 class Tile
 
   attr_accessor :type, :hue, :mossiness
+
   @@tile_memory_per_level = []
   @@tile_visibility_per_level = []
 
@@ -83,8 +84,7 @@ class Tile
     tile_size = 40 * $zoom
     x_offset = $pan_x + (1280 - (level_width * tile_size)) / 2
     y_offset = $pan_y + (720 - (level_height * tile_size)) / 2
-    hue = level.floor_hue
-
+    hue = level.floor_hsl[0]
     tile_visibility = @@tile_visibility_per_level[args.state.current_level] || []
     tile_memory = @@tile_memory_per_level[args.state.current_level] || []
 

@@ -69,6 +69,11 @@ class Behaviour
   def fight args
     # find target (e.g., hero) and move towards it
     npc = @npc
+    if npc.has_status?(:shock)
+      args.state.kronos.spend_time(npc, npc.walking_speed * 4, args)
+      HUD.output_message args, "#{npc.name} is shocked and cannot move!"
+      return
+    end
     hero = args.state.hero
     if hero && hero.level == npc.level
       dx = hero.x - npc.x
@@ -120,6 +125,11 @@ class Behaviour
   end
 
   def wander args
+    if @npc.has_status?(:shock)
+      args.state.kronos.spend_time(@npc, @npc.walking_speed * 4, args)
+      HUD.output_message args, "#{@npc.name} is shocked and cannot move!"
+      return
+    end
     #printf "NPC #{@npc.species} is wandering.\n"
     npc = @npc
     # choose a random location on the map to walk to, stored in @destination

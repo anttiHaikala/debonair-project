@@ -42,21 +42,33 @@ class Potion < Item
     case self.kind
     when :potion_of_healing
       effect = 0
-      entity.traumas.each do |trauma|
-        roll = args.state.rng.d8
+      Trauma.active_traumas(entity).each do |trauma|
+        roll = args.state.rng.d12 
         if roll >= trauma.numeric_severity
           trauma.heal_one_step
           effect += 1
         end
       end
-      HUD.output_message(args, "You feel #{effect} times better!")
+      # test for shock recovery
+      if entity.has_status?(:shock)
+        still_shocked = Trauma.determine_shock(entity)  
+        unless still_shocked
+          entity.remove_status(:shock)
+        end
+      end
+      if effect == 0
+        HUD.output_message(args, "You feel no different after drinking the potion.")
+      end
     when :potion_of_strength
       HUD.output_message(args, "You feel stronger!")
     when :potion_of_speed
       HUD.output_message(args, "You feel faster!")
     when :potion_of_invisibility
       HUD.output_message(args, "You become invisible!")
+    else
+      HUD.output_message(args, "You feel strange...")
     end
+    entity.carried_items.delete(self)
+    args.state.kronos.spend_time(entity, entity.walking_speed, args)
   end
-
 end

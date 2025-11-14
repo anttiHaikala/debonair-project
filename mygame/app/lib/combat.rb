@@ -7,12 +7,34 @@ class Combat
     base_attack_roll = args.state.rng.d20
     to_hit = 5
     attack_roll = base_attack_roll
+    if defender.has_status?(:shock)
+      to_hit += 10
+    end
     weapon_modifier = 0
-    if attacker.carried_items
-      attacker.carried_items.each do |item|
-        if item.kind == :sword || item.kind == :axe || item.kind == :claws
-          weapon_modifier = 3
+    if attacker.wielded_items
+      attacker.wielded_items.each do |item|
+        if item.category == :weapon
+          weapon_modifier = 3 # base for all weapons
         end
+        if item.attributes.include?(:fine)
+          weapon_modifier += 2
+        elsif item.attributes.include?(:rusty) 
+          weapon_modifier -= 2
+        elsif item.attributes.include?(:crude)
+          weapon_modifier -= 1
+        elsif item.attributes.include?(:masterwork)
+          weapon_modifier += 4
+        elsif item.attributes.include?(:legendary)
+          weapon_modifier += 6
+        elsif item.attributes.include?(:cursed)
+          weapon_modifier -= 3
+        elsif item.attributes.include?(:broken)
+          weapon_modifier -= 4
+        end
+      end
+    end
+    if attacker.worn_items
+      attacker.worn_items.each do |item|
         if item.kind == :ring_of_accuracy
           attack_roll += 5
         end
@@ -26,7 +48,7 @@ class Combat
       return # miss
     end
     # defender attempts to dodge
-    if !attacker.invisible?
+    if !attacker.invisible? && !defender.has_status?(:shock)
       dodge_roll = args.state.rng.d20
       dodge_roll -= 3 # just to make it a bit less likely to dodge  
       if dodge_roll > attack_roll
@@ -42,15 +64,20 @@ class Combat
     Trauma.inflict(defender, hit_location, hit_kind, hit_severity, args)
     SoundFX.play_sound(:hit, args)
     HUD.output_message args, "#{aname} bruises #{dname}'s #{hit_location.to_s.gsub('_', ' ')} #{hit_severity}ly."
+    defender_shocked = Trauma.determine_shock(defender)
+    if defender_shocked
+      defender.add_status(:shock)
+      HUD.output_message args, "#{dname} is in shock from trauma!"
+    end
     # todo: inflict "shaken" effects to make the target miss some time due to receiving trauma
     defender_dead = Trauma.determine_morbidity(defender)
     printf "Defender dead?=: %s, Defender wound count: %d\n" % [defender_dead.to_s, defender.traumas.size]
     if defender_dead
-      HUD.output_message args, "#{dname} has died from their injuries!"
+      HUD.output_message args, "#{dname} has died!"
       if defender == args.state.run.hero
-        args.state.scene = :game_over
+        HUD.output_message args, "Press A to continue..."
         args.state.hero.perished = true
-        args.state.hero.reason_of_death = " combat against #{aname}"
+        args.state.hero.reason_of_death = "in combat against #{aname}"
         return
       else
         SoundFX.play_sound(:npc_death, args)
@@ -70,8 +97,32 @@ class Combat
 
   def self.hit_severity(attacker, defender, attack_roll, args)
     severity_modifier = 0
-    if attacker.carried_items
-      attacker.carried_items.each do |item|
+    weapon_modifier = 0
+    if attacker.wielded_items
+      attacker.wielded_items.each do |item|
+        if item.category == :weapon
+          weapon_modifier = 3 # base for all weapons
+        end
+        if item.attributes.include?(:fine)
+          weapon_modifier += 2
+        elsif item.attributes.include?(:rusty) 
+          weapon_modifier -= 2
+        elsif item.attributes.include?(:crude)
+          weapon_modifier -= 1
+        elsif item.attributes.include?(:masterwork)
+          weapon_modifier += 4
+        elsif item.attributes.include?(:legendary)
+          weapon_modifier += 6
+        elsif item.attributes.include?(:cursed)
+          weapon_modifier -= 3
+        elsif item.attributes.include?(:broken)
+          weapon_modifier -= 4
+        end
+      end
+    end
+    severity_modifier += weapon_modifier
+    if attacker.worn_items
+      attacker.worn_items.each do |item|
         if item.kind == :ring_of_strength
           severity_modifier += 5
         end
@@ -81,6 +132,15 @@ class Combat
       # natural 20, critical hit
       severity_modifier += 5
     end
+    # defender's items
+    if defender.worn_items
+      defender.worn_items.each do |item|
+        if item.kind == :ring_of_protection
+          severity_modifier -= 5
+        end
+      end
+    end
+    # roll for severity
     severity_roll = args.state.rng.d20 + severity_modifier
     case severity_roll
     when 1..8

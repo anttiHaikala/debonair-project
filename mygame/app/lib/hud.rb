@@ -22,7 +22,8 @@ class HUD
       a: 255,
       font: "fonts/olivetti.ttf"
     }
-    hero.traumas.each_with_index do |trauma, index|
+    traumas = Trauma.active_traumas(hero)
+    traumas.each_with_index do |trauma, index|
       args.outputs.labels << {
         x: 960,
         y: 620 - index * 13,
@@ -58,7 +59,7 @@ class HUD
       args.outputs.labels << {
         x: x,
         y: y,
-        text: item.kind.to_s.gsub('_',' '),
+        text: item.title,
         size_enum: 0,
         r: 255,
         g: 255,
@@ -66,6 +67,23 @@ class HUD
         a: 255,
         font: "fonts/olivetti.ttf"
       }
+      if hero.worn_items.include?(item)
+        args.outputs.sprites << {
+          x: x - 20,
+          y: y - item_size - 3,
+          r: 255,
+          g: 255,
+          b: 255,
+          a: 255,
+          w: 21,
+          h: 21,  
+          path: "sprites/simple-mood-16x16.png",
+          tile_x: 10*16,
+          tile_y: 15*16,
+          tile_w: 16,
+          tile_h: 16
+        }
+      end
       y -= item_size
     end
     if args.state.selected_item_index
@@ -81,6 +99,26 @@ class HUD
         b: 0,
         a: 100
       }
+    end
+    args.state.hero.carried_items.each_with_index do |item, index|
+      if args.state.hero.wielded_items.include?(item)
+        # draw a hand icon next to wielded items
+        args.outputs.sprites << {
+          x: x - 20,
+          y: 400 - item_size - index * item_size - 3,
+          r: 255,
+          g: 255,
+          b: 255,
+          a: 255,
+          w: 21,
+          h: 21,
+          path: "sprites/simple-mood-16x16.png",
+          tile_x: 9*16,
+          tile_y: 15*16,
+          tile_w: 16,
+          tile_h: 16
+        }
+      end
     end
   end
 

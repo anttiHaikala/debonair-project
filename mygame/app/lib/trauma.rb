@@ -70,10 +70,32 @@ class Trauma
     return trauma
   end
 
+  def self.determine_shock(entity)
+    shock_score = 0
+    shock_threshold = 3
+    entity.traumas.each do |trauma|
+      case trauma.severity
+      when :minor
+        shock_score += 0
+      when :moderate
+        shock_score += 1
+      when :severe
+        shock_score += 2
+      when :critical
+        shock_score += 3
+      end
+    end
+    if shock_score >= shock_threshold
+      return true
+    else
+      return false
+    end
+  end
+
   def self.determine_morbidity(entity)
     printf "Determining morbidity for entity with %d traumas.\n" % [entity.traumas.size]
     death_score = 0
-    death_threshold = 10
+    death_threshold = 6
     entity.traumas.each do |trauma|
       if body_parts_counted_for_death.include?(trauma.hit_location)
         case trauma.severity
@@ -97,5 +119,13 @@ class Trauma
 
   def self.body_parts_counted_for_death
     [:head, :torso, :heart, :lungs, :brain, :spine, :abdomen, :forehead, :top_of_skull, :back_of_skull, :colon, :intestines, :stomach, :genitals, :left_temple, :right_temple, :thorax, :eyes, :left_eye, :right_eye, :right_calf, :left_calf, :right_thigh, :left_thigh]
+  end
+
+  def self.active_traumas(entity)
+    return entity.traumas.select { |trauma| trauma.severity != :healed }
+  end
+
+  def title
+    "#{@severity.to_s.capitalize} #{@kind.to_s.gsub('_',' ')} on #{@hit_location.to_s.gsub('_',' ')}"
   end
 end

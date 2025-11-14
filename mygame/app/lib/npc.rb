@@ -74,6 +74,12 @@ class NPC < Entity
       when 1
         npc = NPC.new(:goblin, room.center_x, room.center_y, level.depth)
         level.entities << npc
+        level_mod = (level.depth / 10).floor
+        level_mod.times do |i|
+          new_npc = NPC.new(:goblin, room.center_x + Numeric.rand(-2..2), room.center_y + Numeric.rand(-2..2), level.depth)
+          level.entities << new_npc
+        end
+
       when 2
         npc = NPC.new(:grid_bug, room.center_x, room.center_y, level.depth)
         level.entities << npc

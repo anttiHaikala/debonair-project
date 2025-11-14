@@ -1,10 +1,10 @@
 TODO LIST
 ---------
+- carried weight, endurance, resting, tending to wounds
+- refactor: use "depth" everywhere as the level index
+- armor
 - perfromance optimization (bigger levels)
 - music tracker at 80 bpm
 - lighting (torches, wall mount torches and other lit things)
-- wield items
-- wield armor
-- drop stuff
 - lichen
 - bigger level area, more levels

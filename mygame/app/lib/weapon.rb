@@ -6,21 +6,22 @@ class Weapon < Item
 
   def self.kinds
     return [
-    :dagger, 
-    :sword, 
-    :axe, 
-    :mace, 
-    :bow, 
-    :spear,
-    :katana,
-    :club]
+      :dagger, 
+      :sword, 
+      :axe, 
+      :mace, 
+      :spear,
+      :katana,
+      :club
+    ]
   end
 
   def self.common_attributes
     [
       :rusty,
       :broken,
-      :fine
+      :fine,
+      :crude
     ]
   end
 
@@ -47,4 +48,20 @@ class Weapon < Item
     end
     return weapon
   end
+
+  def use(entity, args)
+    if entity.wielded_items.include?(self)
+      HUD.output_message(args, "You unwield the #{self.attributes.join(' ')} #{self.kind.to_s.gsub('_',' ')}.".gsub('  ',' '))
+      entity.wielded_items.delete(self)
+    else
+      entity.wielded_items = [self] # only one weapon at a time for now
+      HUD.output_message(args, "You wield the #{self.attributes.join(' ')}#{self.kind.to_s.gsub('_',' ').gsub('  ',' ')}.")
+    end
+    args.state.kronos.spend_time(entity, entity.walking_speed * 0.5, args) 
+  end
+
+  def title
+    "#{self.attributes.join(' ')} #{self.kind.to_s.gsub('_',' ')}".gsub('  ',' ').trim
+  end
+  
 end

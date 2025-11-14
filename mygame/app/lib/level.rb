@@ -1,17 +1,30 @@
 class Level
-  attr_accessor :depth, :levels, :tiles, :items
-  attr_accessor :floor_hue # this determines the color scheme of the level
+  attr_accessor :depth, :tiles, :items
+  attr_accessor :floor_hsl # this determines the color scheme of the level
   attr_accessor :vibe # this is a placeholder for different styles of level
   attr_accessor :rooms
   attr_accessor :entities
 
   def initialize
     @tiles = []
-    @floor_hue = Numeric.rand(360)
     @vibe = :hack
+    self.set_colors
     @rooms = []
     @entities = []
     @items = []
+  end
+
+  def set_colors
+    case @vibe
+    when :hack
+      @floor_hsl = [34, 0, 100]
+    when :lush
+      @floor_hsl = [120, 255, 100]
+    when :swamp
+      @floor_hsl = [34, 0, 100]
+    else  
+      @floor_hsl = [34, 0, 100]
+    end
   end
 
   def entity_at(x, y)

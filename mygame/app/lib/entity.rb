@@ -6,8 +6,9 @@ class Entity
   attr_accessor :enemies
   attr_accessor :allies
   attr_accessor :needs
-  attr_accessor :carried_items, :worn_items
+  attr_accessor :carried_items, :worn_items, :wielded_items
   attr_accessor :behaviours
+  attr_accessor :statuses
 
   def self.kinds
     [:generic, :item, :pc, :npc, :plant, :furniture]
@@ -28,6 +29,16 @@ class Entity
     @carried_items = []
     @worn_items = []
     @behaviours = []
+    @wielded_items = []
+    @statuses = []
+  end
+
+  def add_status(status)
+    @statuses << status unless @statuses.include?(status)
+  end
+
+  def has_status?(status)
+    return @statuses.include?(status)
   end
   
   def color
@@ -56,8 +67,8 @@ class Entity
     when :grid_bug
       range += 5
     end
-    if self.carried_items
-      self.carried_items.each do |item|
+    if self.worn_items
+      self.worn_items.each do |item|
         if item.kind == :ring_of_telepathy
           range += 20
         end
@@ -98,5 +109,28 @@ class Entity
       return
     end
     item.use(self, args)
+  end
+
+  def drop_item(item, args)
+    # check that entity has item
+    unless self.carried_items && self.carried_items.include?(item)
+      printf "ERROR: #{self.name} tries to drop a #{item.kind.to_s.gsub('_',' ')} but doesn't have it."
+      return
+    end
+    # check that it is not worn
+    # you cannot drop worn items
+    if self.worn_items && self.worn_items.include?(item)
+      printf "ERROR: #{self.name} tries to drop a #{item.kind.to_s.gsub('_',' ')} but is wearing it."
+      return
+    end
+    self.carried_items.delete(item)
+    level = args.state.dungeon.levels[self.level]
+    item.x = self.x
+    item.y = self.y
+    item.level = self.level
+    level.items << item
+    printf "Dropped item: %s\n" % item.kind.to_s
+    SoundFX.play_sound(:drop_item, args)
+    HUD.output_message(args, "#{self.name} dropped #{item.kind.to_s.gsub('_',' ')}.")
   end
 end

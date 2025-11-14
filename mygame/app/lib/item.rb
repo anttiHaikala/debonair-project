@@ -28,6 +28,10 @@ class Item
     [255, 215, 0]
   end
 
+  def title
+    "#{self.attributes.join(' ')} #{self.kind.to_s.gsub('_',' ')}".gsub('  ',' ').trim
+  end
+
   def c 
     # character representation from the sprite sheet
     case @category
@@ -74,7 +78,7 @@ class Item
         item.y = room.center_y
         level.items << item
       when 2
-        item = Potion.new(:health_potion)
+        item = Potion.new(:potion_of_healing)
         item.level = level.depth
         item.x = room.center_x
         item.y = room.center_y

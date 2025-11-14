@@ -22,7 +22,7 @@ class GameOverScreen
       args.outputs.labels << { x: 640, y: 500, text: "Game Over", size_enum: 5, alignment_enum: 1, r: 250, g: 250, b: 250 }
       if args.state.hero.perished
         reason_of_death = args.state.hero.reason_of_death || "unknown causes"
-        args.outputs.labels << { x: 640, y: 460, text: "You have died from #{reason_of_death}.", size_enum: 3, alignment_enum: 1, r: 250, g: 250, b: 250 }
+        args.outputs.labels << { x: 640, y: 460, text: "You have died #{reason_of_death}.".gsub('  ', ' '), size_enum: 3, alignment_enum: 1, r: 250, g: 250, b: 250 }
         GameOverScreen.play_game_over_sound(:player_died, args)
       else
         args.outputs.labels << { x: 640, y: 460, text: "You escaped the dungeon without the Amulet of Skandor.", size_enum: 3, alignment_enum: 1, r: 250, g: 250, b: 250 }
@@ -31,9 +31,8 @@ class GameOverScreen
     end
     args.outputs.labels << { x: 640, y: 320, text: "Thanks for Playing", size_enum: 5, alignment_enum: 1, r: 250, g: 250, b: 250 }
     args.outputs.labels << { x: 640, y: 280, text: "press space to continue", size_enum: 3, alignment_enum: 1, r: 250, g: 250, b: 250 }
-    if args.inputs.keyboard.key_down.space
+    if args.inputs.keyboard.key_down.space || args.inputs.controller_one.key_down.a
       args.gtk.reset
-      reset args
       args.state.scene = :title_screen
     end
   end
