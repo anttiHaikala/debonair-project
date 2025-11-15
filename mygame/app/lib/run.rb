@@ -18,7 +18,7 @@ class Run
     Architect.instance.architect_dungeon(args)
     @dungeon = args.state.dungeon # TODO: should we only access these things below the :run attribute?
     @hero = args.state.hero
-    args.state.current_level = 0
+    args.state.current_depth = 0
     args.state.kronos = Kronos.new
   end
     

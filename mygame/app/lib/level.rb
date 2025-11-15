@@ -14,6 +14,14 @@ class Level
     @items = []
   end
 
+  def width
+    return @tiles[0].size if @tiles.size > 0
+  end
+
+  def height
+    return @tiles.size if @tiles
+  end
+
   def set_colors
     case @vibe
     when :hack
@@ -34,6 +42,18 @@ class Level
       end
     end
     return nil
+  end
+
+  def tile_at(x, y)
+    unless x.is_a?(Integer) && y.is_a?(Integer)
+      printf "tile_at called with non-integer coordinates: (%s, %s)\n" % [x.to_s, y.to_s]
+      return nil
+    end
+    return nil unless @tiles
+    return nil unless @tiles.size > 0
+    return nil if y < 0 || y >= @tiles.size
+    return nil if x < 0 || x >= @tiles[0].size
+    return @tiles[y][x]
   end
 
   def create_rooms(args)
@@ -80,6 +100,36 @@ class Level
     return false
   end
 
+  def staircase_down_x
+    pos = staircase_down_position
+    return pos[:x] unless pos.nil?
+    return nil
+  end
+
+  def staircase_down_y
+    pos = staircase_down_position
+    return pos[:y] unless pos.nil?
+    return nil
+  end
+
+  def staircase_down_position
+    for y in 0...@tiles.size
+      for x in 0...@tiles[y].size
+        if @tiles[y][x] == :staircase_down
+          return {:x => x, :y => y}
+        end
+      end
+    end
+    return nil
+  end
+
+  def is_walkable?(x, y)
+    tile = tile_at(x, y)
+    return false if tile.nil?
+    walkable_tiles = [:floor, :closed_door, :open_door, :staircase_up, :staircase_down]
+    return walkable_tiles.include?(tile)
+  end
+
   def add_foliage(args)
 
     # add some foliage to the level based on vibe
@@ -89,6 +139,8 @@ class Level
       foliage_types = [:lichen, :moss, :fungus, :small_plant, :puddle]
     when :swamp
       foliage_types = [:moss, :fungus, :small_plant]
+    when :ice
+      foliage_types = [:lichen, :moss, :fungus]
     else
       foliage_types = [:puddle, :lichen]
     end
@@ -183,8 +235,6 @@ class Level
   end
 
 end
-
-
 class Room
   attr_accessor :x, :y, :w, :h, :center_x, :center_y
   def initialize(x, y, w, h)

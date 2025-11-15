@@ -2,15 +2,15 @@ class NPC < Entity
 
   include Needy
 
-  attr_accessor :char, :species, :has_been_seen, :level, :status, :behaviours, :carried_items
+  attr_accessor :char, :species, :has_been_seen, :depth, :status, :behaviours, :carried_items
 
-  def initialize(species, x = 0, y = 0, level_depth = 0)
+  def initialize(species, x = 0, y = 0, depth = 0)
     @kind = :npc
     @species = species
     @has_been_seen = false
     @home = [x, y]
-    @home_level = level_depth
-    @level = level_depth
+    @home_depth = depth
+    @depth = depth
     @status = []
     super(x, y)
     initialize_needs
@@ -104,7 +104,7 @@ class NPC < Entity
     when :goblin
       species_speed = 1.4 # seconds per tile
     when :grid_bug
-      species_speed = 0.7
+      species_speed = 0.2
     when :rat
       species_speed = 0.8
     when :gelatinous_cube # these guys keep the dungeon clean??

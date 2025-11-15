@@ -7,8 +7,8 @@ class Architect
   def setup(settings)
     @settings ||= {}
     @settings[:levels] ||= 10
-    @settings[:level_width] ||= 30   
-    @settings[:level_height] ||= 10
+    @settings[:level_width] ||= 46   
+    @settings[:level_height] ||= 36
   end
 
   def self.create_seed(args)
@@ -77,8 +77,6 @@ class Architect
       should_be_same = args.state.dungeon.levels[depth].tiles[staircase_y][staircase_x]
       # add rooms and corridors
       level.create_rooms(args)
-
-
       level.create_corridors(args)
       
       # dig corridor from staircase up to entry room
@@ -123,7 +121,7 @@ class Architect
 
   def populate_entities(args)
     hero = Hero.new(args.state.dungeon_entrance_x, args.state.dungeon_entrance_y)
-    hero.level = 0
+    hero.depth = 0
     args.state.hero = hero
     args.state.dungeon.levels[0].entities << hero
     NPC.populate_dungeon(args.state.dungeon, args)

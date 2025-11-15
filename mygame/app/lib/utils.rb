@@ -54,4 +54,58 @@ module Utils
     end
     return points
   end
+
+  def self.dijkstra(start_x, start_y, end_x, end_y, level)
+    # simple Dijkstra implementation for pathfinding
+    visited = {}
+    distances = {}
+    previous = {}
+    queue = []    
+    for y in 0...level.height
+      for x in 0...level.width
+        distances["#{x},#{y}"] = Float::INFINITY
+        previous["#{x},#{y}"] = nil
+        queue << {:x => x, :y => y}
+      end
+    end
+    distances["#{start_x},#{start_y}"] = 0
+    while queue.size > 0 do
+      # get node in queue with smallest distance
+      current = nil
+      current_distance = Float::INFINITY
+      queue.each do |node|
+        dist = distances["#{node[:x]},#{node[:y]}"]
+        if dist < current_distance
+          current_distance = dist
+          current = node
+        end
+      end
+      if current[:x] == end_x && current[:y] == end_y
+        break
+      end
+      queue.delete(current)
+      neighbors = [
+        {:x => current[:x] + 1, :y => current[:y]},
+        {:x => current[:x] - 1, :y => current[:y]},
+        {:x => current[:x], :y => current[:y] + 1},
+        {:x => current[:x], :y => current[:y] - 1}
+      ]
+      neighbors.each do |neighbor|
+        next unless level.is_walkable?(neighbor[:x], neighbor[:y])
+        alt = distances["#{current[:x]},#{current[:y]}"] + 1
+        if alt < distances["#{neighbor[:x]},#{neighbor[:y]}"]
+          distances["#{neighbor[:x]},#{neighbor[:y]}"] = alt
+          previous["#{neighbor[:x]},#{neighbor[:y]}"] = current
+        end
+      end
+    end
+    # reconstruct path
+    path = []
+    u = {:x => end_x, :y => end_y}
+    while previous["#{u[:x]},#{u[:y]}"]
+      path.unshift(u)
+      u = previous["#{u[:x]},#{u[:y]}"]
+    end
+    return path
+  end
 end

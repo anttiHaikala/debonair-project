@@ -180,6 +180,7 @@ class Hero < Entity
   end
   
   def apply_hunger args
+    hero = self
     hunger_increase = 0.001 # per game world time unit
     @hunger += hunger_increase
     hunger_level_before = @hunger_level
@@ -200,26 +201,49 @@ class Hero < Entity
     if hunger_level_before != @hunger_level
       case @hunger_level
       when :satiated
-        HUD.output_message(args, "You feel satiated.")
+        if hero.traits.include?(:robot) || hero.traits.include?(:undead)
+          HUD.output_message(args, "You feel full of energy.")
+        else
+          HUD.output_message(args, "You feel satiated.")
+        end
       when :okay
         if !hunger_level_before == :satiated
-          HUD.output_message(args, "You are no longer hungry.")
+          if hero.traits.include?(:robot) || hero.traits.include?(:undead)
+            HUD.output_message(args, "You no longer lack energy.")
+          else
+            HUD.output_message(args, "You are no longer hungry.")
+          end
         end
       when :hungry
-        HUD.output_message(args, "You feel hungry.")
+        if hero.traits.include?(:robot) || hero.traits.include?(:undead)
+          HUD.output_message(args, "You are somewhat low on energy.")
+        else
+          HUD.output_message(args, "You feel hungry.")
+        end 
       when :starving
-        HUD.output_message(args, "You feel starving!")
+        if hero.traits.include?(:robot) || hero.traits.include?(:undead)
+          HUD.output_message(args, "You are low on energy!")
+        else
+          HUD.output_message(args, "You feel starving!")
+        end
       when :dying
-        HUD.output_message(args, "You starve to death!")
-        args.state.hero.perished = true
-        args.state.hero.reason_of_death = "of starvation"
+        if hero.traits.include?(:undead) || hero.traits.include?(:robot)
+          HUD.output_message(args, "You have no energy left. Eat something.")
+        else
+          HUD.output_message(args, "You starve to death!")
+          args.state.hero.perished = true
+          args.state.hero.reason_of_death = "of starvation"
+        end
       end
     end      
   end
 
   def apply_walking_exhaustion args
-    base_exhaustion_increase = 0.005 # per tile walked
-    exhaustion_increase = base_exhaustion_increase * Item.encumbrance_factor(self, args)
+    base_exhaustion_increase = 0.002 # per tile walked
+    exhaustion_increase = base_exhaustion_increase * Item.encumbrance_factor(self, args) 
+    if self.traits.include?(:robot)
+      exhaustion_increase *= 0.5
+    end
     apply_exhaustion(exhaustion_increase, args)
   end
 end

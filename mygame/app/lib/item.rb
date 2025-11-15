@@ -74,7 +74,7 @@ class Item
     when :armor
       return [2,0]
     when :scroll
-      return [16,3]
+      return [15,3]
     when :wand
       return [4,0]
     when :ring
@@ -102,7 +102,7 @@ class Item
     level.rooms.each do |room|
       case args.state.rng.d6
         when 1
-          item = Food.new(:food_ration)
+          item = Food.new(:food_ration, args)
           item.level = level.depth
           item.x = room.center_x
           item.y = room.center_y

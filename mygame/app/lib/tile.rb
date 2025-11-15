@@ -23,7 +23,7 @@ class Tile
   end
 
   def self.occupied?(x, y, args)
-    level = args.state.dungeon.levels[args.state.current_level]
+    level = args.state.dungeon.levels[args.state.current_depth]
     level.entities.each do |entity|
       if entity.x == x && entity.y == y
         return true
@@ -33,18 +33,18 @@ class Tile
   end
 
   def self.is_tile_visible?(x, y, args)
-    tile_visibility = @@tile_visibility_per_level[args.state.current_level] || []
+    tile_visibility = @@tile_visibility_per_level[args.state.current_depth] || []
     return tile_visibility[y] && tile_visibility[y][x]
   end
 
   def self.auto_map_whole_level args
     dungeon = args.state.dungeon
-    level = dungeon.levels[args.state.current_level]
-    level_height = dungeon.levels[args.state.current_level].tiles.size
-    level_width = dungeon.levels[args.state.current_level].tiles[0].size
+    level = dungeon.levels[args.state.current_depth]
+    level_height = dungeon.levels[args.state.current_depth].tiles.size
+    level_width = dungeon.levels[args.state.current_depth].tiles[0].size
 
-    @@tile_memory_per_level[args.state.current_level] ||= []
-    tile_memory = @@tile_memory_per_level[args.state.current_level] 
+    @@tile_memory_per_level[args.state.current_depth] ||= []
+    tile_memory = @@tile_memory_per_level[args.state.current_depth] 
 
     for y in 0...level_height
       tile_memory[y] ||= []
@@ -53,16 +53,16 @@ class Tile
       end
     end
 
-    @@tile_memory_per_level[args.state.current_level] = tile_memory
+    @@tile_memory_per_level[args.state.current_depth] = tile_memory
   end
 
   def self.observe_tiles args
     dungeon = args.state.dungeon
-    level = dungeon.levels[args.state.current_level]
+    level = dungeon.levels[args.state.current_depth]
     vision_range = args.state.hero.vision_range
 
     # determine visible tiles (line of sight)
-    tile_visibility = @@tile_visibility_per_level[args.state.current_level] ||= []
+    tile_visibility = @@tile_visibility_per_level[args.state.current_depth] ||= []
     for y in level.tiles.each_index
       tile_visibility[y] ||= []
       for x in level.tiles[y].each_index
@@ -77,11 +77,11 @@ class Tile
         end
       end
     end
-    @@tile_visibility_per_level[args.state.current_level] = tile_visibility
+    @@tile_visibility_per_level[args.state.current_depth] = tile_visibility
 
     # update memory with currently visible tiles
-    @@tile_memory_per_level[args.state.current_level] ||= []
-    tile_memory = @@tile_memory_per_level[args.state.current_level] 
+    @@tile_memory_per_level[args.state.current_depth] ||= []
+    tile_memory = @@tile_memory_per_level[args.state.current_depth] 
 
     for y in level.tiles.each_index
       tile_memory[y] ||= []
@@ -92,20 +92,20 @@ class Tile
       end
     end
 
-    @@tile_memory_per_level[args.state.current_level] = tile_memory
+    @@tile_memory_per_level[args.state.current_depth] = tile_memory
   end
 
   def self.draw_tiles args
     dungeon = args.state.dungeon
-    level = dungeon.levels[args.state.current_level]
-    level_height = dungeon.levels[args.state.current_level].tiles.size
-    level_width = dungeon.levels[args.state.current_level].tiles[0].size
+    level = dungeon.levels[args.state.current_depth]
+    level_height = dungeon.levels[args.state.current_depth].tiles.size
+    level_width = dungeon.levels[args.state.current_depth].tiles[0].size
     tile_size = 40 * $zoom
     x_offset = $pan_x + (1280 - (level_width * tile_size)) / 2
     y_offset = $pan_y + (720 - (level_height * tile_size)) / 2
     hue = level.floor_hsl[0]
-    tile_visibility = @@tile_visibility_per_level[args.state.current_level] || []
-    tile_memory = @@tile_memory_per_level[args.state.current_level] || []
+    tile_visibility = @@tile_visibility_per_level[args.state.current_depth] || []
+    tile_memory = @@tile_memory_per_level[args.state.current_depth] || []
 
     for y in level.tiles.each_index
       for x in level.tiles[y].each_index
@@ -194,7 +194,7 @@ class Tile
           y: y_offset + y * tile_size,
           w: tile_size,
           h: tile_size,
-          path: "sprites/simple-mood-16x16.png",
+          path: "sprites/sm16px.png",
           tile_x: 12*16,
           tile_y: 3*16,
           tile_w: 16,
@@ -210,7 +210,7 @@ class Tile
           y: y_offset + y * tile_size,
           w: tile_size,
           h: tile_size,
-          path: "sprites/simple-mood-16x16.png",
+          path: "sprites/sm16px.png",
           tile_x: 14*16,
           tile_y: 3*16,
           tile_w: 16,

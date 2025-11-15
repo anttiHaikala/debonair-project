@@ -40,7 +40,7 @@ class Kronos
     # we might change it so that offscreen levels also advance time slowly later.
     # or at least the levels +-1 from the current level are active
     relevant_entities = []
-    relevant_entities += args.state.dungeon.levels[args.state.hero.level].entities
+    relevant_entities += args.state.dungeon.levels[args.state.hero.depth].entities
 
     min_busy_until = nil
     idle_entity = nil

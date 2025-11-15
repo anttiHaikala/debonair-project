@@ -1,7 +1,7 @@
 #$gtk.trace_nil_punning!
 
 #$fixed_seed = 'dsfjkldasjf'
-$debug = false
+$debug = true
 $zoom = 0.7
 $pan_x = 0.0
 $pan_y = 0.0
@@ -54,7 +54,7 @@ def reset args
   printf "Resetting game state...\n"
   args.state.dungeon = nil
   args.state.hero = nil
-  args.state.current_level = nil
+  args.state.current_depth = nil
   args.state.kronos = nil
   args.state.scene = :title_screen
   Tile.reset_memory_and_visibility

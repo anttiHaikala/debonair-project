@@ -44,6 +44,10 @@ class SeededRandom
   def choice(array)
     array[nxt_int(0, array.length - 1)]
   end
+
+  def sample(array)
+    choice(array)
+  end
   
   def shuffle(array)
     result = array.dup

@@ -80,7 +80,7 @@ class HUD
           a: 255,
           w: 21,
           h: 21,  
-          path: "sprites/simple-mood-16x16.png",
+          path: "sprites/sm16px.png",
           tile_x: 10*16,
           tile_y: 15*16,
           tile_w: 16,
@@ -115,7 +115,7 @@ class HUD
           a: 255,
           w: 21,
           h: 21,
-          path: "sprites/simple-mood-16x16.png",
+          path: "sprites/sm16px.png",
           tile_x: 9*16,
           tile_y: 15*16,
           tile_w: 16,
@@ -173,6 +173,30 @@ class HUD
       b: 100,
       a: 255
     }
+    # hunger bar
+    hunger_bar_width = 270
+    hunger_bar_height = 3
+    args.outputs.solids << {
+      x: 960,
+      y: 638,
+      w: hunger_bar_width,
+      h: hunger_bar_height,
+      r: 0,
+      g: 0,
+      b: 0,
+      a: 255
+    }
+    hunger_width = (hero.hunger * hunger_bar_width).to_i
+    args.outputs.solids << {
+      x: 960,
+      y: 638,
+      w: hunger_width,
+      h: hunger_bar_height,
+      r: 100,       
+      g: 70,     
+      b: 0,
+      a: 255
+    }
   end
 
   def self.draw_seed args
@@ -180,7 +204,7 @@ class HUD
     args.outputs.labels << {
       x: 10,
       y: 40,
-      text: "level: #{args.state.hero.level+1} time: #{args.state.kronos.world_time.to_i} seed: #{seed} ",
+      text: "level: #{args.state.hero.depth+1} time: #{args.state.kronos.world_time.to_i} seed: #{seed} ",
       size_enum: 0,
       r: 255,
       g: 255,
@@ -234,7 +258,7 @@ class HUD
       args.outputs.labels << {
         x: 10,
         y: 100,
-        text: "pos [#{hero.x}, #{hero.y}] level #{hero.level} tiletype: #{args.state.dungeon.levels[hero.level].tiles[hero.y][hero.x]} auto_move: #{GUI.auto_move}",
+        text: "pos [#{hero.x}, #{hero.y}] level #{hero.depth} tiletype: #{args.state.dungeon.levels[hero.depth].tiles[hero.y][hero.x]} auto_move: #{GUI.auto_move}",
         size_enum: 0,
 
         r: 255,

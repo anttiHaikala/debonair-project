@@ -97,7 +97,7 @@ class Combat
       else
         SoundFX.play_sound(:npc_death, args)
         # remove defender from level
-        level = args.state.dungeon.levels[defender.level]
+        level = args.state.dungeon.levels[defender.depth]
         level.entities.delete(defender)
       end
     else

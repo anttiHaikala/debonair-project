@@ -1,7 +1,7 @@
 class Entity
   # x and y are the logical positions in the grid
   # visual_x and visual_y are used for smooth movement animations
-  attr_accessor :level, :x, :y, :kind, :visual_x, :visual_y, :busy_until, :traumas, :perished, :reason_of_death, :species
+  attr_accessor :depth, :x, :y, :kind, :visual_x, :visual_y, :busy_until, :traumas, :perished, :reason_of_death, :species
 
   attr_accessor :enemies
   attr_accessor :allies
@@ -111,7 +111,7 @@ class Entity
     if other_entity.invisible?
       return false
     end
-    return Utils.line_of_sight?(self.x, self.y, other_entity.x, other_entity.y, args.state.dungeon.levels[self.level])
+    return Utils.line_of_sight?(self.x, self.y, other_entity.x, other_entity.y, args.state.dungeon.levels[self.depth])
   end
 
   def use_item(item, args)
@@ -136,10 +136,10 @@ class Entity
       return
     end
     self.carried_items.delete(item)
-    level = args.state.dungeon.levels[self.level]
+    level = args.state.dungeon.levels[self.depth]
     item.x = self.x
     item.y = self.y
-    item.level = self.level
+    item.level = self.depth
     level.items << item
     printf "Dropped item: %s\n" % item.kind.to_s
     SoundFX.play_sound(:drop_item, args)
@@ -147,15 +147,18 @@ class Entity
   end
 
   def teleport(args, x=nil, y=nil)
-    level = args.state.dungeon.levels[self.level]
+    level = args.state.dungeon.levels[self.depth]
+    printf "#{self.name} attempts to teleport to (%s, %s) on level %d\n" % [x.nil? ? "random" : x.to_s, y.nil? ? "random" : y.to_s, self.depth] 
+    printf level.class.to_s + "\n"
     if x.nil? || y.nil?
       # random teleport
       max_attempts = 100
       attempts = 0
       begin
-        x = args.state.rng.rand(0...level.width)
-        y = args.state.rng.rand(0...level.height)
+        x = args.state.rng.nxt_int(0, level.width-1)
+        y = args.state.rng.nxt_int(0, level.height-1)
         attempts += 1
+        printf "Teleport attempt %d to (%d, %d)\n" % [attempts, x, y]
       end while !level.is_walkable?(x,y) && attempts < max_attempts
       if attempts >= max_attempts
         HUD.output_message(args, "#{self.name} tries to teleport but fails!")
@@ -167,10 +170,7 @@ class Entity
       self.y = y
       self.visual_x = x
       self.visual_y = y
-      HUD.output_message(args, "#{self.name} teleports to (#{x}, #{y}).")
       SoundFX.play_sound(:teleport, args)
-    else
-      HUD.output_message(args, "#{self.name} tries to teleport to (#{x}, #{y}) but fails!")
     end
   end
 end

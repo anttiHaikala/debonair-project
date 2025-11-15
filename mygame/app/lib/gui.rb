@@ -48,19 +48,19 @@ class GUI
     args.outputs.primitives << { x: 0, y: 0, w: 1280, h: 720, path: :solid, r: 0, g: 0, b: 0, a: alpha, blendmode_enum: 1 }
     if @@staircase_animation_frame > cutoff && args.state.staircase
       # actually change level now
-      old_level = args.state.dungeon.levels[args.state.current_level]
+      old_level = args.state.dungeon.levels[args.state.current_depth]
       old_level.entities.delete(args.state.hero)
-      args.state.hero.level += (args.state.staircase == :down ? 1 : -1)
-      args.state.current_level = args.state.hero.level
+      args.state.hero.depth += (args.state.staircase == :down ? 1 : -1)
+      args.state.current_depth = args.state.hero.depth
       args.state.staircase = nil
       @@tiles_observed = false
-      new_level = args.state.dungeon.levels[args.state.current_level]
+      new_level = args.state.dungeon.levels[args.state.current_depth]
       new_level.entities << args.state.hero
     end
     if @@staircase_animation_frame >= duration_in_frames
       args.state.scene = :gameplay
       @@staircase_animation_frame = 0
-      HUD.output_message args, "You enter level #{args.state.current_level + 1} of the dungeon."
+      HUD.output_message args, "You enter level #{args.state.current_depth + 1} of the dungeon."
     end
   end
 
@@ -74,7 +74,7 @@ class GUI
       @@look_mode_frames = 1
     end
     hero = args.state.hero
-    level = args.state.dungeon.levels[hero.level]
+    level = args.state.dungeon.levels[hero.depth]
     visible_things = []
     # find visible items
     level.items.each do |item|
@@ -120,7 +120,7 @@ class GUI
       if thing
         tile_size = $tile_size * $zoom
         dungeon = args.state.dungeon
-        level = dungeon.levels[args.state.current_level]
+        level = dungeon.levels[args.state.current_depth]
         level_height = level.tiles.size
         level_width = level.tiles[0].size
         x_offset = $pan_x + (1280 - (level_width * tile_size)) / 2
@@ -136,7 +136,7 @@ class GUI
           b: 255,
           w: tile_size,
           h: tile_size,
-          path: "sprites/simple-mood-16x16.png",
+          path: "sprites/sm16px.png",
           tile_x: 15*16,
           tile_y: 1*16,
           tile_w: 16,
@@ -179,6 +179,22 @@ class GUI
     else 
       @@look_mode_index = nil 
     end
+    # debug inputs
+    if $debug
+      if args.inputs.keyboard.key_down.m || args.controller_one.key_down.x
+        Tile.auto_map_whole_level(args)
+      end
+      if args.inputs.keyboard.key_down.t || args.controller_one.key_down.y
+        args.state.hero.teleport(args)
+      end
+      if args.inputs.keyboard.key_down.l || args.controller_one.key_down.r1
+        # debug info you need right now
+        printf "Dijkstra test from hero position %d,%d to exit staircase %d,%d\n" % [args.state.hero.x, args.state.hero.y,args.state.dungeon.levels[args.state.hero.depth].staircase_down_x, args.state.dungeon.levels[args.state.hero.depth].staircase_down_y]
+        path = Utils.dijkstra(args.state.hero.x, args.state.hero.y, args.state.dungeon.levels[args.state.hero.depth].staircase_down_x, args.state.dungeon.levels[args.state.hero.depth].staircase_down_y, args.state.dungeon.levels[args.state.hero.depth]) 
+        printf "Dijkstra path length: %d\n" % [path.size]
+        return
+      end
+    end
     # inventory management can happen in parallel
     self.handle_inventory_input args
     unless GUI.is_hero_locked? # already moving
@@ -211,7 +227,7 @@ class GUI
             # pick up item(s) on the current tile
             # check for items
             hero = args.state.hero
-            level = args.state.dungeon.levels[hero.level]
+            level = args.state.dungeon.levels[hero.depth]
             items_on_tile = level.items.select { |item| item.x == hero.x && item.y == hero.y }
             # if there are items:
             if items_on_tile && items_on_tile.size > 0
@@ -234,7 +250,7 @@ class GUI
                     @@just_used_staircase = true
                     @@staircase_animation_frame = 0
                   elsif tile == :staircase_up
-                    if hero.level > 0
+                    if hero.depth > 0
                       args.state.staircase = :up
                       args.state.scene = :staircase
                       @@just_used_staircase = true
@@ -304,7 +320,7 @@ class GUI
   end
 
   def self.draw_items args
-    level = args.state.dungeon.levels[args.state.current_level]
+    level = args.state.dungeon.levels[args.state.current_depth]
     return unless level
     tile_size = $tile_size * $zoom
     dungeon = args.state.dungeon
@@ -321,7 +337,7 @@ class GUI
         y: y_offset + item.y * tile_size,
         w: tile_size,
         h: tile_size,
-        path: "sprites/simple-mood-16x16.png",
+        path: "sprites/sm16px.png",
         tile_x: item.c[0]*16,
         tile_y: item.c[1]*16,
         tile_w: 16,
@@ -335,7 +351,7 @@ class GUI
   end
 
   def self.draw_entities args
-    level = args.state.dungeon.levels[args.state.current_level]
+    level = args.state.dungeon.levels[args.state.current_depth]
     return unless level
     level.entities.each do |entity|
       unless entity == args.state.hero
@@ -354,7 +370,7 @@ class GUI
       end
       tile_size = $tile_size * $zoom
       dungeon = args.state.dungeon
-      level = dungeon.levels[args.state.current_level]
+      level = dungeon.levels[args.state.current_depth]
       level_height = level.tiles.size
       level_width = level.tiles[0].size
       x_offset = $pan_x + (1280 - (level_width * tile_size)) / 2
@@ -370,7 +386,7 @@ class GUI
         y: y_offset + y * tile_size,
         w: tile_size,
         h: tile_size,
-        path: "sprites/simple-mood-16x16.png",
+        path: "sprites/sm16px.png",
         tile_x: entity.c[0]*16,
         tile_y: entity.c[1]*16,
         tile_w: 16,
@@ -414,12 +430,12 @@ class GUI
       @@auto_move = nil
       return false
     end
-    if hero.x + dx >= args.state.dungeon.levels[hero.level].tiles[0].size ||
-       hero.y + dy >= args.state.dungeon.levels[hero.level].tiles.size
+    if hero.x + dx >= args.state.dungeon.levels[hero.depth].tiles[0].size ||
+       hero.y + dy >= args.state.dungeon.levels[hero.depth].tiles.size
       @@auto_move = nil
       return false
     end
-    target_tile = args.state.dungeon.levels[hero.level].tiles[hero.y + dy][hero.x + dx]
+    target_tile = args.state.dungeon.levels[hero.depth].tiles[hero.y + dy][hero.x + dx]
     unless Tile.is_walkable?(target_tile, args)
       @@auto_move = nil
       return false
@@ -430,7 +446,7 @@ class GUI
         return false
       end
       GUI.lock_hero
-      npc = args.state.dungeon.levels[hero.level].entity_at(hero.x + dx, hero.y + dy)
+      npc = args.state.dungeon.levels[hero.depth].entity_at(hero.x + dx, hero.y + dy)
       npc.enemies << hero unless npc.enemies.include?(hero)
       Combat.resolve_attack(hero, npc, args)
       args.state.kronos.spend_time(hero, hero.walking_speed, args) # todo fix speed depending on action
@@ -447,7 +463,7 @@ class GUI
 
   def self.update_entity_animations args
     animation_speed = 0.2 # tiles per frame
-    level = args.state.dungeon.levels[args.state.current_level]
+    level = args.state.dungeon.levels[args.state.current_depth]
     return unless level
     level.entities.each do |entity|
       if entity.visual_x < entity.x
@@ -506,7 +522,7 @@ class GUI
     # check if we stepped on something?
     x = args.state.hero.x
     y = args.state.hero.y
-    level = args.state.hero.level
+    level = args.state.hero.depth
     dungeon = args.state.dungeon
     tile = dungeon.levels[level].tiles[y][x]
   end
@@ -515,7 +531,7 @@ class GUI
     hero = args.state.hero
     tile_size = $tile_size * $zoom
     dungeon = args.state.dungeon
-    level = dungeon.levels[args.state.current_level]
+    level = dungeon.levels[args.state.current_depth]
     level_height = level.tiles.size
     level_width = level.tiles[0].size
     x_offset = $pan_x + ($gui_width - (level_width * tile_size)) / 2

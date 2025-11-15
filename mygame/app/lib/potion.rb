@@ -7,17 +7,21 @@ class Potion < Item
   def self.kinds
     [
     :potion_of_healing,
-    :potion_of_strength,
-    :potion_of_speed,
-    :potion_of_invisibility,
+    # :potion_of_strength,
+    # :potion_of_speed,
+    # :potion_of_invisibility,
     # :potion_of_fire_resistance,
     # :potion_of_cold_resistance,
-    :potion_of_poison,
+    # :potion_of_poison,
     # :potion_of_water_breathing,
     # :potion_of_levitation,
-    :potion_of_telepathy,
+    # :potion_of_telepathy,
     :potion_of_extra_healing,
-    :potion_of_teleportation
+    :potion_of_teleportation,
+    :potion_of_teleportation,
+    :potion_of_teleportation,
+    :potion_of_teleportation,
+    :potion_of_teleportation,
     ]
   end
 
@@ -48,13 +52,21 @@ class Potion < Item
     when :potion_of_teleportation
       HUD.output_message(args, "You feel disoriented...")
       entity.teleport(args)
-    when :potion_of_healing
+    when :potion_of_healing, :potion_of_extra_healing
       effect = 0
       Trauma.active_traumas(entity).each do |trauma|
         roll = args.state.rng.d12 
         if roll >= trauma.numeric_severity
           trauma.heal_one_step
           effect += 1
+        end
+        if self.kind == :potion_of_extra_healing
+          # extra healing potion heals faster
+          roll = args.state.rng.d20
+          if roll >= trauma.numeric_severity
+            trauma.heal_one_step
+            effect += 1
+          end
         end
       end
       # test for shock recovery
