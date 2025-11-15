@@ -2,7 +2,8 @@ class Hero < Entity
 
   include Needy
 
-  attr_reader :role, :species, :trait, :age, :name, :exhaustion, :hunger, :sleep_deprivation, :insanity, :carried_items
+  attr_reader :role, :species, :trait, :age, :name, :exhaustion, :sleep_deprivation, :insanity, :carried_items
+  attr_accessor :hunger
 
   def initialize(x, y)
     super(x, y)
@@ -112,8 +113,7 @@ class Hero < Entity
     if @role == :ninja || @role == :thief
       seconds_per_tile -= 0.2
     end
-    #Ex:- :default =>''
-    return seconds_per_tile
+    return seconds_per_tile / Trauma.walking_speed_modifier(self) 
   end
 
   def pickup_speed
@@ -164,10 +164,12 @@ class Hero < Entity
   end
   
   def apply_hunger args
-    hunger_increase = 0.001 # per kronos tick
+    hunger_increase = 0.001 # per game world time unit
     @hunger += hunger_increase
     hunger_level_before = @hunger_level
-    if @hunger >= 0.8
+    if @hunger >= 1.0
+      @hunger_level = :dying
+    elsif @hunger >= 0.8
       @hunger_level = :starving
     elsif @hunger >= 0.5
       @hunger_level = :hungry
@@ -176,16 +178,25 @@ class Hero < Entity
     else
       @hunger_level = :satiated
     end
+    if @hunger > 0.9
+      HUD.output_message(args, "Eat soon or you will die from hunger.")
+    end
     if hunger_level_before != @hunger_level
       case @hunger_level
       when :satiated
-        HUD.output_message("You feel satiated.", args)
+        HUD.output_message(args, "You feel satiated.")
       when :okay
-        HUD.output_message("You feel okay.", args)
+        if !hunger_level_before == :satiated
+          HUD.output_message(args, "You are no longer hungry.")
+        end
       when :hungry
-        HUD.output_message("You feel hungry.", args)
+        HUD.output_message(args, "You feel hungry.")
       when :starving
-        HUD.output_message("You feel starving!", args)
+        HUD.output_message(args, "You feel starving!")
+      when :dying
+        HUD.output_message(args, "You starve to death!")
+        args.state.hero.perished = true
+        args.state.hero.reason_of_death = "of starvation"
       end
     end      
   end

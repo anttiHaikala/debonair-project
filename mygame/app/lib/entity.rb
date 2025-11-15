@@ -37,6 +37,10 @@ class Entity
     @statuses << status unless @statuses.include?(status)
   end
 
+  def remove_status(status)
+    @statuses.delete(status)  
+  end
+
   def has_status?(status)
     return @statuses.include?(status)
   end

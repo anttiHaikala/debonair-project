@@ -7,6 +7,20 @@ class Combat
     base_attack_roll = args.state.rng.d20
     to_hit = 5
     attack_roll = base_attack_roll
+    if base_attack_roll == 1
+      base_attack_roll = args.state.rng.d10
+      if base_attack_roll < 3
+        HUD.output_message args, "#{aname} attempts to attack but fumbles the weapon breaks!"
+        SoundFX.play_sound(:self_hit, args)
+        attacker.wielded_items.each do |item|
+          if item.category == :weapon
+            item.add_attribute(:broken)
+            break
+          end
+        end
+        return
+      end
+    end
     if defender.has_status?(:shock)
       to_hit += 10
     end
@@ -41,6 +55,7 @@ class Combat
       end
     end
     attack_roll += weapon_modifier
+    attack_roll += Combat.role_bonus(attacker, args)
     # does it even hit?
     if base_attack_roll < to_hit 
       HUD.output_message args, "#{aname} attacks #{dname} but misses."
@@ -58,12 +73,12 @@ class Combat
       end
     end
     # hit!
-    hit_location = defender.random_body_part(args)
+    body_part = defender.random_body_part(args)
     hit_severity = self.hit_severity(attacker, defender, attack_roll, args)
     hit_kind = :bruise
-    Trauma.inflict(defender, hit_location, hit_kind, hit_severity, args)
+    Trauma.inflict(defender, body_part, hit_kind, hit_severity, args)
     SoundFX.play_sound(:hit, args)
-    HUD.output_message args, "#{aname} bruises #{dname}'s #{hit_location.to_s.gsub('_', ' ')} #{hit_severity}ly."
+    HUD.output_message args, "#{aname} bruises #{dname}'s #{body_part.to_s.gsub('_', ' ')} #{hit_severity}ly."
     defender_shocked = Trauma.determine_shock(defender)
     if defender_shocked
       defender.add_status(:shock)
@@ -151,6 +166,24 @@ class Combat
       return :severe
     when 19..Float::INFINITY
       return :critical
+    end
+  end
+
+  def self.role_bonus(character, args)
+    if args.state.hero != character
+      return 0
+    end
+    case character.role
+    when :warrior, :samurai, :ninja
+      return 3
+    when :rogue
+      return 1
+    when :tourist, :monk, :detective
+      return -1
+    when :mage, :druid, :archeologist
+      return -2
+    else
+      return 0
     end
   end
 end

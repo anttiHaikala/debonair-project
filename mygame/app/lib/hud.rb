@@ -11,7 +11,9 @@ class HUD
 
   def self.draw_health args
     hero = args.state.hero
-    args.outputs.labels << {
+    traumas = Trauma.active_traumas(hero)
+    if !traumas.empty?
+      args.outputs.labels << {
       x: 960,
       y: 641,
       text: "Health",
@@ -21,13 +23,12 @@ class HUD
       b: 255,
       a: 255,
       font: "fonts/olivetti.ttf"
-    }
-    traumas = Trauma.active_traumas(hero)
+      }
     traumas.each_with_index do |trauma, index|
       args.outputs.labels << {
         x: 960,
         y: 620 - index * 13,
-        text: "#{trauma.severity} #{trauma.kind.to_s.gsub('_',' ')} on #{trauma.hit_location.to_s.gsub('_',' ')}",
+        text: "#{trauma.severity} #{trauma.kind.to_s.gsub('_',' ')} on #{trauma.body_part.to_s.gsub('_',' ')}",
         size_enum: -3,
         r: 255,
         g: 0,
@@ -35,6 +36,7 @@ class HUD
         a: 255,
         font: "fonts/olivetti.ttf"
       }
+    end
     end
   end
   def self.draw_items args

@@ -74,7 +74,7 @@ class Item
     when :armor
       return [2,0]
     when :scroll
-      return [3,0]
+      return [16,3]
     when :wand
       return [4,0]
     when :ring
@@ -99,33 +99,37 @@ class Item
   end
 
   def self.populate_level(level, args)
-  level.rooms.each do |room|
-    case args.state.rng.d6
-      when 1
-        item = Item.new(:food_ration, :food)
-        item.level = level.depth
-        item.x = room.center_x
-        item.y = room.center_y
-        level.items << item
-      when 2
-        item = Potion.new(:potion_of_healing)
-        item.level = level.depth
-        item.x = room.center_x
-        item.y = room.center_y
-        level.items << item
-      when 3
-        item = Ring.new(Ring.kinds.sample)
-        item.level = level.depth
-        item.x = room.center_x
-        item.y = room.center_y
-        level.items << item
-      when 4
-        item = Weapon.randomize(level.depth, args)
-        item.x = room.center_x
-        item.y = room.center_y
-        level.items << item
-    end
+    level.rooms.each do |room|
+      case args.state.rng.d6
+        when 1
+          item = Food.new(:food_ration)
+          item.level = level.depth
+          item.x = room.center_x
+          item.y = room.center_y
+          level.items << item
+        when 2
+          item = Potion.new(:potion_of_healing)
+          item.level = level.depth
+          item.x = room.center_x
+          item.y = room.center_y
+          level.items << item
+        when 3
+          item = Ring.new(Ring.kinds.sample)
+          item.level = level.depth
+          item.x = room.center_x
+          item.y = room.center_y
+          level.items << item
+        when 4
+          item = Weapon.randomize(level.depth, args)
+          item.x = room.center_x
+          item.y = room.center_y
+          level.items << item
+        when 5
+          item = Scroll.new
+          item.x = room.center_x
+          item.y = room.center_y
+          level.items << item
+      end
     end
   end
-
 end

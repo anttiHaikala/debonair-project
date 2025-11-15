@@ -99,18 +99,18 @@ class NPC < Entity
   end
 
   def walking_speed # separate to attack speed later
+    species_speed = 1.0
     case @species
     when :goblin
-      return 1.4 # seconds per tile
+      species_speed = 1.4 # seconds per tile
     when :grid_bug
-      return 0.7
+      species_speed = 0.7
     when :rat
-      return 0.8
+      species_speed = 0.8
     when :gelatinous_cube # these guys keep the dungeon clean??
-      return 5.0
-    else
-      return 1.0
+      species_speed = 5.0
     end
+    return species_speed / Trauma.walking_speed_modifier(self)
   end
 
   def take_action args
@@ -118,4 +118,7 @@ class NPC < Entity
     Behaviour.select_for_npc(self).execute(args)
   end
 
+  def title
+    self.species
+  end
 end

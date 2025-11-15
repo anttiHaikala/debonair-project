@@ -75,6 +75,7 @@ class Kronos
         if item.usage >= item.max_usage
           HUD.output_message args, "Your #{item.title} crumbles to dust!"
           hero.worn_items.delete(item)
+          hero.carried_items.delete(item)
         end
         item.apply_continuous_effect(hero, args)
       end

@@ -42,6 +42,8 @@ require 'app/lib/trauma'
 require 'app/lib/run'
 require 'app/lib/behaviour'
 require 'app/lib/potion'
+require 'app/lib/food'
+require 'app/lib/scroll'
 
 def boot args
   args.state = {}

@@ -10,6 +10,9 @@ class GUI
     @@tiles_observed = false
     @@color_flash = nil
     @@menu_cooldown = 0
+    @@look_mode_index = nil
+    @@look_mode_cooldown = 0
+    @@look_mode_frames = nil
   end
 
   def self.standing_still_frames
@@ -61,6 +64,88 @@ class GUI
     end
   end
 
+  def self.handle_look_mode(args)
+    if @@look_mode_cooldown && @@look_mode_cooldown > 0
+      @@look_mode_cooldown -= 1
+    end
+    if @@look_mode_frames
+      @@look_mode_frames += 1
+    else
+      @@look_mode_frames = 1
+    end
+    hero = args.state.hero
+    level = args.state.dungeon.levels[hero.level]
+    visible_things = []
+    # find visible items
+    level.items.each do |item|
+      if Tile.is_tile_visible?(item.x, item.y, args)
+        visible_things << item
+      end
+    end
+    # find visible entities
+    level.entities.each do |entity|
+      next if entity == hero
+      if Tile.is_tile_visible?(entity.x, entity.y, args)
+        visible_things << entity
+      end
+    end
+    if visible_things.size > 0
+      thing = nil
+      if @@look_mode_index == nil
+        @@look_mode_index = 0
+        thing = visible_things[@@look_mode_index]
+        HUD.output_message args, "You see a #{thing.title}."
+      else
+        if args.inputs.up && @@look_mode_cooldown == 0
+          @@look_mode_index -= 1
+          if @@look_mode_index < 0
+            @@look_mode_index = visible_things.size - 1
+          end
+          thing = visible_things[@@look_mode_index]
+          HUD.output_message args, "You see a #{thing.title}."
+          @@look_mode_cooldown = 10
+        elsif args.inputs.down && @@look_mode_cooldown == 0
+          @@look_mode_index += 1
+          if @@look_mode_index >= visible_things.size
+            @@look_mode_index = 0
+          end
+          thing = visible_things[@@look_mode_index]
+          HUD.output_message args, "You see a #{thing.title}."
+          @@look_mode_cooldown = 10
+        else
+          thing = visible_things[@@look_mode_index]
+        end
+      end
+      # show a marker on the thing
+      if thing
+        tile_size = $tile_size * $zoom
+        dungeon = args.state.dungeon
+        level = dungeon.levels[args.state.current_level]
+        level_height = level.tiles.size
+        level_width = level.tiles[0].size
+        x_offset = $pan_x + (1280 - (level_width * tile_size)) / 2
+        y_offset = $pan_y + (720 - (level_height * tile_size)) / 2
+        printf "Look mode marker at #{thing.x*tile_size},#{thing.y*tile_size} x_offset: #{x_offset}, y_offset: #{y_offset}\n"
+        args.outputs.sprites << {
+          x: x_offset + thing.x * tile_size,
+          y: y_offset + thing.y * (tile_size+1),
+          w: tile_size,
+          h: tile_size,
+          r: 255,
+          g: 255, 
+          b: 255,
+          w: tile_size,
+          h: tile_size,
+          path: "sprites/simple-mood-16x16.png",
+          tile_x: 15*16,
+          tile_y: 1*16,
+          tile_w: 16,
+          tile_h: 16,
+        }
+      end
+    end
+  end
+
   def self.handle_input args
     $input_frames ||= 0
     $input_frames += 1
@@ -70,6 +155,13 @@ class GUI
         args.state.scene = :game_over
       end
       return
+    end
+    if args.controller_one.key_held.l2 || args.inputs.keyboard.key_held.tab
+      # look mode
+      self.handle_look_mode(args)
+      return
+    else 
+      @@look_mode_index = nil 
     end
     # inventory management can happen in parallel
     self.handle_inventory_input args

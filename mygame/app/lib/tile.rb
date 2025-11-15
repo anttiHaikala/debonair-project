@@ -37,6 +37,25 @@ class Tile
     return tile_visibility[y] && tile_visibility[y][x]
   end
 
+  def self.auto_map_whole_level args
+    dungeon = args.state.dungeon
+    level = dungeon.levels[args.state.current_level]
+    level_height = dungeon.levels[args.state.current_level].tiles.size
+    level_width = dungeon.levels[args.state.current_level].tiles[0].size
+
+    @@tile_memory_per_level[args.state.current_level] ||= []
+    tile_memory = @@tile_memory_per_level[args.state.current_level] 
+
+    for y in 0...level_height
+      tile_memory[y] ||= []
+      for x in 0...level_width
+        tile_memory[y][x] = level.tiles[y][x]
+      end
+    end
+
+    @@tile_memory_per_level[args.state.current_level] = tile_memory
+  end
+
   def self.observe_tiles args
     dungeon = args.state.dungeon
     level = dungeon.levels[args.state.current_level]

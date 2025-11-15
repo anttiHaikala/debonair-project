@@ -1,10 +1,10 @@
 class Trauma
-  attr_reader :kind, :category, :treatments, :hit_location, :last_treated, :severity
-  def initialize(kind, hit_location, severity)
+  attr_reader :kind, :category, :treatments, :body_part, :last_treated, :severity
+  def initialize(kind, body_part, severity)
     @kind = kind
     @category = Trauma.kinds.find { |cat, kinds| kinds.include?(kind) }&.first
     @treatments = []
-    @hit_location = hit_location
+    @body_part = body_part
     @severity = severity
     @last_treated = nil # simulation time when applied
   end
@@ -59,14 +59,14 @@ class Trauma
     end
   end
 
-  def self.inflict(entity, hit_location, kind, severity, args)
+  def self.inflict(entity, body_part, kind, severity, args)
     category = kinds.find { |cat, kinds| kinds.include?(kind) }&.first
     raise 'Unknown trauma kind' unless category
-    trauma = Trauma.new(kind, hit_location, severity)
-    trauma.instance_variable_set(:@hit_location, hit_location)  
+    trauma = Trauma.new(kind, body_part, severity)
+    trauma.instance_variable_set(:@body_part, body_part)  
     entity.traumas << trauma
     entity.increase_need(:avoid_being_hit)
-    printf "Inflicted #{kind} trauma to #{entity.class} at #{hit_location}. Has now #{entity.traumas.size} traumas.\n"
+    printf "Inflicted #{kind} trauma to #{entity.class} at #{body_part}. Has now #{entity.traumas.size} traumas.\n"
     return trauma
   end
 
@@ -95,20 +95,18 @@ class Trauma
   def self.determine_morbidity(entity)
     printf "Determining morbidity for entity with %d traumas.\n" % [entity.traumas.size]
     death_score = 0
-    death_threshold = 6
-    entity.traumas.each do |trauma|
-      if body_parts_counted_for_death.include?(trauma.hit_location)
-        case trauma.severity
-        when :minor
-          death_score += 0
-        when :moderate
-          death_score += 2
-        when :severe
-          death_score += 4
-        when :critical
-          death_score += 6
-        end
-      end
+    death_threshold = 10
+    entity.traumas.each do |trauma|     
+      case trauma.severity
+      when :minor
+        death_score += 0
+      when :moderate
+        death_score += 2
+      when :severe
+        death_score += 4
+      when :critical
+        death_score += 6
+      end    
     end
     if death_score >= death_threshold
       return true
@@ -126,6 +124,29 @@ class Trauma
   end
 
   def title
-    "#{@severity.to_s.capitalize} #{@kind.to_s.gsub('_',' ')} on #{@hit_location.to_s.gsub('_',' ')}"
+    "#{@severity.to_s.capitalize} #{@kind.to_s.gsub('_',' ')} on #{@body_part.to_s.gsub('_',' ')}"
+  end
+
+  def self.walking_speed_modifier(entity)
+    speed_modifier = 1.0
+    active_traumas(entity).each do |trauma|
+      case trauma.body_part
+      when :left_leg, :right_leg, :left_knee, :right_knee, :left_foot, :right_foot, :left_hip, :right_hip, :left_thigh, :right_thigh, :left_calf, :right_calf, :toes_of_left_foot, :toes_of_right_foot
+        case trauma.severity
+        when :minor
+          speed_modifier -= 0.05
+        when :moderate
+          speed_modifier -= 0.1
+        when :severe
+          speed_modifier -= 0.2
+        when :critical
+          speed_modifier -= 0.3
+        end
+      end
+    end
+    if speed_modifier < 0.1
+      speed_modifier = 0.1
+    end
+    return speed_modifier
   end
 end
