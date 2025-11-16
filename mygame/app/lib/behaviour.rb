@@ -34,7 +34,7 @@ class Behaviour
   def self.setup_for_npc(npc)
     species = npc.species
     case species
-    when :goblin
+    when :goblin, :orc, :skeleton, :wraith
       npc.behaviours << Behaviour.new(:fight, npc)
       # npc.behaviours << Behaviour.new(:attack, npc)
       # npc.behaviours << Behaviour.new(:escape, npc)

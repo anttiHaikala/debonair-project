@@ -22,28 +22,55 @@ class NPC < Entity
     @species.to_s.capitalize.gsub('_',' ')
   end
 
+  def hue
+    case @species
+    when :goblin, :orc
+      return 120  
+    when :grid_bug
+      return 300
+    when :rat
+      return 40
+    else
+      return 0
+    end
+  end
+
   def color
     case @species
-    when :goblin
+    when :goblin, :orc
       return [20, 125, 20]
     when :grid_bug
       return [255, 0, 255]
     when :rat
       return [80, 70, 48]
+    when :wraith
+      return [200, 200, 255]
+    when :skeleton
+      return [220, 220, 220]
+    when :minotaur
+      return [150, 75, 0]
     else
       return [255, 255, 255]
     end
   end
   
   def c 
-    # character representation from the sprite sheet
+    # x, y character representation from the sprite sheet
     case @species
     when :goblin
-      return [8,4]
+      return [7,6]
     when :grid_bug
       return [8,7]
     when :rat 
       return [2,7]
+    when :orc
+      return [15,4]
+    when :wraith
+      return [7,5]  
+    when :skeleton
+      return [3,5]
+    when :minotaur
+      return [13,4]
     else
       return [16,14]
     end
@@ -72,17 +99,32 @@ class NPC < Entity
     level.rooms.each do |room|
       case args.state.rng.d6
       when 1
-        npc = NPC.new(:goblin, room.center_x, room.center_y, level.depth)
+        if level.depth < 6
+          mobtype = :goblin
+        else
+          mobtype = :orc
+        end
+        npc = NPC.new(mobtype, room.center_x, room.center_y, level.depth)
+        npc.carried_items << Weapon.generate_for_npc(npc, level.depth, args)
         level.entities << npc
         level_mod = (level.depth / 10).floor
         level_mod.times do |i|
-          new_npc = NPC.new(:goblin, room.center_x + Numeric.rand(-2..2), room.center_y + Numeric.rand(-2..2), level.depth)
+          new_npc = NPC.new(mobtype, room.center_x + Numeric.rand(-2..2), room.center_y + Numeric.rand(-2..2), level.depth)
+          new_npc.carried_items << Weapon.generate_for_npc(npc, level.depth, args)
           level.entities << new_npc
         end
 
       when 2
-        npc = NPC.new(:grid_bug, room.center_x, room.center_y, level.depth)
-        level.entities << npc
+        if level.depth < 4
+          npc = NPC.new(:grid_bug, room.center_x, room.center_y, level.depth)
+          level.entities << npc
+        elsif level.depth < 8
+          npc = NPC.new(:skeleton, room.center_x, room.center_y, level.depth)
+          level.entities << npc
+        else
+          npc = NPC.new(:wraith, room.center_x, room.center_y, level.depth)
+          level.entities << npc
+        end
       when 3
         npc = NPC.new(:rat, room.center_x, room.center_y, level.depth)
         level.entities << npc

@@ -1,7 +1,7 @@
 #$gtk.trace_nil_punning!
 
 #$fixed_seed = 'dsfjkldasjf'
-$debug = true
+#$debug = true
 $zoom = 0.7
 $pan_x = 0.0
 $pan_y = 0.0

@@ -4,7 +4,11 @@ class Species
     [
       :goblin, 
       :grid_bug, 
-      :rat
+      :rat,
+      :wraith,
+      :skeleton,
+      :minotaur,
+      :orc
     ]
   end
   def self.hero_species

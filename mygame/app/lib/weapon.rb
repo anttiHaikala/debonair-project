@@ -84,5 +84,21 @@ class Weapon < Item
   def title
     "#{self.attributes.join(' ')} #{self.kind.to_s.gsub('_',' ')}".gsub('  ',' ').trim
   end
+
+  def self.generate_for_npc(npc, level_depth, args)
+    case npc.species
+    when :goblin
+      weapon = Weapon.new(:dagger)
+      weapon.add_attribute(:crude)
+    when :orc
+      weapon = Weapon.new(:axe)
+    when :skeleton
+      weapon = Weapon.new(:sword)
+      weapon.add_attribute(:rusty)
+    else
+      weapon = Weapon.randomize(level_depth, args)
+    end
+    return weapon
+  end
   
 end
