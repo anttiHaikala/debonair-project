@@ -80,15 +80,15 @@ class Hero < Entity
   end
 
   def vision_range
-    range = 7
+    range = 20
     if @age == :elder
-      range -= 2
+      range -= 5
     end
     if @species == :dwarf || @species == :gnome
-      range -= 1
+      range -= 4
     end
     if @species == :elf || @species == :dark_elf
-      range += 1
+      range += 4
     end
     return range
   end

@@ -5,6 +5,18 @@ class Lighting
     # iterate through all light sources on the level
     light_level = 0.0
     if level.lights
+      level.entities.each do |entity|
+        entity.worn_items.each do |item|
+          if item.kind == :ring_of_illumination
+            distance = Utils::distance(entity.x, entity.y, x, y)
+            if distance < 0.1
+              distance = 0.1
+            end
+            contribution = 30.0 / (distance * distance)
+            light_level += contribution
+          end
+        end
+      end
       level.lights.each do |light|
         distance = Utils::distance(light.x, light.y, x, y)
         if distance < 0.1
@@ -14,7 +26,6 @@ class Lighting
         light_level += contribution
       end
     end
-    puts "Light calculation took #{Time.now - timer} seconds"
     return light_level
   end
 
@@ -33,7 +44,9 @@ class Lighting
   end
 
   def self.calculate_lighting(level, args)
-    level.lighting = Array.new(level.height) { Array.new(level.width, 0.0) }
+    unless level.lighting
+      level.lighting = Array.new(level.height) { Array.new(level.width, 0.0) }
+    end
     for y in 0...level.height
       for x in 0...level.width
         level.lighting[y][x] = self.calculate_light_level_at(level, x, y)
@@ -63,5 +76,11 @@ class Light
       return 0.4
     end
     return 0
+  end
+end
+
+class PortableLight < Item
+  def initialize(kind)
+    super(kind, :portable_light)
   end
 end

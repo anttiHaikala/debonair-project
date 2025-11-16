@@ -99,6 +99,7 @@ def gameplay_tick args
   GUI.handle_input args
   args.state.kronos.advance_time args
   GUI.update_entity_animations args
+  Lighting.calculate_lighting(args.state.dungeon.levels[args.state.current_depth], args)
   GUI.draw_background args
   GUI.draw_tiles args
   GUI.draw_items args

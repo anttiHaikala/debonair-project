@@ -270,7 +270,7 @@ class HUD
 
   def self.output_message args, message
     args.state.hud_messages ||= []
-    args.state.hud_messages << { text: message, time: args.state.kronos.world_time }
+    args.state.hud_messages << { text: message.trim, time: args.state.kronos.world_time }
     # keep only last 5 messages
     if args.state.hud_messages.size > 5
       args.state.hud_messages.shift 

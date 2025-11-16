@@ -14,7 +14,7 @@ class Item
   end
 
   def self.categories
-    return [:food, :weapon, :potion, :armor, :scroll, :wand, :ring, :scroll, :amulet, :gloves, :footwear, :helmet]
+    return [:food, :weapon, :potion, :armor, :scroll, :wand, :ring, :scroll, :amulet, :gloves, :footwear, :helmet, :portable_light]
   end
 
   def set_weight # grams

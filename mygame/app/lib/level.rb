@@ -14,7 +14,7 @@ class Level
     @entities = []
     @items = []
     @lights = []
-    @lighting = [] # lighting value of each tile
+    @lighting = nil # lighting value of each tile
   end
 
   def width

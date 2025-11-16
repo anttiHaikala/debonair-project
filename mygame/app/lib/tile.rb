@@ -123,7 +123,7 @@ class Tile
 
   def self.draw(tile, y, x, tile_size, x_offset, y_offset, hue, visible, lighting, args)
     # base color
-    saturation_modifier = visible ? 1.0 : 0.3
+    saturation_modifier = visible ? 1.0 : 0.6
     #lightness_modifier = visible ? 1.0 : 0.4
     lightness_modifier = 1.0 - (1.0 * (1.0 - lighting.clamp(0.0, 1.0)))
     color = case tile

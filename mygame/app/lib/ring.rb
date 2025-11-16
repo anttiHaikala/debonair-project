@@ -17,6 +17,7 @@ class Ring < Item
     :ring_of_invisibility,
     :ring_of_protection, 
     :ring_of_strength, 
+    :ring_of_illumination,
     # :ring_of_stealth, 
     :ring_of_regeneration, 
     # :ring_of_adornment,
@@ -50,7 +51,16 @@ class Ring < Item
       entity.worn_items.delete(self)
     else
       entity.worn_items << self
-      HUD.output_message(args, "You wear the #{self.kind.to_s.gsub('_',' ')}.")
+      suffix = ""
+      case self.kind
+      when :ring_of_illumination
+        suffix = " It lights up the area around you."
+      when :ring_of_invisibility
+        suffix = " You feel unseen."
+      when :ring_of_telepathy
+        suffix = " You feel connected to other minds."
+      end
+      HUD.output_message(args, "You wear the #{self.kind.to_s.gsub('_',' ')}. " + suffix)
     end
   end
 
