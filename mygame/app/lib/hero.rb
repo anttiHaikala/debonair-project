@@ -29,7 +29,7 @@ class Hero < Entity
       :cleric, # holiness
       :detective, # investigation and clues
       :druid, # spells and nature
-      :mage, # classic spellcaster
+      :wizard, # classic spellcaster
       :monk, # martial arts and spirituality
       :ninja, # stealth and combat
       :rogue, # agility and trickery
@@ -183,7 +183,7 @@ class Hero < Entity
     level.items.delete(item)
     item.x = nil
     item.y = nil
-    item.level = nil
+    item.depth = nil
     printf "Picked up item: %s\n" % item.kind.to_s
   end
 

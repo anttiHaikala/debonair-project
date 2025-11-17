@@ -151,7 +151,7 @@ class Entity
     level = args.state.dungeon.levels[self.depth]
     item.x = self.x
     item.y = self.y
-    item.level = self.depth
+    item.depth = self.depth
     level.items << item
     printf "Dropped item: %s\n" % item.kind.to_s
     SoundFX.play_sound(:drop_item, args)

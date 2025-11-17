@@ -24,13 +24,23 @@ class Tile
   end
 
   def self.occupied?(x, y, args)
-    level = args.state.dungeon.levels[args.state.current_depth]
+    level = Utils.level(args)
     level.entities.each do |entity|
       if entity.x == x && entity.y == y
         return true
       end
     end 
     return false
+  end
+
+  def self.entity_at(x, y, args)
+    level = Utils.level(args)
+    level.entities.each do |entity|
+      if entity.x == x && entity.y == y
+        return entity
+      end
+    end 
+    return nil
   end
 
   def self.is_tile_visible?(x, y, args)

@@ -52,9 +52,9 @@ class Weapon < Item
     end 
   end
 
-  def self.randomize(level, args)
+  def self.randomize(depth, args)
     weapon = Weapon.new(Weapon.kinds.sample)
-    weapon.level = level
+    weapon.depth = depth
     common_roll = args.state.rng.d6
     secondary_common_roll = args.state.rng.d8
     rare_roll = args.state.rng.d20
@@ -85,7 +85,7 @@ class Weapon < Item
     "#{self.attributes.join(' ')} #{self.kind.to_s.gsub('_',' ')}".gsub('  ',' ').trim
   end
 
-  def self.generate_for_npc(npc, level_depth, args)
+  def self.generate_for_npc(npc, depth, args)
     case npc.species
     when :goblin
       weapon = Weapon.new(:dagger)
@@ -96,7 +96,7 @@ class Weapon < Item
       weapon = Weapon.new(:sword)
       weapon.add_attribute(:rusty)
     else
-      weapon = Weapon.randomize(level_depth, args)
+      weapon = Weapon.randomize(depth, args)
     end
     return weapon
   end

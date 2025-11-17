@@ -1,12 +1,23 @@
 class Ring < Item
 
   @@mask_index_seed = nil
-  attr_accessor :usage, :max_usage
+  attr_accessor :usage, :max_usage, :cursed
 
   def initialize(kind)
     super(kind, :ring)
     @usage = 0
+    if Numeric.rand(1..6) == 1
+      @cursed = true
+    else
+      @cursed = false
+    end
     @max_usage = Numeric.rand(0..3000)
+  end
+
+  def self.traits
+    return [
+      :heavy, :lightweight, :ornate, :engraved
+    ]
   end
 
   def self.kinds
@@ -47,6 +58,10 @@ class Ring < Item
     # TODO: check that we have enough fingers free to wear the ring
     # TODO: maybe have a dexterity penalty if too many rings are being worn!!!
     if entity.worn_items.include?(self)
+      if self.cursed
+        HUD.output_message(args, "The #{self.kind.to_s.gsub('_',' ')} appears to be stuck to your finger!")
+        return
+      end
       HUD.output_message(args, "You remove the #{self.kind.to_s.gsub('_',' ')}.")
       entity.worn_items.delete(self)
     else

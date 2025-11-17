@@ -1,12 +1,12 @@
 class Item
-  attr_accessor :kind, :category, :cursed, :identified, :level, :x, :y
+  attr_accessor :kind, :category, :cursed, :identified, :depth, :x, :y
   attr_reader :attributes, :weight, :traits
   def initialize(kind, category, identified = false)
     @kind = kind
     @category = category
     @cursed = false
     @identified = identified
-    @level = nil
+    @depth = nil
     @x = nil
     @y = nil
     @attributes = []
@@ -104,19 +104,19 @@ class Item
       case args.state.rng.d12
         when 1
           item = Food.new(:food_ration, args)
-          item.level = level.depth
+          item.depth = level.depth
           item.x = room.center_x
           item.y = room.center_y
           level.items << item
         when 2
           item = Potion.randomize(level.depth, args)
-          item.level = level.depth
+          item.depth = level.depth
           item.x = room.center_x
           item.y = room.center_y
           level.items << item
         when 3
           item = Ring.new(Ring.kinds.sample)
-          item.level = level.depth
+          item.depth = level.depth
           item.x = room.center_x
           item.y = room.center_y
           level.items << item
@@ -126,8 +126,8 @@ class Item
           item.y = room.center_y
           level.items << item
         when 5
-          item = Scroll.new
-          item.level = level.depth
+          item = Scroll.randomize(level.depth, args)
+          item.depth = level.depth
           item.x = room.center_x
           item.y = room.center_y
           level.items << item

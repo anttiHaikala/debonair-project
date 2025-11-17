@@ -1,6 +1,7 @@
 #$gtk.trace_nil_punning!
 
-$fixed_seed = 'dsfjkldasjdfdsaf'
+#$fixed_seed = 'dsfjkldasjdfdsaf' # THIS ONE IS A NICE SAMURAI SEED
+#$fixed_seed = 'testing12345678'
 #$debug = true
 $dynamic_light_system = true
 $zoom = 0.7

@@ -7,8 +7,8 @@ class Architect
   def setup(settings)
     @settings ||= {}
     @settings[:levels] ||= 10
-    @settings[:level_width] ||= 46   
-    @settings[:level_height] ||= 36
+    @settings[:level_width] ||= 42   
+    @settings[:level_height] ||= 32
   end
 
   def self.create_seed(args)
@@ -110,7 +110,7 @@ class Architect
         amulet_y = Numeric.rand(amulet_room.y+1...(amulet_room.y + amulet_room.h)-1).to_i
         level.tiles[amulet_y][amulet_x] = :floor
         amulet_item = Item.new(:amulet_of_skandor, :amulet)
-        amulet_item.level = depth
+        amulet_item.depth = depth
         amulet_item.x = amulet_x
         amulet_item.y = amulet_y
         level.items << amulet_item
