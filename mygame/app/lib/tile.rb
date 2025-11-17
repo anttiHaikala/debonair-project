@@ -49,21 +49,17 @@ class Tile
   end
 
   def self.auto_map_whole_level args
-    dungeon = args.state.dungeon
-    level = dungeon.levels[args.state.current_depth]
-    level_height = dungeon.levels[args.state.current_depth].tiles.size
-    level_width = dungeon.levels[args.state.current_depth].tiles[0].size
-
+    level = Utils.level(args)
+    level_height = Utils.level_height(args)
+    level_width = Utils.level_width(args)
     @@tile_memory_per_level[args.state.current_depth] ||= []
     tile_memory = @@tile_memory_per_level[args.state.current_depth] 
-
     for y in 0...level_height
       tile_memory[y] ||= []
       for x in 0...level_width
         tile_memory[y][x] = level.tiles[y][x]
       end
     end
-
     @@tile_memory_per_level[args.state.current_depth] = tile_memory
   end
 

@@ -73,6 +73,7 @@ class Scroll < Item
   def self.fireball(user, args)
     raise "There must be an entity to call this method on." if user.nil?
     printf user.kind.to_s + " casts fireball!\n"
+    SoundFX.play("fireball", args)
     level = Utils.level(args)
     height = level.height
     width = level.width

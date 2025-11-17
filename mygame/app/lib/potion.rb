@@ -69,6 +69,7 @@ class Potion < Item
       if effect == 0
         HUD.output_message(args, "You feel no different after drinking the potion.")
       end
+      SoundFX.play(:potion)
     when :potion_of_strength
       HUD.output_message(args, "You feel stronger!")
     when :potion_of_speed

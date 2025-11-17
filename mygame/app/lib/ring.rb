@@ -70,10 +70,13 @@ class Ring < Item
       case self.kind
       when :ring_of_illumination
         suffix = " It lights up the area around you."
+        SoundFX.play(:illumination, args)
       when :ring_of_invisibility
         suffix = " You become invisible!"
+        SoundFX.play(:invisibility, args)
       when :ring_of_telepathy
         suffix = " You feel connected to other minds."
+        SoundFX.play(:telepathy, args)
       end
       HUD.output_message(args, "You wear the #{self.kind.to_s.gsub('_',' ')}. " + suffix)
     end

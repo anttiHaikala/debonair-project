@@ -11,7 +11,7 @@ class Combat
       base_attack_roll = args.state.rng.d10
       if base_attack_roll < 3
         HUD.output_message args, "#{aname} attempts to attack but fumbles the weapon breaks!"
-        SoundFX.play_sound(:self_hit, args)
+        SoundFX.play_sound(:fumble, args)
         attacker.wielded_items.each do |item|
           if item.category == :weapon
             item.add_attribute(:broken)

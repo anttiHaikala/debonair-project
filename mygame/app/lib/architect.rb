@@ -1,5 +1,10 @@
 class Architect
   # singleton class that creates the dungeon and populates it with entities
+  # 
+  def self.reset!
+    @instance = nil
+  end
+
   def self.instance
     @instance ||= Architect.new
   end
@@ -117,7 +122,7 @@ class Architect
       end
 
     end
-    args.state[:dungeon] = dungeon
+    args.state.dungeon = dungeon
   end
 
   def populate_entities(args)

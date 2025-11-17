@@ -77,6 +77,7 @@ class Weapon < Item
     else
       entity.wielded_items = [self] # only one weapon at a time for now
       HUD.output_message(args, "You wield the #{self.attributes.join(' ')}#{self.kind.to_s.gsub('_',' ').gsub('  ',' ')}.")
+      SoundFX.play(:blade, args) # TODO: different sound for different weapon types
     end
     args.state.kronos.spend_time(entity, entity.walking_speed * 0.5, args) 
   end
