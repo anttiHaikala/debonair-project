@@ -132,4 +132,20 @@ module Utils
     end
     return path
   end
+
+  def self.list_files_recursive(path, extension = nil)
+    results = []
+    $gtk.list_files(path).each do |file|
+      full_path = "#{path}/#{file}"
+      # Check if it's a directory by trying to list its contents
+      sub_files = $gtk.list_files(full_path) rescue nil
+      if sub_files
+        # It's a directory, recurse into it
+        results += list_files_recursive(full_path, extension)
+      elsif extension.nil? || file.end_with?(extension)
+        results << full_path
+      end
+    end
+    results
+  end
 end
