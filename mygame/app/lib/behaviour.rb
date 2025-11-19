@@ -81,6 +81,12 @@ class Behaviour
       distance = Math.sqrt(dx * dx + dy * dy)
       if distance < 20 # aggro range
         if npc.sees?(hero, args)          
+          # make angry emote towards hero if here is not yet enemy!
+          if !args.state.hero.is_hostile_to?(npc)
+            HUD.output_message args, "#{npc.name} stares angrily at you!"
+            args.state.hero.become_hostile_to(npc)
+            args.state.kronos.spend_time(npc, npc.walking_speed*0.5, args)
+          end
           # move towards hero
           if dy.abs < dx.abs || hero.y == npc.y # north-south movement
             step_x = dx > 0 ? 1 : -1

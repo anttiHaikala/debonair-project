@@ -2,7 +2,6 @@ class Music
 
   attr_reader :bpm, :pattern_count, :beat_count, :bar_count
   attr_reader :start_time
-  attr_reader :pattern_start_time
   attr_reader :pattern_length
 
   def self.setup(args)
@@ -22,49 +21,80 @@ class Music
     printf "Starting music system...\n"
     now = Time.now
     @start_time = now
-    @pattern_start_time = now
-    @beat_count = -1
-    @bar_count = -1
-    @pattern_count = -1
-    @music_volume = 0.0
+    @beat_count = nil 
+    @bar_count = nil
+    @pattern_count = nil
+    @music_volume = 0.3
     alter_pattern!
   end
 
   def alter_pattern!
-    @pattern = {}
-    # add fx on beats 0, 4, 8, 12
-    (0...@pattern_length * 4).each do |beat|
-      if beat % 4 == 0
-        @pattern[:fx] ||= []
-        @pattern[:fx] << @samples[:fx].sample if @samples[:fx] && !@samples[:fx].empty?
-      else
-        @pattern[:fx] ||= []
-        @pattern[:fx] << nil
+    @pattern ||= {}
+    printf "Altering music pattern...\n"
+    if Numeric.rand(0.0..1.0) < 0.2
+      (0...@pattern_length * 4).each do |beat|
+        if beat % 4 == 0
+          @pattern[:fx] ||= []
+          @pattern[:fx] << @samples[:fx].sample if @samples[:fx] && !@samples[:fx].empty?
+        else
+          @pattern[:fx] ||= []
+          @pattern[:fx] << nil
+        end
       end
     end
-    (0...@pattern_length * 4).each do |beat|
-      if beat % 4 == 2
-        @pattern[:snare] ||= []
-        @pattern[:snare] << @samples[:snare].sample if @samples[:snare] && !@samples[:snare].empty?
-      else
-        @pattern[:snare] ||= []
-        @pattern[:snare] << nil
+    if Numeric.rand(0.0..1.0) < 0.4
+      string_sample = @samples[:strings].sample
+      (0...@pattern_length * 4).each do |beat|
+        if beat % 8 == 0
+          @pattern[:strings] ||= []
+          @pattern[:strings] << string_sample if string_sample
+        else
+          @pattern[:strings] ||= []
+          @pattern[:strings] << nil
+        end
       end
     end
-    # pad on every 8th beat
-    (0...@pattern_length * 4).each do |beat|
-      if beat % 8 == 0
-        @pattern[:pad] ||= []
-        @pattern[:pad] << @samples[:pad].sample if @samples[:pad] && !@samples[:pad].empty?
-      else
-        @pattern[:pad] ||= []
-        @pattern[:pad] << nil
+    if Numeric.rand(0.0..1.0) < 0.2
+      (0...@pattern_length * 4).each do |beat|
+        kick_sample = @samples[:kick].sample
+        snare_sample = @samples[:snare].sample
+        hihat_sample = @samples[:hihat].sample
+        @pattern[:hihat] ||= []
+        @pattern[:hihat] << hihat_sample if hihat_sample
+        if beat % 4 == 2
+          @pattern[:snare] ||= []
+          @pattern[:snare] << snare_sample if snare_sample
+        else
+          @pattern[:snare] ||= []
+          @pattern[:snare] << nil
+        end
+        if beat % 4 == 0
+          @pattern[:kick] ||= []
+          @pattern[:kick] << kick_sample if kick_sample
+        else
+          @pattern[:kick] ||= []
+          @pattern[:kick] << nil
+        end
+      end
+    end
+    if Numeric.rand(0.0..1.0) < 0.3
+      @pattern[:pad] = nil
+      # pad on every 8th beat
+      the_sample = @samples[:pad].sample
+      (0...@pattern_length * 4).each do |beat|
+        if beat % 8 == 0
+          @pattern[:pad] ||= []
+          @pattern[:pad] << the_sample if @samples[:pad] && !@samples[:pad].empty?
+        else
+          @pattern[:pad] ||= []
+          @pattern[:pad] << nil
+        end
       end
     end
   end
 
   def calc_beat
-    (elapsed_pattern_time * 60 / @bpm).floor % (@pattern_length * 4)
+    (elapsed_time * 60 / @bpm).floor % (@pattern_length * 4)
   end
 
   def calc_bars
@@ -72,23 +102,11 @@ class Music
   end
 
   def calc_pattern
-    (calc_bars / @pattern_length).floor % 8
-  end
-
-  def beat_time
-    elapsed_time / @bpm
+    (elapsed_time * 60 / @bpm / 4 / @pattern_length).floor
   end
 
   def elapsed_time
     Time.now - @start_time
-  end
-
-  def elapsed_pattern_time
-    Time.now - @pattern_start_time
-  end
-
-  def pattern_beat_time
-    elapsed_pattern_time * 60 / @bpm
   end
 
   def self.tick(args)
@@ -100,26 +118,23 @@ class Music
   end
 
   def tick(args)
-    old_beat_count = @beat_count
-    new_beat_count = self.calc_beat
     old_bar_count = @bar_count
     new_bar_count = self.calc_bars
     if old_bar_count != new_bar_count
       @bar_count = new_bar_count
-      printf "Music: New bar started: #{@bar_count}\n"
     end
     #printf "Music tick... elapsed time = #{self.elapsed_time} # pattern time: #{elapsed_pattern_time} old beat #{old_beat} / new beat #{new_beat}\n"
     old_pattern_count = @pattern_count
     new_pattern_count = self.calc_pattern
     if old_pattern_count != new_pattern_count  
-      @pattern_start_time = Time.now
-      alter_pattern!
       @pattern_count = new_pattern_count
-      printf "Music: New pattern started.\n"
+      alter_pattern!
     end
+    old_beat_count = @beat_count
+    new_beat_count = self.calc_beat
     if old_beat_count != new_beat_count
       @beat_count = new_beat_count
-      printf "Music: Pattern: #{@pattern_count} Bar: #{@bar_count} Beat: #{@beat_count}\n"
+      printf "Pattern: #{@pattern_count} Bar: #{@bar_count} Beat: #{@beat_count}\n"
       play_beat(args)
     end
   end
@@ -130,7 +145,7 @@ class Music
         @pattern.each do |kind, beats|
           if beats && beats[@beat_count]
             sample_file = beats[@beat_count]
-            printf "Playing sample: %s\n" % sample_file
+            #printf "Playing sample: %s\n" % sample_file
             sample_path = "sounds/music/#{kind}/" + sample_file
             args.outputs.audio[kind] = {
               input: sample_path,

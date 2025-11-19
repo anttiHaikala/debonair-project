@@ -59,8 +59,13 @@ class Scroll < Item
 
   def self.dig_around_entity(entity, radius, args)
     level = Utils.level(args)
-    (entity.x - radius).upto(entity.x + radius) do |x|
-      (entity.y - radius).upto(entity.y + radius) do |y|
+    low_x = [entity.x - radius, 0].max
+    high_x = [entity.x + radius, level.width - 1].min
+    low_y = [entity.y - radius, 0].max
+    high_y = [entity.y + radius, level.height - 1].min
+    printf "Digging around entity at (%d, %d) with radius %d - x: %d..%d and y: %d..%d\n" % [entity.x, entity.y, radius, low_x, high_x, low_y, high_y]
+    (low_x.to_i..high_x.to_i).each do |x|
+      (low_y.to_i..high_y.to_i).each do |y|
         if Math.sqrt((x - entity.x)**2 + (y - entity.y)**2) <= radius
           if level.tiles[y][x] == :wall || level.tiles[y][x] == :rock
             level.tiles[y][x] = :floor
