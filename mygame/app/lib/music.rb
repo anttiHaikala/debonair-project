@@ -30,7 +30,9 @@ class Music
 
   def alter_pattern!
     @pattern ||= {}
+    @pattern[:notes] ||= {}
     printf "Altering music pattern...\n"
+    # fx track
     if Numeric.rand(0.0..1.0) < 0.2
       (0...@pattern_length * 4).each do |beat|
         if beat % 4 == 0
@@ -42,18 +44,27 @@ class Music
         end
       end
     end
+    # strings track
     if Numeric.rand(0.0..1.0) < 0.4
       string_sample = @samples[:strings].sample
       (0...@pattern_length * 4).each do |beat|
         if beat % 8 == 0
+          @pattern[:notes][:strings] ||= []
           @pattern[:strings] ||= []
           @pattern[:strings] << string_sample if string_sample
+          @pattern[:notes][:strings] << 0
+        elsif beat % 8 == 4
+          @pattern[:strings] ||= []
+          @pattern[:strings] << string_sample if string_sample
+          @pattern[:notes][:strings] << 3
         else
           @pattern[:strings] ||= []
           @pattern[:strings] << nil
+          @pattern[:notes][:strings] << nil
         end
       end
     end
+    # drumtrax
     if Numeric.rand(0.0..1.0) < 0.2
       (0...@pattern_length * 4).each do |beat|
         kick_sample = @samples[:kick].sample
@@ -77,7 +88,8 @@ class Music
         end
       end
     end
-    if Numeric.rand(0.0..1.0) < 0.3
+    # pad
+    if Numeric.rand(0.0..1.0) < 0.5
       @pattern[:pad] = nil
       # pad on every 8th beat
       the_sample = @samples[:pad].sample
@@ -85,6 +97,29 @@ class Music
         if beat % 8 == 0
           @pattern[:pad] ||= []
           @pattern[:pad] << the_sample if @samples[:pad] && !@samples[:pad].empty?
+          @pattern[:notes][:pad] ||= []
+          @pattern[:notes][:pad] << [0,5,7,10].sample
+        elsif beat % 8 == 4
+          @pattern[:pad] ||= []
+          @pattern[:pad] << the_sample if @samples[:pad] && !@samples[:pad].empty?
+          @pattern[:notes][:pad] ||= []
+          @pattern[:notes][:pad] << [0,5,7,10].sample
+        else
+          @pattern[:pad] ||= []
+          @pattern[:pad] << nil
+        end
+      end
+    end
+    if Numeric.rand(0.0..1.0) < 0.3
+      # perc can be pretty random lol
+      primary_sample = @samples[:perc].sample
+      secondary_sample = @samples[:perc].sample
+      interval = [1,2,3,4,6].sample
+      (0...@pattern_length * 4).each do |beat|
+        the_sample = Numeric.rand(0.0..1.0) < 0.7 ? primary_sample : secondary_sample
+        if beat % interval == 0
+          @pattern[:perc] ||= []
+          @pattern[:perc] << the_sample if @samples[:perc] && !@samples[:perc].empty?
         else
           @pattern[:pad] ||= []
           @pattern[:pad] << nil
@@ -144,12 +179,19 @@ class Music
       if @pattern
         @pattern.each do |kind, beats|
           if beats && beats[@beat_count]
+            # do we have a note(pitch) info also?
+            if @pattern[:notes] && @pattern[:notes][kind] && @pattern[:notes][kind][@beat_count]
+              pitch = @pattern[:notes][kind][@beat_count]
+              numeric_pitch = (pitch - 1.0)/12.0 + 1.0
+              printf "Playing sample: %s with semitone pitch %s - numeric pitch: %s\n" % [kind.to_s, pitch.to_s, numeric_pitch.to_s]
+            end
             sample_file = beats[@beat_count]
             #printf "Playing sample: %s\n" % sample_file
             sample_path = "sounds/music/#{kind}/" + sample_file
             args.outputs.audio[kind] = {
               input: sample_path,
-              gain: @music_volume || 0.5
+              gain: @music_volume || 0.5,
+              pitch: numeric_pitch || 1.0
             }
           end
         end

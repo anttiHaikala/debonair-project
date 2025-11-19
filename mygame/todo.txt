@@ -6,9 +6,9 @@ NOTES ON GAME SYSTEM
 
 TODO LIST
 - performance (calculate lighting only when needed, not every tick)
+- drop weapon when hand is hit, skill modifiers
 - bigger rooms!!
 - bigger caves 
-- music tracker at 80 bpm
 - doors
 - fix levels that do not have exit
 - detective should detect secret doors automagically
