@@ -19,9 +19,10 @@ class TitleScreen
       printf "Game start complete.\n"
       printf "Dungeon has %d levels.\n" % args.state.dungeon.levels.size
       args.state.dungeon.levels.each_with_index do |level, index|
-        printf " Level %d has %d rooms and %d entities and %d items.\n" % [index, level.rooms.size, level.entities.size, level.items.size]
+        printf " %s level %d has %d rooms and %d entities and %d items.\n" % [level.vibe, index, level.rooms.size, level.entities.size, level.items.size]
       end
       args.state.scene = :gameplay
+      Lighting.mark_lighting_stale
       SoundFX.play_sound(:staircase, args)
       HUD.output_message args, "You enter the dungeon seeking the legendary Amulet of Skandor. Good luck!"
   end

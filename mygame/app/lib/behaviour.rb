@@ -117,6 +117,7 @@ class Behaviour
               npc.x = target_x
               npc.y = target_y
               args.state.kronos.spend_time(npc, npc.walking_speed, args)
+              Lighting.mark_lighting_stale
               return
             end
           else
@@ -168,8 +169,7 @@ class Behaviour
       level = args.state.dungeon.levels[npc.depth]
       target_tile = level.tiles[target_coordinates[1]][target_coordinates[0]]
       if Tile.is_walkable?(target_tile, args) && !Tile.occupied?(target_coordinates[0], target_coordinates[1], args)
-        @npc.x = target_coordinates[0]
-        @npc.y = target_coordinates[1]
+        Tile.enter(npc, target_coordinates[0], target_coordinates[1], args)
       end
     end
     args.state.kronos.spend_time(npc, npc.walking_speed, args) # todo fix speed depending on action

@@ -10,6 +10,7 @@ class Entity
   attr_accessor :behaviours
   attr_accessor :statuses
   attr_accessor :traits
+  attr_accessor :hands
 
   def self.kinds
     [:generic, :item, :pc, :npc, :plant, :furniture]
@@ -33,6 +34,7 @@ class Entity
     @wielded_items = []
     @statuses = []
     @traits = []
+    @hands = [:right, :left] # in order of preference
   end
 
   def is_hostile_to?(other_entity)

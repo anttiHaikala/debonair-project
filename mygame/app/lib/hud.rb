@@ -3,7 +3,7 @@ class HUD
   def self.draw args
     self.draw_hero_info args
     self.draw_health args
-    self.draw_items args
+    self.draw_inventory args
     self.draw_seed args
     self.draw_messages args
     self.debug_info args if $debug
@@ -39,9 +39,10 @@ class HUD
     end
     end
   end
-  def self.draw_items args
+  def self.draw_inventory args
     hero = args.state.hero
     return unless hero && hero.carried_items.any?
+    return unless args.inputs.controller_one.key_held.r2 || args.inputs.keyboard.key_down.tab
     title = "Items Carried (#{Item.carried_weight(hero).round(2)} kg)"
     args.outputs.labels << {
       x: 960,

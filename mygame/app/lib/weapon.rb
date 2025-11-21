@@ -101,5 +101,27 @@ class Weapon < Item
     end
     return weapon
   end
+
+  def break_check(args)
+    roll = args.state.rng.d20
+    break_threshold = 11
+    if self.attributes.include?(:broken)
+      return
+    end
+    if self.attributes.include?(:masterwork)
+      break_threshold += 8
+    end
+    if self.attributes.include?(:fine)
+      break_threshold += 5
+    end
+    if self.attributes.include?(:crude) || self.attributes.include?(:rusty)
+      break_threshold -= 3
+    end
+    if roll >= break_threshold
+      HUD.output_message(args, "Your #{self.title} breaks!")
+      SoundFX.play_sound(:item_break, args)
+      self.add_attribute(:broken)
+    end
+  end
   
 end

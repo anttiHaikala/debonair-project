@@ -53,7 +53,15 @@ class Tile
     return tile_memory[y] && tile_memory[y][x]
   end
 
+  def self.enter(entity, x, y, args)
+    entity.x = x
+    entity.y = y
+    Lighting.mark_lighting_stale
+    GUI.mark_tiles_stale
+  end
+
   def self.auto_map_whole_level args
+    depth = args.state.current_depth
     level = Utils.level(args)
     level_height = Utils.level_height(args)
     level_width = Utils.level_width(args)
@@ -64,7 +72,7 @@ class Tile
         tile_memory[y][x] = level.tiles[y][x]
       end
     end
-    @@tile_memory_per_level[args.state.current_depth] = tile_memory
+    @@tile_memory_per_level[depth] = tile_memory
   end
 
   def self.observe_tiles args
@@ -94,18 +102,15 @@ class Tile
     @@tile_visibility_per_level[args.state.current_depth] = tile_visibility
 
     # update memory with currently visible tiles
-    @@tile_memory_per_level[args.state.current_depth] ||= []
-    tile_memory = @@tile_memory_per_level[args.state.current_depth] 
-
+    @@tile_memory_per_level[args.state.current_depth] ||= [] 
     for y in level.tiles.each_index
-      tile_memory[y] ||= []
+      @@tile_memory_per_level[args.state.current_depth][y] ||= []
       for x in level.tiles[y].each_index
         if tile_visibility[y][x]
-          tile_memory[y][x] = level.tiles[y][x]
+          @@tile_memory_per_level[args.state.current_depth][y][x] = level.tiles[y][x]
         end
       end
     end
-    @@tile_memory_per_level[args.state.current_depth] = tile_memory
   end
 
   def self.draw_tiles args

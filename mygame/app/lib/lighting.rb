@@ -7,44 +7,42 @@ class Lighting
   end
 
   def self.calculate_light_level_at(level, x, y)
-    # initilalize light levels at zero
     # iterate through all light sources on the level
     light_level = 0.0
-    if level.lights
-      level.entities.each do |entity|
-        entity.worn_items.each do |item|
-          if item.kind == :ring_of_illumination
-            distance = Utils::distance(entity.x, entity.y, x, y)
-            if distance < 0.1
-              distance = 0.1
-            end
-            contribution = 30.0 / (distance * distance)
-            light_level += contribution
-          end
-        end
-        # grid bugs
-        if entity.species == :grid_bug
+    level.entities.each do |entity|
+      entity.worn_items.each do |item|
+        if item.kind == :ring_of_illumination
           distance = Utils::distance(entity.x, entity.y, x, y)
           if distance < 0.1
             distance = 0.1
           end
-          contribution = 20.0 / (distance * distance)
+          contribution = 30.0 / (distance * distance)
           light_level += contribution
         end
       end
-      level.lights.each do |light|
-        distance = Utils::distance(light.x, light.y, x, y)
+      # grid bugs
+      if entity.species == :grid_bug
+        distance = Utils::distance(entity.x, entity.y, x, y)
         if distance < 0.1
           distance = 0.1
         end
-        contribution = light.intensity / (distance * distance)
+        contribution = 4.0 / (distance * distance)
         light_level += contribution
       end
+    end
+    level.lights.each do |light|
+      distance = Utils::distance(light.x, light.y, x, y)
+      if distance < 0.1
+        distance = 0.1
+      end
+      contribution = light.intensity / (distance * distance)
+      light_level += contribution
     end
     return light_level
   end
 
   def self.populate_lights(args)
+    printf("populating lights...\n")
     dungeon = args.state.dungeon
     for level in dungeon.levels
       level.lights ||= []
@@ -59,13 +57,24 @@ class Lighting
           end
         end
       end
+      # rocky levels need different lighting
+      if level.vibe == :rocky
+        for i in 0...(level.width * level.height / 100)
+          x = args.state.rng.rand(level.width)
+          y = args.state.rng.rand(level.height)
+          tile = level.tiles[y][x]
+          if tile == :floor
+            light = Light.new(x, y, :bonfire)
+            level.lights << light
+          end
+        end
+      end 
       # calculate lighting for the level
       self.calculate_lighting(level, args)
     end
   end
 
   def self.calculate_lighting(level, args)
-    printf "Calculating lighting for level %d...\n" % level.depth
     if @@lighting_stale
       unless level.lighting
         level.lighting = Array.new(level.height) { Array.new(level.width, 0.0) }
@@ -75,6 +84,9 @@ class Lighting
           # only if within line of sight
           if level.los_cache["#{args.state.hero.x},#{args.state.hero.y}->#{x},#{y}"]
             level.lighting[y][x] = self.calculate_light_level_at(level, x, y)
+          end
+          unless level.lighting[y][x]
+            level.lighting[y][x] = 0.0
           end
         end
       end

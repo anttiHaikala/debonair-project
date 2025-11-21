@@ -73,9 +73,25 @@ class Trauma
     trauma = Trauma.new(kind, body_part, severity, entity)
     trauma.instance_variable_set(:@body_part, body_part)  
     entity.traumas << trauma
-    entity.increase_need(:avoid_being_hit)
     printf "Inflicted #{kind} trauma to #{entity.class} at #{body_part}. Has now #{entity.traumas.size} traumas.\n"
+    self.apply_effects(entity, trauma, args)
     return trauma
+  end
+
+  def self.apply_effects(entity, trauma, args)
+    entity.increase_need(:avoid_being_hit)
+    if trauma.severity != :minor
+      if [:right_hand, :right_fingers, :right_arm].include? trauma.body_part
+        if entity.wielded_items.any?
+          dropped_item = entity.wielded_items.sample
+          entity.wielded_items.delete(dropped_item)
+          entity.carried_items << dropped_item
+          printf "Entity dropped wielded item due to hand trauma.\n"
+        end
+      end
+    end
+    # check for shock
+    # check for death
   end
 
   def self.determine_shock(entity)

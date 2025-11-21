@@ -35,6 +35,14 @@ class Level
       @floor_hsl = [120, 255, 100]
     when :swamp
       @floor_hsl = [34, 0, 100]
+    when :fiery
+      @floor_hsl = [0, 255, 100]
+    when :ice
+      @floor_hsl = [200, 100, 90]
+    when :rocky
+      @floor_hsl = [34, 0, 80]
+    when :water
+      @floor_hsl = [200, 150, 80]
     else  
       @floor_hsl = [34, 0, 100]
     end
@@ -83,17 +91,45 @@ class Level
       x = rand(@tiles[0].size - width - buffer*2) + buffer
       y = rand(@tiles.size - height - buffer*2) + buffer
       new_room = Room.new(x, y, width, height)
-      if rooms.none? { |room| room.intersects?(new_room) }
+      if self.vibe != :rocky
+        if rooms.none? { |room| room.intersects?(new_room) }
+          rooms << new_room
+        end
+      else
         rooms << new_room
       end
     end
     @rooms.each do |room|
-      for i in room.y...(room.y + room.h)
-        for j in room.x...(room.x + room.w)
-          if i == room.y || i == (room.y + room.h - 1) || j == room.x || j == (room.x + room.w - 1)
-            @tiles[i][j] = :wall if @tiles[i][j] == :rock
-          else
-            @tiles[i][j] = :floor if @tiles[i][j] == :rock
+      if self.vibe == :rocky
+        # make rocky levels have bigger rooms that are round, not square
+        room.w += 4
+        room.h += 4
+        radius_x = (room.w / 2).to_i
+        radius_y = (room.h / 2).to_i
+        for i in room.y...(room.y + room.h)
+          for j in room.x...(room.x + room.w)
+            # check level boundaries
+            next if i < 1 || i >= @tiles.size - 1
+            next if j < 1 || j >= @tiles[0].size - 1
+            dx = j - room.center_x
+            dy = i - room.center_y
+            if ((dx * dx) * (radius_y * radius_y) + (dy * dy) * (radius_x * radius_x)) <= (radius_x * radius_x) * (radius_y * radius_y)
+              printf "#{i}, #{j}, inside ellipse\n"
+              # inside ellipse, no walls
+              @tiles[i][j] = :floor if @tiles[i][j] == :rock
+            else
+              printf "outside ellipse\n"
+            end
+          end
+        end
+      else
+        for i in room.y...(room.y + room.h)
+          for j in room.x...(room.x + room.w)
+            if i == room.y || i == (room.y + room.h - 1) || j == room.x || j == (room.x + room.w - 1)
+              @tiles[i][j] = :wall if @tiles[i][j] == :rock
+            else
+              @tiles[i][j] = :floor if @tiles[i][j] == :rock
+            end
           end
         end
       end
@@ -140,7 +176,6 @@ class Level
   end
 
   def add_foliage(args)
-
     # add some foliage to the level based on vibe
     foliage_types = []
     case @vibe
@@ -150,6 +185,8 @@ class Level
       foliage_types = [:moss, :fungus, :small_plant]
     when :ice
       foliage_types = [:lichen, :moss, :fungus]
+    # water
+    # fiery
     else
       foliage_types = [:puddle, :lichen]
     end
@@ -202,7 +239,7 @@ class Level
         # create a corridor from center of room to target_x, target_y
         current_x = room.x + (room.w / 2).to_i
         current_y = room.y + (room.h / 2).to_i
-        #printf "  Corridor from (%d,%d) to (%d,%d)\n" % [current_x, current_y, target_x, target_y]
+        printf "  Corridor from (%d,%d) to (%d,%d)\n" % [current_x, current_y, target_x, target_y]
         safety = 0
         horizontal_mode = [true, false].sample
         previous_x = current_x
@@ -234,6 +271,7 @@ class Level
               current_y -= 1
             end
           end
+          printf "      Digging at (%d,%d) - level width %d height %d\n" % [current_x, current_y, @tiles[0].size, @tiles.size ]
           @tiles[current_y][current_x] = :floor if @tiles[current_y][current_x] == :rock || @tiles[current_y][current_x] == :wall 
         end
         corridors += 1
@@ -243,16 +281,22 @@ class Level
 
 end
 class Room
-  attr_accessor :x, :y, :w, :h, :center_x, :center_y
+  attr_accessor :x, :y, :w, :h
   def initialize(x, y, w, h)
     @x = x
     @y = y
     @w = w
     @h = h
-    @center_x = (x + (w / 2)).to_i  
-    @center_y = (y + (h / 2)).to_i
+  end
+
+  def center_x
+    return (x + (w / 2)).to_i
   end
   
+  def center_y
+    return (y + (h / 2)).to_i
+  end
+
   def intersects?(other)
     return !(@x + @w < other.x || other.x + other.w < @x ||
              @y + @h < other.y || other.y + other.h < @y)

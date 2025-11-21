@@ -178,13 +178,15 @@ class Hero < Entity
     # hero is controlled by player, so no AI here
   end 
 
-  def pick_up_item(item, level)
+  def pick_up_item(item, level, args)
     @carried_items << item
     level.items.delete(item)
     item.x = nil
     item.y = nil
     item.depth = nil
     printf "Picked up item: %s\n" % item.kind.to_s
+    SoundFX.play_sound(:pick_up, args)
+    HUD.output_message(args, "You picked up #{item.kind}.")
   end
 
   def has_item?(item_kind)

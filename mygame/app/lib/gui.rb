@@ -230,8 +230,7 @@ class GUI
             # if there are items:
             if items_on_tile && items_on_tile.size > 0
               items_on_tile.each do |item|
-                hero.pick_up_item(item, level)
-                SoundFX.play_sound(:pick_up, args)
+                hero.pick_up_item(item, level, args)
                 return
               end
             end
@@ -451,7 +450,6 @@ class GUI
         @@auto_move = nil # stop auto moving if blocked
         return false
       end
-      GUI.lock_hero
       # determine if there is combat or not
       npc = args.state.dungeon.levels[hero.depth].entity_at(hero.x + dx, hero.y + dy)
       if hero.is_hostile_to?(npc)
@@ -477,8 +475,7 @@ class GUI
     end
     # we are cleared to move
     GUI.lock_hero
-    hero.x += dx # logical position is updated first, visual changes later
-    hero.y += dy
+    Tile.enter(hero, hero.x + dx, hero.y + dy, args)
     args.state.kronos.spend_time(hero, hero.walking_speed, args)
     hero.apply_walking_exhaustion(args)
     return true
@@ -515,7 +512,7 @@ class GUI
     # check if hero has reached target
     hero = args.state.hero
     if hero.visual_x == hero.x && hero.visual_y == hero.y
-      GUI.unlock_hero(args)
+      GUI.unlock_hero(args) if GUI.is_hero_locked?
     end
   end  
 
@@ -524,6 +521,7 @@ class GUI
   end
 
   def self.lock_hero
+    printf "Locking hero for movement\n"
     @@hero_locked = true
     @@just_used_staircase = false
     # input cooldown depends on moving frames
@@ -539,7 +537,12 @@ class GUI
     SoundFX.play_sound(:walk, $gtk.args)
   end
 
+  def self.mark_tiles_stale
+    @@tiles_observed = false
+  end
+
   def self.unlock_hero(args)
+    printf "Unlocking hero after movement\n"
     @@hero_locked = false
     @@tiles_observed = false
     # check if we stepped on something?

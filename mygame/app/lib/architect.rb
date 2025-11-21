@@ -61,6 +61,17 @@ class Architect
     level.tiles = Array.new(@settings[:level_height]) { Array.new(@settings[:level_width], :floor) }
     return level
   end
+  
+  def randomize_vibe_for_depth(depth)
+    case depth
+    when 7..9
+      return [:hack, :water, :rocky].sample
+    when 10
+      return :fiery
+    else
+      return [:rocky].sample
+    end
+  end
 
   def create_dungeon(args)
     # Code to create the dungeon layout
@@ -72,20 +83,22 @@ class Architect
     args.state.dungeon = dungeon
 
     for depth in 0..(@settings[:levels] - 1)
-      level = create_level(args, depth, :hack)
+
+      vibe = randomize_vibe_for_depth(depth)
+      level = create_level(args, depth, vibe)
 
       dungeon.levels[depth] = level
 
       # add staircase up (entrance)
       previous_tile = level.tiles[staircase_y][staircase_x]
       level.tiles[staircase_y][staircase_x] = :staircase_up
-      
       should_be_same = args.state.dungeon.levels[depth].tiles[staircase_y][staircase_x]
+
       # add rooms and corridors
       level.create_rooms(args)
       level.create_corridors(args)
-      
       # dig corridor from staircase up to entry room
+      printf level.rooms.size.to_s + " rooms created at depth %d with vibe %s\n" % [depth, vibe.to_s]
       entry_room = level.rooms.sample
       level.dig_corridor(args, staircase_x, staircase_y, entry_room.center_x, entry_room.center_y)
 
