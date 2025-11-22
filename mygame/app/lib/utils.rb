@@ -4,6 +4,10 @@ module Utils
     return args.state.dungeon.levels[args.state.current_depth]
   end
 
+  def self.level_by_depth(depth, args)
+    return args.state.dungeon.levels[depth]
+  end
+
   def self.tile_size(args)
     return 40 * $zoom
   end

@@ -33,7 +33,7 @@ class Level
     when :hack
       @floor_hsl = [34, 0, 100]
     when :lush
-      @floor_hsl = [280, 255, 100]
+      @floor_hsl = [180, 255, 100]
     when :swamp
       @floor_hsl = [34, 0, 100]
     when :fiery
@@ -234,9 +234,11 @@ class Level
         break if corridors > 5 # safety to avoid infinite loops
         target_room = @rooms.sample
         next if target_room == room
-        # point in the middle of the target room
-        target_x = Numeric.rand(target_room.x...(target_room.x + target_room.w - 1)).to_i
-        target_y = Numeric.rand(target_room.y...(target_room.y + target_room.h - 1)).to_i
+        # random point in the target room
+        target_x = Numeric.rand(target_room.x...(target_room.x + target_room.w)).to_i
+        target_x = [self.width - 2, target_x].min
+        target_y = Numeric.rand(target_room.y...(target_room.y + target_room.h)).to_i
+        target_y = [self.height - 2, target_y].min
         # create a corridor from center of room to target_x, target_y
         current_x = room.x + (room.w / 2).to_i
         current_y = room.y + (room.h / 2).to_i
@@ -278,6 +280,39 @@ class Level
         corridors += 1
       end
     end
+  end
+
+  def add_waters(args)
+    water_modifier = -2
+    case @vibe
+    when :swamp
+      water_modifier = 2
+    when :water
+      water_modifier = 4
+    end
+    # how many water ellipses to create?
+    water_ellipses = Numeric.rand(3..6) + water_modifier
+    water_ellipses.times do
+      center_x = Numeric.rand(1...(@tiles[0].size - 1)).to_i
+      center_y = Numeric.rand(1...(@tiles.size - 1)).to_i
+      radius_x = Numeric.rand(1..8).to_i + water_modifier
+      radius_y = Numeric.rand(1..8).to_i + water_modifier
+      for i in (center_y - radius_y)..(center_y + radius_y)
+        for j in (center_x - radius_x)..(center_x + radius_x)
+          # check level boundaries
+          next if i < 1 || i >= @tiles.size - 1
+          next if j < 1 || j >= @tiles[0].size - 1
+          dx = j - center_x
+          dy = i - center_y
+          if ((dx * dx) * (radius_y * radius_y) + (dy * dy) * (radius_x * radius_x)) <= (radius_x * radius_x) * (radius_y * radius_y)
+            if @tiles[i][j] == :floor 
+              @tiles[i][j] = :water
+            end
+          end
+        end
+      end
+    end
+
   end
 
 end

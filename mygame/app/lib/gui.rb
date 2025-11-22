@@ -50,7 +50,8 @@ class GUI
       # actually change level now
       old_level = args.state.dungeon.levels[args.state.current_depth]
       old_level.entities.delete(args.state.hero)
-      args.state.hero.depth += (args.state.staircase == :down ? 1 : -1)
+      new_depth = args.state.hero.depth + (args.state.staircase == :down ? 1 : -1)
+      args.state.hero.set_depth(new_depth)
       args.state.current_depth = args.state.hero.depth
       args.state.staircase = nil
       @@tiles_observed = false
@@ -167,7 +168,7 @@ class GUI
     $input_frames ||= 0
     $input_frames += 1
 
-    if args.state.hero.perished
+    if args.state.hero.perished && args.state.scene == :gameplay
       if args.inputs.keyboard.key_down.space || args.inputs.controller_one.key_down.a
         args.state.scene = :game_over
       end
@@ -480,7 +481,6 @@ class GUI
     # we are cleared to move
     GUI.lock_hero
     Tile.enter(hero, hero.x + dx, hero.y + dy, args)
-    args.state.kronos.spend_time(hero, hero.walking_speed, args)
     hero.apply_walking_exhaustion(args)
     return true
   end

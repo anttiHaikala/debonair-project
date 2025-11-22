@@ -257,16 +257,18 @@ class HUD
         b: 255,
         a: 255
       }
-      args.outputs.labels << {
-        x: 10,
-        y: 100,
-        text: "pos [#{hero.x}, #{hero.y}] level #{hero.depth} vibe: #{level.vibe if level} tiletype: #{args.state.dungeon.levels[hero.depth].tiles[hero.y][hero.x]} lighting: #{args.state.dungeon.levels[hero.depth].lighting[hero.y][hero.x]} auto_move: #{GUI.auto_move}",
-        size_enum: 0,
-        r: 255,
-        g: 255,
-        b: 255,
-        a: 255
-      }
+      if level
+        args.outputs.labels << {
+          x: 10,
+          y: 100,
+          text: "pos [#{hero.x}, #{hero.y}] level #{hero.depth} vibe: #{level.vibe if level} tiletype: #{level.tiles[hero.y][hero.x] if level} lighting: #{level.lighting[hero.y][hero.x] if level.lighting} auto_move: #{GUI.auto_move}",
+          size_enum: 0,
+          r: 255,
+          g: 255,
+          b: 255,
+          a: 255
+        }
+      end
     end
   end
 

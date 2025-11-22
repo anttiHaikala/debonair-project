@@ -2,7 +2,7 @@
 
 #$fixed_seed = 'dsfjkldasjdfdsaf' # THIS ONE IS A NICE SAMURAI SEED
 #$fixed_seed = 'testing12345678'
-$debug = true
+$debug = false
 $enable_music = false
 $dynamic_light_system = true
 $zoom = 0.7
@@ -53,6 +53,7 @@ require 'app/lib/food'
 require 'app/lib/scroll'
 require 'app/lib/debug'
 require 'app/lib/lighting'
+require 'app/lib/score'
 
 def boot args
   args.state = {}
@@ -98,6 +99,8 @@ def tick args
     title_screen_tick args
   when :game_over
     game_over_tick args
+  when :high_score_list
+    high_score_list args
   end
 end
 
@@ -107,6 +110,10 @@ end
 
 def game_over_tick args
   GameOverScreen.tick args
+end
+
+def high_score_list args
+  Score.tick args
 end
 
 def gameplay_tick args

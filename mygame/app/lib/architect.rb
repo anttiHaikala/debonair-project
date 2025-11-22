@@ -96,6 +96,7 @@ class Architect
       # add rooms and corridors
       level.create_rooms(args)
       level.create_corridors(args)
+      level.add_waters(args)
       # dig corridor from staircase up to entry room
       printf level.rooms.size.to_s + " rooms created at depth %d with vibe %s\n" % [depth, vibe.to_s]
       entry_room = level.rooms.sample
@@ -139,7 +140,7 @@ class Architect
 
   def populate_entities(args)
     hero = Hero.new(args.state.dungeon_entrance_x, args.state.dungeon_entrance_y)
-    hero.depth = 0
+    hero.set_depth(0)
     args.state.hero = hero
     args.state.dungeon.levels[0].entities << hero
     NPC.populate_dungeon(args.state.dungeon, args)
@@ -148,4 +149,5 @@ class Architect
   def populate_items(args)
     Item.populate_dungeon(args.state.dungeon, args)
   end
+
 end

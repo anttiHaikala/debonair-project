@@ -15,14 +15,13 @@ NOTES ON GAME SYSTEM
 - how many seconds is the time unit? (maybe 10?)
 
 TODO LIST
-- lava, shallow water, deep water
-- enter tile method - good for traps, lighting recalc etc.
-- bigger caves 
-- HI SCORE LIST: (- time used + amulet + survival - wounds/lost body parts + collected loot + quests(?))
+- picking up torches from the wall
+- fireball animation
+- magic missiles
+- drop weapon when hand is hit, skill modifiers, handedness, wield-hand
+- show wielded items in inventory (handedness)
 - status / emotion markers!!!
 - grid bug coloring (can we get gradients or something??)
-- drop weapon when hand is hit, skill modifiers, handedness, wield-hand
-- bigger rooms!!
 - taming grid bugs with food
 - doors
 - fix levels that do not have exit
@@ -41,6 +40,11 @@ TODO LIST
 
 
 DONE LIST
+- bigger rooms!!
+- HI SCORE LIST: (- time used + amulet + survival - wounds/lost body parts + collected loot + quests(?))
+- enter tile method - good for traps, lighting recalc etc.
+- bigger caves 
+- water
 - lighting (torches, wall mount torches and other lit things)
 - resting
 - carried weight, endurance

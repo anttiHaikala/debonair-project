@@ -75,6 +75,7 @@ class Behaviour
       return
     end
     hero = args.state.hero
+    depth = npc.depth
     if hero && hero.depth == npc.depth
       dx = hero.x - npc.x
       dy = hero.y - npc.y
@@ -87,8 +88,8 @@ class Behaviour
             args.state.hero.become_hostile_to(npc)
             args.state.kronos.spend_time(npc, npc.walking_speed*0.5, args)
           end
-          # move towards hero
-          if dy.abs < dx.abs || hero.y == npc.y # north-south movement
+          # move towards hero, but check if the target is walkable first
+          if dy.abs < dx.abs || hero.y == npc.y # north-south movement            
             step_x = dx > 0 ? 1 : -1
             step_y = 0
           else
@@ -98,8 +99,18 @@ class Behaviour
           target_x = npc.x + step_x
           target_y = npc.y + step_y
           printf "Target x,y: #{target_x}, #{target_y}, hero x,y #{hero.x}, #{hero.y}, npc x,y #{npc.x}, #{npc.y}\n"
-          level = args.state.dungeon.levels[npc.depth]
+          level = args.state.dungeon.levels[depth]
           target_tile = level.tiles[target_y][target_x]
+          if !Tile.is_walkable?(target_tile, args) && Tile.occupied?(target_x, target_y, args)
+            # cannot move towards the hero, try the other direction
+            if step_x != 0
+              target_x = npc.x
+              target_y = npc.y + (dy > 0 ? 1 : -1)
+            else
+              target_x = npc.x + (dx > 0 ? 1 : -1)
+              target_y = npc.y 
+            end
+          end
           if Tile.is_walkable?(target_tile, args) 
             if Tile.occupied?(target_x, target_y, args)
               if hero.x == target_x && hero.y == target_y
@@ -114,10 +125,7 @@ class Behaviour
                 return
               end
             else
-              npc.x = target_x
-              npc.y = target_y
-              args.state.kronos.spend_time(npc, npc.walking_speed, args)
-              Lighting.mark_lighting_stale
+              Tile.enter(npc, target_x, target_y, args)
               return
             end
           else
@@ -170,6 +178,7 @@ class Behaviour
       target_tile = level.tiles[target_coordinates[1]][target_coordinates[0]]
       if Tile.is_walkable?(target_tile, args) && !Tile.occupied?(target_coordinates[0], target_coordinates[1], args)
         Tile.enter(npc, target_coordinates[0], target_coordinates[1], args)
+        return # important to not spend time twice!
       end
     end
     args.state.kronos.spend_time(npc, npc.walking_speed, args) # todo fix speed depending on action

@@ -2,7 +2,7 @@ class Hero < Entity
 
   include Needy
 
-  attr_reader :role, :species, :trait, :age, :name, :exhaustion, :sleep_deprivation, :insanity, :carried_items
+  attr_reader :role, :species, :trait, :age, :name, :exhaustion, :sleep_deprivation, :insanity, :carried_items, :max_depth
   attr_accessor :hunger
 
   def initialize(x, y)
@@ -13,7 +13,7 @@ class Hero < Entity
     @species = Hero.species.sample
     @traits = [Hero.traits.sample]
     @age = Hero.age.sample
-    @name = 'Jaakko'
+    @name = random_name
     @exhaustion = 0.2 # 0.0 = totally rested, 1.0 = totally exhausted
     @hunger = 0.2 # 0.0 = satiated, 1.0 = starving
     @hunger_level = :okay
@@ -21,6 +21,7 @@ class Hero < Entity
     @insanity = 0.0 # 0.0 = sane, 1.0 = totally insane
     @stress = 0.0 # 0.0 = calm, 1.0 = totally stressed
     @carried_items = []
+    @max_depth = 0
   end
 
   def self.roles
@@ -85,6 +86,18 @@ class Hero < Entity
 
   def hue
     0
+  end
+
+  def random_name
+    names = ['Jaakko', 'Liisa', 'Mikko', 'Anna', 'Kari', 'Sari', 'Pekka', 'Marja', 'Jukka', 'Tiina']
+    return names.sample
+  end
+
+  def set_depth(depth)
+    @depth = depth
+    if depth > @max_depth
+      @max_depth = depth
+    end
   end
 
   def color # hsl

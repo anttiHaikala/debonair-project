@@ -86,7 +86,7 @@ class Lighting
             level.lighting[y][x] = self.calculate_light_level_at(level, x, y)
           end
           unless level.lighting[y][x]
-            level.lighting[y][x] = 0.0
+            level.lighting[y][x] = 0.2
           end
         end
       end

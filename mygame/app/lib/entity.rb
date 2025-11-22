@@ -185,4 +185,12 @@ class Entity
       SoundFX.play_sound(:teleport, args)
     end
   end
+
+  def slowed_in_water?
+    slowed = true
+    if self.species == :grid_bug
+      slowed = false
+    end
+    return slowed
+  end 
 end

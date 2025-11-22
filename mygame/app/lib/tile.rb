@@ -20,7 +20,7 @@ class Tile
   end
 
   def self.is_walkable?(tile_type, args)
-    return [:floor, :staircase_up, :staircase_down].include?(tile_type)
+    return [:floor, :staircase_up, :staircase_down, :water].include?(tile_type)
   end
 
   def self.occupied?(x, y, args)
@@ -56,8 +56,29 @@ class Tile
   def self.enter(entity, x, y, args)
     entity.x = x
     entity.y = y
+    base_walking_speed = entity.walking_speed || 1.0
+    random_element = 0.8 + (args.state.rng.nxt_float * 0.4) # 0.8 to 1.2
+    time_spent = base_walking_speed * self.terrain_modifier_for_entity(x, y, entity, args) * random_element
+    args.state.kronos.spend_time(entity, time_spent, args)
     Lighting.mark_lighting_stale
     GUI.mark_tiles_stale
+  end
+
+  def self.terrain_modifier_for_entity(x, y, entity, args)
+    level = Utils.level_by_depth(entity.depth, args)
+    tile = level.tile_at(x, y)
+    case tile
+    when :floor
+      return 1.0
+    when :water
+      if entity.slowed_in_water?
+        return 2.0
+      else
+        return 1.0
+      end
+    else
+      return 1.0
+    end
   end
 
   def self.auto_map_whole_level args
@@ -153,7 +174,9 @@ class Tile
       when :closed_door
         { r: 100, g: 50, b: 0 }
       when :water
-        { r: 0, g: 0, b: 255 }
+        # blue 360 hue
+        hue = 220
+        Color.hsl_to_rgb(hue, 100 * saturation_modifier, 0 * lightness_modifier)
       when :chasm
         { r: 0, g: 0, b: 120 }
       else
@@ -169,7 +192,7 @@ class Tile
       g: color[:g],
       b: color[:b]
     }
-    # floor decoration
+    # floor decoration is printed on top of the solid below
     if tile == :floor
       # highlight square
       c = Color.hsl_to_rgb(hue, 80 * saturation_modifier, 80 * lightness_modifier)
@@ -248,6 +271,23 @@ class Tile
           path: "sprites/sm16px.png",
           tile_x: 14*16,
           tile_y: 3*16,
+          tile_w: 16,
+          tile_h: 16,
+          r: c[:r],
+          g: c[:g],
+          b: c[:b]
+        }
+      end
+      if tile == :water
+        c = Color.hsl_to_rgb(hue, 100 * saturation_modifier, 60 * lightness_modifier)
+        args.outputs.sprites << {
+          x: x_offset + x * tile_size,
+          y: y_offset + y * tile_size,
+          w: tile_size,
+          h: tile_size,
+          path: "sprites/sm16px.png",
+          tile_x: 7*16,
+          tile_y: 15*16,
           tile_w: 16,
           tile_h: 16,
           r: c[:r],
