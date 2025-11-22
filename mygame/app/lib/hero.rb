@@ -294,9 +294,9 @@ class Hero < Entity
 
   def walking_sound tile, args
     if tile == :water
-      SoundFX.play_sound(:splash, args)
+      SoundFX.play_sound(:water_walk, args, 0.5)
     else
-      SoundFX.play_sound(:walk, args)
+      SoundFX.play_sound(:walk, args, 0.5)
     end
   end
 end
