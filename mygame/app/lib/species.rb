@@ -25,6 +25,13 @@ class Species
     ]
   end
 
+  def self.undead_species
+    [
+      :skeleton,
+      :wraith
+    ]
+  end
+
   def self.mammal_body_parts
     [
       :heart,

@@ -63,7 +63,7 @@ class HUD
       args.outputs.labels << {
         x: x,
         y: y,
-        text: item.title + " " + hero.wield_info(item),
+        text: item.title(args) + " " + hero.wield_info(item),
         size_enum: 0,
         r: 255,
         g: 255,
@@ -292,7 +292,7 @@ class HUD
     m = message.to_s.gsub('_',' ').gsub('  ',' ').trim
     args.state.hud_messages << { text: m, time: args.state.kronos.world_time }
     # keep only last 5 messages
-    if args.state.hud_messages.size > 5
+    if args.state.hud_messages.size > 10
       args.state.hud_messages.shift 
     end
   end 

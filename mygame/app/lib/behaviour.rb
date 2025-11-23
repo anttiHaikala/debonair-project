@@ -42,7 +42,7 @@ class Behaviour
       npc.behaviours << Behaviour.new(:wander, npc)
       # npc.behaviours << Behaviour.new(:escape, npc)
       # npc.behaviours << Behaviour.new(:forage, npc)
-    when :rat
+    when :rat, :newt
       npc.behaviours << Behaviour.new(:wander, npc)
       # npc.behaviours << Behaviour.new(:forage, npc)
       # npc.behaviours << Behaviour.new(:pack, npc)

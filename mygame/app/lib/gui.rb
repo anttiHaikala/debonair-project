@@ -96,7 +96,7 @@ class GUI
       if @@look_mode_index == nil
         @@look_mode_index = 0
         thing = visible_things[@@look_mode_index]
-        HUD.output_message args, "You see a #{thing.traits.join(', ')} #{thing.title}."
+        HUD.output_message args, "You see a #{thing.traits.join(', ')} #{thing.title(args)}."
       else
         if args.inputs.up && @@look_mode_cooldown == 0
           @@look_mode_index -= 1
@@ -104,7 +104,7 @@ class GUI
             @@look_mode_index = visible_things.size - 1
           end
           thing = visible_things[@@look_mode_index]
-          HUD.output_message args, "You see a #{thing.traits.join(', ')} #{thing.title}."
+          HUD.output_message args, "You see a #{thing.traits.join(', ')} #{thing.title(args)}."
           @@look_mode_cooldown = 10
         elsif args.inputs.down && @@look_mode_cooldown == 0
           @@look_mode_index += 1
@@ -112,7 +112,7 @@ class GUI
             @@look_mode_index = 0
           end
           thing = visible_things[@@look_mode_index]
-          HUD.output_message args, "You see a #{thing.traits.join(', ')} #{thing.title}."
+          HUD.output_message args, "You see a #{thing.traits.join(', ')} #{thing.title(args)}."
           @@look_mode_cooldown = 10
         else
           thing = visible_things[@@look_mode_index]
@@ -151,7 +151,7 @@ class GUI
         args.outputs.labels << {
           x: screen_x,
           y: screen_y,
-          text: thing.title,
+          text: thing.title(args),
           size_enum: 0,
           alignment_enum: 1,
           r: 255,
@@ -387,6 +387,7 @@ class GUI
     level = Utils.level(args)
     return unless level
     level.entities.each do |entity|
+      telepathic_connection = false
       unless entity == args.state.hero
         visible = Tile.is_tile_visible?(entity.x, entity.y, args) && !entity.invisible?
         if args.state.hero.telepathy_range > 0
@@ -394,7 +395,10 @@ class GUI
           dist_y = (entity.y - args.state.hero.y).abs
           # pythagorean distance
           dist = Math.sqrt(dist_x**2 + dist_y**2)
-          visible = true if dist <= args.state.hero.telepathy_range
+          if dist <= args.state.hero.telepathy_range
+            visible = true
+            telepathic_connection = true 
+          end
         end
         if visible
           entity.has_been_seen = true
@@ -417,7 +421,7 @@ class GUI
       hue = entity.hue
       saturation = entity.color[1]
       level = entity.color[2]
-      level *= lighting
+      level *= lighting unless telepathic_connection
       color = Color::hsl_to_rgb(hue, saturation, level)
       args.outputs.primitives << {
         x: x_offset + x * tile_size,
@@ -484,16 +488,21 @@ class GUI
       end
       # determine if there is combat or not
       npc = args.state.dungeon.levels[hero.depth].entity_at(hero.x + dx, hero.y + dy)
-      if hero.is_hostile_to?(npc)
-        Combat.resolve_attack(hero, npc, args)
-        args.state.kronos.spend_time(hero, hero.walking_speed, args) # todo fix speed depending on action
-        return true
+      if hero.is_hostile_to?(npc) 
+        # check that the direction button was pressed, not just held
+        if args.inputs.keyboard.key_down.up || args.inputs.keyboard.key_down.down || args.inputs.keyboard.key_down.left || args.inputs.keyboard.key_down.right || args.inputs.controller_one.key_down.dpad_up || args.inputs.controller_one.key_down.dpad_down || args.inputs.controller_one.key_down.dpad_left || args.inputs.controller_one.key_down.dpad_right
+          Combat.resolve_attack(hero, npc, args)
+          args.state.kronos.spend_time(hero, hero.walking_speed, args) # todo fix speed depending on action
+          return true
+        else
+          return false
+        end
       else
         if npc.is_hostile_to?(hero)
-          HUD.output_message args, "You bump into the #{npc.title}!"
+          HUD.output_message args, "You bump into the #{npc.name}!"
         else
           # swap places
-          HUD.output_message args, "You trade places with the #{npc.title}."
+          HUD.output_message args, "You trade places with the #{npc.name}."
           npc.x = hero.x
           npc.y = hero.y
           hero.x += dx

@@ -78,7 +78,7 @@ class Weapon < Item
       # special case: if wielding a weapon and an off-hand item, replace the weapon with this one
       if entity.wielded_items.size == 2 && entity.wielded_items[0].category == :weapon && entity.wielded_items[1].category != :weapon
         entity.wielded_items[0] = self
-        HUD.output_message(args, "You switch to wielding the #{self.title}.")
+        HUD.output_message(args, "You switch to wielding the #{self.title(args)}.")
         return
       end
       # add to beginning of array
@@ -86,14 +86,10 @@ class Weapon < Item
       if entity.wielded_items.length > 2
         entity.wielded_items = entity.wielded_items[0..1]
       end
-      HUD.output_message(args, "You wield the #{self.title}.")
+      HUD.output_message(args, "You wield the #{self.title(args)}.")
       SoundFX.play(:blade, args) # TODO: different sound for different weapon types
     end
     args.state.kronos.spend_time(entity, entity.walking_speed * 0.5, args) 
-  end
-
-  def title
-    "#{self.attributes.join(' ')} #{self.kind.to_s.gsub('_',' ')}".gsub('  ',' ').trim
   end
 
   def self.generate_for_npc(npc, depth, args)
@@ -129,7 +125,7 @@ class Weapon < Item
       break_threshold -= 3
     end
     if roll >= break_threshold
-      HUD.output_message(args, "Your #{self.title} breaks!")
+      HUD.output_message(args, "Your #{self.title(args)} breaks!")
       SoundFX.play_sound(:item_break, args)
       self.add_attribute(:broken)
     end

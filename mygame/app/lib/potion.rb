@@ -7,7 +7,6 @@ class Potion < Item
   def self.kinds
     [
     :potion_of_healing,
-    :potion_of_healing,
     # :potion_of_strength,
     # :potion_of_speed,
     # :potion_of_invisibility,
@@ -39,9 +38,25 @@ class Potion < Item
     ]
   end
 
+  def title(args)
+    mask_index = Potion.kinds.index(self.kind) % Potion.masks.length
+    mask = Potion.masks[mask_index]
+    if args.state.hero.known_potions.include?(self.kind)
+      "#{self.attributes.join(' ')} #{self.kind.to_s.gsub('_',' ')}".trim
+    else
+      "#{mask} potion".trim
+    end
+  end
+
   def self.randomize(level_depth, args)
     kind = args.state.rng.choice(self.kinds)
     return Potion.new(kind)
+  end
+
+  def identify(args)
+    unless args.state.hero.known_potions.include?(self.kind)
+      args.state.hero.known_potions << self.kind
+    end
   end
 
   def use(entity, args)
@@ -49,6 +64,7 @@ class Potion < Item
     when :potion_of_teleportation
       HUD.output_message(args, "You feel disoriented...")
       entity.teleport(args)
+      self.identify(args)
     when :potion_of_healing, :potion_of_extra_healing
       effect = 0
       Trauma.active_traumas(entity).each do |trauma|
@@ -68,6 +84,9 @@ class Potion < Item
       end
       if effect == 0
         HUD.output_message(args, "You feel no different after drinking the potion.")
+      else
+        self.identify(args)
+        HUD.output_message(args, "You feel better after drinking the potion.")
       end
       SoundFX.play(:potion, args)
     when :potion_of_strength

@@ -21,11 +21,17 @@ class NPC < Entity
   end
 
   def name
-    @species.to_s.capitalize.gsub('_',' ')
+    if @name
+      return @name
+    else
+      return "#{@traits.join(' ')} #{@species.to_s.gsub('_',' ')}".capitalize.strip
+    end
   end
 
   def hue # deprecate!!!
     case @species
+    when :newt
+      return 80
     when :goblin, :orc
       return 120  
     when :grid_bug
@@ -38,12 +44,15 @@ class NPC < Entity
   end
 
   # these are HSl values (hue, saturation, level)
+  # hue cheat sheet: 0=red, 40=orange, 80=yellow, 120=green, 200=blue, 300=purple
   def color
     case @species
     when :goblin, :orc
-      return [20, 255, 100]
+      return [20, 80, 70]
+    when :newt
+      return [90, 100, 100]
     when :grid_bug
-      return [130, 170, 100]
+      return [130, 100, 100]
     when :rat
       return [80, 80, 20]
     when :wraith
@@ -63,7 +72,7 @@ class NPC < Entity
       @traits << [:skinny, :fat, :short, :tall, :muscular].sample
     when :grid_bug
       @traits << [:shiny, :metallic, :buzzing].sample
-    when :rat
+    when :rat, :newt
       @traits << [:skinny, :fat, :big, :small, :muscular].sample
     when :wraith
     when :skeleton
@@ -81,6 +90,8 @@ class NPC < Entity
       return [8,7]
     when :rat 
       return [2,7]
+    when :newt
+      return [14,6]
     when :orc
       return [15,4]
     when :wraith
@@ -113,6 +124,23 @@ class NPC < Entity
     end
   end
 
+  def self.populate_with_endgame_challenges(level, args)
+    level.rooms.each do |room|
+      case args.state.rng.d12
+      when 1
+        npc = NPC.new(:minotaur, room.center_x, room.center_y, level.depth)
+        level.entities << npc
+      when 2
+        npc = NPC.new(:skeleton, room.center_x, room.center_y, level.depth)
+        npc.carried_items << Weapon.generate_for_npc(npc, level.depth, args)
+        level.entities << npc
+      when 3
+        npc = NPC.new(:wraith, room.center_x, room.center_y, level.depth)
+        level.entities << npc
+      end
+    end
+  end
+
   def self.populate_level(level, args)
     level.rooms.each do |room|
       case args.state.rng.d6
@@ -131,7 +159,6 @@ class NPC < Entity
           new_npc.carried_items << Weapon.generate_for_npc(npc, level.depth, args)
           level.entities << new_npc
         end
-
       when 2
         if level.depth < 4
           npc = NPC.new(:grid_bug, room.center_x, room.center_y, level.depth)
@@ -144,14 +171,20 @@ class NPC < Entity
           level.entities << npc
         end
       when 3
-        npc = NPC.new(:rat, room.center_x, room.center_y, level.depth)
+        case level.vibe
+          when :lush
+            kind = :newt
+          else
+            kind = :rat
+        end
+        npc = NPC.new(kind, room.center_x, room.center_y, level.depth)
         level.entities << npc
         if args.state.rng.d6 > 3
-          npc2 = NPC.new(:rat, room.center_x + 1, room.center_y, level.depth)
+          npc2 = NPC.new(kind, room.center_x + 1, room.center_y, level.depth)
           level.entities << npc2
         end
         if args.state.rng.d6 == 6
-          npc3 = NPC.new(:rat, room.center_x - 1, room.center_y, level.depth)
+          npc3 = NPC.new(kind, room.center_x - 1, room.center_y, level.depth)
           level.entities << npc3
         end
       end
@@ -165,7 +198,7 @@ class NPC < Entity
       species_speed = 1.4 # seconds per tile
     when :grid_bug
       species_speed = 0.2
-    when :rat
+    when :rat, :newt
       species_speed = 0.8
     when :gelatinous_cube # these guys keep the dungeon clean??
       species_speed = 5.0
@@ -178,7 +211,7 @@ class NPC < Entity
     Behaviour.select_for_npc(self).execute(args)
   end
 
-  def title
-    self.species
+  def title(args)
+    self.name
   end
 end

@@ -3,7 +3,7 @@ class Hero < Entity
   include Needy
 
   attr_reader :role, :species, :trait, :age, :name, :exhaustion, :sleep_deprivation, :insanity, :carried_items, :max_depth
-  attr_accessor :hunger
+  attr_accessor :hunger, :hunger_level, :stress, :perished, :reason_of_death, :known_potions
 
   def initialize(x, y)
     super(x, y)
@@ -22,6 +22,7 @@ class Hero < Entity
     @stress = 0.0 # 0.0 = calm, 1.0 = totally stressed
     @carried_items = []
     @max_depth = 0
+    @known_potions = []
   end
 
   def self.roles
@@ -199,7 +200,11 @@ class Hero < Entity
     item.depth = nil
     printf "Picked up item: %s\n" % item.kind.to_s
     SoundFX.play_sound(:pick_up, args)
-    HUD.output_message(args, "You picked up #{item.title}.")
+    HUD.output_message(args, "You picked up #{item.title(args)}.")
+    if item.kind == :amulet_of_skandor
+      args.state.architect.setup_endgame(args)
+      HUD.output_message(args, "Your intuition tells you things might get more difficult now.")
+    end
   end
 
   def has_item?(item_kind)

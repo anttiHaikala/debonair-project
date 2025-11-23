@@ -73,7 +73,7 @@ class Kronos
       if item.category == :ring
         item.usage += 1
         if item.usage >= item.max_usage
-          HUD.output_message args, "Your #{item.title} crumbles to dust!"
+          HUD.output_message args, "Your #{item.title(args)} crumbles to dust!"
           hero.worn_items.delete(item)
           hero.carried_items.delete(item)
         end

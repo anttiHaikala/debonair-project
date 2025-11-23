@@ -15,17 +15,16 @@ NOTES ON GAME SYSTEM
 - how many seconds is the time unit? (maybe 10?)
 
 TODO LIST
-- performance optimization (bigger levels we can only support pretty small ones atm)
-- status / emotion markers!!!
-- show wielded items in inventory (handedness)
-- drop weapon when hand is hit, skill modifiers, handedness, wield-hand
-- fireball animation
+- potion identification
 - make the game slow down properly when there is danger/combat!!!
+- status / emotion markers!!!
+- drop weapon when hand is hit, skill modifiers, handedness, wield-hand
 - walking speed modifiers for wounds below waist
 - different weapons make different damage
 - cutting/slicing weapons (not just bruises)
 - do undead get shock or do they just crumble to dust?
 - magic missiles
+- fireball animation
 - grid bug coloring (can we get gradients or something??)
 - taming grid bugs with food
 - doors
@@ -44,6 +43,8 @@ TODO LIST
 
 
 DONE LIST
+- show wielded items in inventory (handedness)
+- performance optimization (bigger levels we can only support pretty small ones atm)
 - picking up torches from the wall
 - bigger rooms!!
 - HI SCORE LIST: (- time used + amulet + survival - wounds/lost body parts + collected loot + quests(?))

@@ -70,6 +70,10 @@ class Entity
     parts[args.state.rng.rand(parts.length)]
   end
 
+  def title
+    self.name
+  end
+
   def body_parts
     case @species
     when :grid_bug
@@ -157,7 +161,7 @@ class Entity
     level.items << item
     printf "Dropped item: %s\n" % item.kind.to_s
     SoundFX.play_sound(:drop_item, args)
-    HUD.output_message(args, "#{self.name} dropped #{item.title}.")
+    HUD.output_message(args, "#{self.name} dropped #{item.title(args)}.")
   end
 
   def teleport(args, x=nil, y=nil)
@@ -201,7 +205,7 @@ class Entity
   def drop_wielded_items(args)
     if self.wielded_items
       self.wielded_items.each do |item|
-        HUD.output_message(args, "#{self.name} drops #{item.title}.")
+        HUD.output_message(args, "#{self.name} drops #{item.title(args)}.")
         self.wielded_items.delete(item)
         self.carried_items.delete(item)
         level = args.state.dungeon.levels[self.depth]
@@ -216,7 +220,7 @@ class Entity
   def drop_all_items(args)
     if self.carried_items
       self.carried_items.each do |item|
-        HUD.output_message(args, "#{self.name} drops #{item.title}.")
+        HUD.output_message(args, "#{self.name} drops #{item.title(args)}.")
         level = args.state.dungeon.levels[self.depth]
         item.x = self.x
         item.y = self.y
@@ -224,6 +228,23 @@ class Entity
         level.items << item
       end
       self.carried_items = []
+    end
+  end
+
+  def perish(args)
+    @perished = true
+    self.drop_all_items(args)
+    if self.undead?
+      HUD.output_message(args, "#{self.name.capitalize} is destroyed!")
+    else
+      kind = (self.species.to_s + "_corpse").to_sym
+      corpse = Item.new(kind, :corpse)
+      corpse.depth = self.depth
+      corpse.x = self.x
+      corpse.y = self.y
+      level = args.state.dungeon.levels[self.depth]
+      level.items << corpse
+      HUD.output_message(args, "#{self.name.capitalize} has perished!")
     end
   end
 
@@ -238,5 +259,8 @@ class Entity
       end
     end
     return ""
+  end
+  def undead?
+    return Species.undead_species.include?(self.species)
   end
 end

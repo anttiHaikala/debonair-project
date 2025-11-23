@@ -36,3 +36,17 @@ class Food < Item
     [:yummy, :edible, :bland, :disgusting, :kinda_crap]
   end
 end
+
+class Corpse < Food
+
+  def initialize(kind, args)
+    super(kind, :corpse)
+    case @kind
+    when :newt_corpse
+      @nutrition_value = 1.0
+    else
+      @nutrition_value = 0.05
+    end
+  end
+
+end

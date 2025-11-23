@@ -90,11 +90,23 @@ class Trauma
         end
       end
     end
-    # check for shock
-    # check for death
+    shocked = self.determine_shock(entity)
+    if shocked
+      unless entity.has_status?(:shock)
+        entity.add_status(:shock)
+        HUD.output_message(args, "#{entity.name.capitalize} goes into shock!")
+      end
+    end
+    dead = self.determine_morbidity(entity)
+    if dead
+      entity.perish(args)
+    end
   end
 
   def self.determine_shock(entity)
+    if entity.undead?
+      return false
+    end
     shock_score = 0
     shock_threshold = 3
     entity.traumas.each do |trauma|
@@ -147,7 +159,7 @@ class Trauma
     return entity.traumas.select { |trauma| trauma.severity != :healed }
   end
 
-  def title
+  def title(args)
     "#{@severity.to_s.capitalize} #{@kind.to_s.gsub('_',' ')} on #{@body_part.to_s.gsub('_',' ')}"
   end
 

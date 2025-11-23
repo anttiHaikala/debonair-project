@@ -1,16 +1,8 @@
 class Architect
-  # singleton class that creates the dungeon and populates it with entities
-  # 
-  def self.reset!
-    @instance = nil
-  end
-
-  def self.instance
-    @instance ||= Architect.new
-  end
-
-  def setup(settings)
-    @settings ||= {}
+  #  class that creates the dungeon and populates it with entities
+  
+  def initialize
+    @settings = {}
     @settings[:levels] ||= 10
     @settings[:level_width] ||= 70   
     @settings[:level_height] ||= 42
@@ -152,4 +144,9 @@ class Architect
     Item.populate_dungeon(args.state.dungeon, args)
   end
 
+  def setup_endgame(args)
+    for level in args.state.dungeon.levels
+      NPC.populate_with_endgame_challenges(level, args)        
+    end
+  end
 end

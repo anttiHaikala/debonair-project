@@ -15,7 +15,7 @@ class Item
   end
 
   def self.categories
-    return [:food, :weapon, :potion, :armor, :scroll, :wand, :ring, :scroll, :amulet, :gloves, :footwear, :helmet, :portable_light]
+    return [:food, :weapon, :potion, :armor, :scroll, :wand, :ring, :scroll, :amulet, :gloves, :footwear, :helmet, :portable_light, :corpse]
   end
 
   def set_weight # grams
@@ -59,8 +59,8 @@ class Item
     [56, 100, 100]
   end
 
-  def title
-    "#{self.attributes.join(' ')} #{self.kind.to_s.gsub('_',' ')}"
+  def title(args)
+    "#{self.attributes.join(' ')} #{self.kind.to_s.gsub('_',' ')}".trim
   end
 
   def c 
@@ -88,6 +88,8 @@ class Item
       return [8,0]
     when :helmet
       return [9,0]
+    when :corpse
+      return [5,2]
     else
       return [10,0] # unknown
     end
@@ -201,14 +203,14 @@ class Item
       #wield/unwield the portable light
       if user.wielded_items.include?(self)
         user.wielded_items.delete(self)
-        HUD.output_message(args, "#{user.name} puts away the #{self.title}.")
+        HUD.output_message(args, "#{user.name} puts away the #{self.title(args)}.")
       else
         # imporant that we add it to the end of the list
         user.wielded_items << self
         if user.wielded_items.length > 2
           user.wielded_items = user.wielded_items.slice(1,2)
         end
-        HUD.output_message(args, "#{user.name} wields the #{self.title}.")
+        HUD.output_message(args, "#{user.name} wields the #{self.title(args)}.")
       end
       return
     end

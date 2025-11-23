@@ -89,7 +89,11 @@ class Combat
     defender_dead = Trauma.determine_morbidity(defender)
     printf "Defender dead?=: %s, Defender wound count: %d\n" % [defender_dead.to_s, defender.traumas.size]
     if defender_dead
-      HUD.output_message args, "#{dname} has died!"
+      if defender.undead?
+        HUD.output_message args, "#{dname} has been destroyed!"
+      else
+        HUD.output_message args, "#{dname} has died!"
+      end
       if defender == args.state.run.hero
         HUD.output_message args, "Press A to continue..."
         args.state.hero.perished = true

@@ -98,7 +98,7 @@ class Ring < Item
         if self.usage % 10 == 0 # heal one step every 10 usage ticks
           roll = args.state.rng.d12
           if roll >= trauma.numeric_severity
-            HUD.output_message(args, "#{trauma.title} gets better.")
+            HUD.output_message(args, "#{trauma.title(args)} gets better.")
             trauma.heal_one_step
             break
           end 
