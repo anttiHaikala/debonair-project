@@ -261,7 +261,7 @@ class HUD
         args.outputs.labels << {
           x: 10,
           y: 100,
-          text: "pos [#{hero.x}, #{hero.y}] level #{hero.depth} vibe: #{level.vibe if level} tiletype: #{level.tiles[hero.y][hero.x] if level} lighting: #{level.lighting[hero.y][hero.x] if level.lighting} auto_move: #{GUI.auto_move}",
+          text: "pos [#{hero.x}, #{hero.y}] level #{hero.depth} vibe: #{level.vibe if level} tiletype: #{level.tiles[hero.y][hero.x] if level} foliage: #{level.foliage[hero.y][hero.x] if level.foliage} lighting: #{level.lighting[hero.y][hero.x] if level.lighting} auto_move: #{GUI.auto_move}",
           size_enum: 0,
           r: 255,
           g: 255,
@@ -269,9 +269,24 @@ class HUD
           a: 255
         }
       end
+      if args.state.profile_data
+        y = 550
+        args.state.profile_data.each do |subsystem, time_taken|
+          args.outputs.labels << {
+            x: 10,
+            y: y,
+            text: "#{subsystem.to_s.gsub('_',' ')}: #{(time_taken * 1000).to_i} ms",
+            size_enum: 0,
+            r: 255,
+            g: 255,
+            b: 255,
+            a: 255
+          }
+          y -= 30
+        end
+      end
     end
   end
-
   def self.output_message args, message
     args.state.hud_messages ||= []
     m = message.to_s.gsub('_',' ').gsub('  ',' ').trim

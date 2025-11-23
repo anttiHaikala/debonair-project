@@ -6,10 +6,12 @@ class Level
   attr_accessor :entities
   attr_accessor :lighting
   attr_accessor :los_cache
+  attr_accessor :foliage
 
   def initialize(depth, vibe = :hack)
     @depth = depth
     @tiles = []
+    @foliage = []
     @vibe = vibe  
     self.set_colors
     @rooms = []
@@ -180,6 +182,8 @@ class Level
     # add some foliage to the level based on vibe
     foliage_types = []
     case @vibe
+    when :hack
+      foliage_types = [:small_rocks, :puddle]
     when :lush
       foliage_types = [:lichen, :moss, :fungus, :small_plant, :puddle]
     when :swamp
@@ -192,9 +196,11 @@ class Level
       foliage_types = [:puddle, :lichen]
     end
     @tiles.each_index do |y|
+      @foliage[y] ||= []
       @tiles[y].each_index do |x|
-        if @tiles[y][x] == :floor && args.state.rng.d20 == 1
-          @tiles[y][x] = foliage_types.sample
+        @foliage[y][x] ||= []
+        if args.state.rng.d6 >= 6
+          @foliage[y][x] = foliage_types.sample if [:floor, :water].include?(@tiles[y][x])
         end
       end
     end

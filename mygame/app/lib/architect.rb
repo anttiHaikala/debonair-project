@@ -12,8 +12,8 @@ class Architect
   def setup(settings)
     @settings ||= {}
     @settings[:levels] ||= 10
-    @settings[:level_width] ||= 42   
-    @settings[:level_height] ||= 32
+    @settings[:level_width] ||= 62   
+    @settings[:level_height] ||= 42
   end
 
   def self.create_seed(args)
@@ -97,6 +97,8 @@ class Architect
       level.create_rooms(args)
       level.create_corridors(args)
       level.add_waters(args)
+      level.add_foliage(args)
+
       # dig corridor from staircase up to entry room
       printf level.rooms.size.to_s + " rooms created at depth %d with vibe %s\n" % [depth, vibe.to_s]
       entry_room = level.rooms.sample

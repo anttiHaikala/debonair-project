@@ -11,6 +11,11 @@ class Tile
     @@tile_visibility_per_level = []
   end
 
+  def self.tile_visibility(level, args)
+    depth = level.depth
+    return @@tile_visibility_per_level[depth] || []
+  end 
+
   def self.tile_types
     [:floor, :rock, :wall, :water, :staircase_up, :staircase_down, :chasm]
   end

@@ -54,6 +54,7 @@ require 'app/lib/scroll'
 require 'app/lib/debug'
 require 'app/lib/lighting'
 require 'app/lib/score'
+require 'app/lib/foliage'
 
 def boot args
   args.state = {}
@@ -116,14 +117,44 @@ def high_score_list args
   Score.tick args
 end
 
+def start_profile subsystem, args
+  # measure performance here for each subsystem
+  # e.g.
+  # start_time = Time.now
+  # ... subsystem code ...
+  # end_time = Time.now
+  # elapsed_time = end_time - start_time
+  # args.state.profile_data[:subsystem_name] = elapsed_time
+  # At end of frame, display profile data on screen
+  args.state.profile_data ||= {}
+  args.state.profile_data[subsystem] = Time.now
+end
+
+def end_profile subsystem, args
+  # finalize performance measurement for subsystem
+  start_time = args.state.profile_data[subsystem]
+  end_time = Time.now
+  elapsed_time = end_time - start_time
+  args.state.profile_data[subsystem] = elapsed_time
+end
+
 def gameplay_tick args
   GUI.handle_input args
   args.state.kronos.advance_time args
   GUI.update_entity_animations args
+  start_profile(:lighting_calculation, args)
   Lighting.calculate_lighting(args.state.dungeon.levels[args.state.current_depth], args) if $dynamic_light_system
+  end_profile(:lighting_calculation, args)
   GUI.draw_background args
+  start_profile(:tile_drawing, args)
   GUI.draw_tiles args
+  end_profile(:tile_drawing, args)
+  start_profile(:foliage_drawing, args)
+  GUI.draw_foliage args
+  end_profile(:foliage_drawing, args)
+  start_profile(:light_drawing, args)
   Light.draw_lights args
+  end_profile(:light_drawing, args)
   GUI.draw_items args
   GUI.draw_entities args
   GUI.pan_to_player args

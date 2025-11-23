@@ -321,6 +321,12 @@ class GUI
     Tile.draw_tiles args
   end
 
+  def self.draw_foliage args
+    level = Utils.level(args)
+    return unless level
+    Foliage.draw(args, level)
+  end
+
   def self.draw_items args
     level = Utils.level(args)
     return unless level
@@ -392,7 +398,7 @@ class GUI
       level = entity.color[2]
       level *= lighting
       color = Color::hsl_to_rgb(hue, saturation, level)
-      args.outputs.sprites << {
+      args.outputs.primitives << {
         x: x_offset + x * tile_size,
         y: y_offset + y * tile_size,
         w: tile_size,
