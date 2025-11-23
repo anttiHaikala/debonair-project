@@ -13,11 +13,11 @@ Double click the ./dragonruby executable to start up the game.
 ## Controls
 
 ### Gamepad
-
-    D-pad/Left Stick - move and attack enemies (no diagonal movement is permitted)
-    A - pick up objects, use staircases
-    Left Trigger - hold to enable look mode where you can use up/down controls to look at stuff
-    Right Trigger - hold to view inventory, A to use item, B to drop item
+|:----------------|:-------------------------------------------------------------------------------|
+|D-pad/Left Stick | move and attack enemies (no diagonal movement is permitted) |
+|A                | pick up objects, use staircases |
+|Left Trigger     | hold to enable look mode where you can use up/down controls to look at stuff |
+|Right Trigger    | hold to view inventory, A to use item, B to drop item |
 
 ### Keyboard
 
