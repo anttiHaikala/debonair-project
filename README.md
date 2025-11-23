@@ -13,6 +13,7 @@ Double click the ./dragonruby executable to start up the game.
 ## Controls
 
 ### Gamepad
+|Control          | Meaning |
 |:----------------|:-------------------------------------------------------------------------------|
 |D-pad/Left Stick | move and attack enemies (no diagonal movement is permitted) |
 |A                | pick up objects, use staircases |
