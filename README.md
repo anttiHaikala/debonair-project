@@ -13,7 +13,7 @@ Double click the ./dragonruby executable to start up the game.
 ## Controls
 
 ### Gamepad
-|Control          | Meaning |
+|Input          | Function |
 |:----------------|:-------------------------------------------------------------------------------|
 |D-pad/Left Stick | move and attack enemies (no diagonal movement is permitted) |
 |A                | pick up objects, use staircases |
@@ -22,10 +22,12 @@ Double click the ./dragonruby executable to start up the game.
 
 ### Keyboard
 
-    WASD/arrow keys - to move and attack enemies (diagonal movement is not permitted)
-    SPACE - pick up objects, use staircases
-    Tab - hold to enable look mode where up/down controls let you look at stuff
-    Shift - hold to open inventory, SPACE to use item, RETURN to drop item
+|Input          | Function |
+|:----------------|:-------------------------------------------------------------------------------|
+|WASD/arrow keys  | move and attack enemies (no diagonal movement is permitted) |
+|Space             | pick up objects, use staircases |
+|Tab     | hold to enable look mode where you can use up/down controls to look at stuff |
+|Shift    | hold to view inventory, A to use item, B to drop item |
 
 ## Source code
 
