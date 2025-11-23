@@ -1,6 +1,6 @@
 class SoundFX
 
-  @@fx_volume = 0.2
+  @@fx_volume = 0.8
 
   def self.play(kind, args)
     self.play_sound(kind, args)

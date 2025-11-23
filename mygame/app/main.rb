@@ -136,6 +136,11 @@ def end_profile subsystem, args
   end_time = Time.now
   elapsed_time = end_time - start_time
   args.state.profile_data[subsystem] = elapsed_time
+  args.state.profile_record_data ||= {}
+  record = args.state.profile_record_data["#{subsystem}".to_sym]
+  if record.nil? || elapsed_time > record
+    args.state.profile_record_data["#{subsystem}".to_sym] = elapsed_time
+  end
 end
 
 def gameplay_tick args
@@ -146,9 +151,7 @@ def gameplay_tick args
   Lighting.calculate_lighting(args.state.dungeon.levels[args.state.current_depth], args) if $dynamic_light_system
   end_profile(:lighting_calculation, args)
   GUI.draw_background args
-  start_profile(:tile_drawing, args)
   GUI.draw_tiles args
-  end_profile(:tile_drawing, args)
   start_profile(:foliage_drawing, args)
   GUI.draw_foliage args
   end_profile(:foliage_drawing, args)

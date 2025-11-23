@@ -316,9 +316,13 @@ class GUI
   end
 
   def self.draw_tiles args
+    start_profile(:observe_tiles, args)
     Tile.observe_tiles args unless @@tiles_observed
+    end_profile(:observe_tiles, args)
     @@tiles_observed = true
+    start_profile(:tile_drawing, args)
     Tile.draw_tiles args
+    end_profile(:tile_drawing, args)
   end
 
   def self.draw_foliage args

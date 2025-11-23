@@ -16,6 +16,9 @@ NOTES ON GAME SYSTEM
 
 TODO LIST
 - picking up torches from the wall
+- cutting/slicing weapons (not just bruises)
+- do undead get shock or do they just crumble to dust?
+- walking speed modifiers for wounds below waist
 - fireball animation
 - magic missiles
 - drop weapon when hand is hit, skill modifiers, handedness, wield-hand

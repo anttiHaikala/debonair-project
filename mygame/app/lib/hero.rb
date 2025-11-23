@@ -89,7 +89,7 @@ class Hero < Entity
   end
 
   def random_name
-    names = ['Jaakko', 'Liisa', 'Mikko', 'Anna', 'Kari', 'Sari', 'Pekka', 'Marja', 'Jukka', 'Tiina']
+    names = ['Jaakko', 'Liisa', 'Mikko', 'Anna', 'Kari', 'Sari', 'Pekka', 'Marja', 'Jukka', 'Tiina', 'Marjatta', 'Antti', 'Kaisa', 'Jari', 'Laura', 'Timo', 'Sanna', 'Markku', 'Katja', 'Juha', 'Virpi', 'Minerva', 'Ener', 'Aapo', 'Aila', 'Aino', 'Alarik', 'Aleksi', 'Aliisa', 'Alpo', 'Anja', 'Armas', 'Arto', 'Aune', 'Eero', 'Elina', 'Eljas', 'Emmi', 'Esko', 'Helmi', 'Hilkka', 'Ilmari', 'Inkeri', 'Irma', 'Jalmari', 'Kaarina', 'Kalevi', 'Leena', 'Lempi', 'Lempiina', 'Lauri', 'Levi', 'Liisi', 'Lyyli', 'Maija', 'Malla', 'Martti', 'Matias', 'Onni', 'Orvokki', 'Outi', 'Paavo', 'Pirkko', 'Reino', 'Ritva','Jari-Pekka']
     return names.sample
   end
 

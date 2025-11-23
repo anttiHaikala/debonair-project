@@ -44,7 +44,7 @@ class Score
       when :amulet
         score += 50
       end
-      item.atrributes.each do |attr, value|
+      item.attributes.each do |attr, value|
         if attr == :masterwork
           score += 100
         end
@@ -56,28 +56,30 @@ class Score
         end
       end
     end
-    hero.traumas.each do |trauma|
-      if trauma.severity == :minor
-        score -= 20
-      elsif trauma.severity == :major
-        score -= 100
-      elsif trauma.severity == :severe
-        score -= 250
-      elsif trauma.severity == :critical
-        score -= 500
+    if !hero.perished
+      hero.traumas.each do |trauma|
+        if trauma.severity == :minor
+          score -= 10
+        elsif trauma.severity == :major
+          score -= 50
+        elsif trauma.severity == :severe
+          score -= 150
+        elsif trauma.severity == :critical
+          score -= 250
+        end
       end
     end
     score += hero.max_depth * 100
     score += 5000 if hero.has_item?(:amulet_of_skandor)
     final_score = score / (1 + (time_used / 600.0))
     args.state.final_score = final_score.round
-    self.update_high_scores(hero.name, final_score.round, args)
+    self.update_high_scores(hero.name, final_score.round, hero.max_depth, time_used, args)
     return final_score
   end
 
-  def self.update_high_scores(name, score, args)
+  def self.update_high_scores(name, score, depth, time_taken, args)
     high_scores = self.high_score_list(args)
-    high_scores << { name: name, score: score }
+    high_scores << { name: name, score: score, depth: depth, time_taken: time_taken }
     high_scores = high_scores.sort_by { |s| -s[:score] }
     high_scores = high_scores.first(10) # keep top 10
     args.state.high_scores = high_scores
@@ -99,11 +101,64 @@ class Score
     dem_funky_scorez = self.high_score_list(args) # make sure they are loaded 
     if dem_funky_scorez.any?  
       y = 580
+      x = 460
       dem_funky_scorez.each_with_index do |entry, index|
         args.outputs.labels << {
-          x: 520,
+          x: x,
           y: y - index * 20,
-          text: "#{index + 1}. #{entry[:name]} - #{entry[:score]}",
+          text: "#{index + 1}.",
+          size_enum: 1,
+          r: 255,
+          g: 255,
+          b: 255,
+          a: 255,
+          font: "fonts/greek-freak.ttf"
+        }
+      end
+      dem_funky_scorez.each_with_index do |entry, index|
+        args.outputs.labels << {
+          x: x + 50,
+          y: y - index * 20,
+          text: "#{entry[:name]}",
+          size_enum: 1,
+          r: 255,
+          g: 255,
+          b: 255,
+          a: 255,
+          font: "fonts/greek-freak.ttf"
+        }
+      end
+      dem_funky_scorez.each_with_index do |entry, index|
+        args.outputs.labels << {
+          x: x + 200,
+          y: y - index * 20,
+          text: "#{entry[:score]}",
+          size_enum: 1,
+          r: 255,
+          g: 255,
+          b: 255,
+          a: 255,
+          font: "fonts/greek-freak.ttf"
+        }
+      end
+      dem_funky_scorez.each_with_index do |entry, index|
+        args.outputs.labels << {
+          x: x+400,
+          y: y - index * 20,
+          text: "#{entry[:depth]}",
+          size_enum: 1,
+          r: 255,
+          g: 255,
+          b: 255,
+          a: 255,
+          font: "fonts/greek-freak.ttf"
+        }
+      end
+      dem_funky_scorez.each_with_index do |entry, index|
+        args.outputs.labels << {
+          x: x+500,
+          y: y - index * 20,
+          text: "#{entry[:time_taken]}",
           size_enum: 1,
           r: 255,
           g: 255,

@@ -275,7 +275,7 @@ class HUD
           args.outputs.labels << {
             x: 10,
             y: y,
-            text: "#{subsystem.to_s.gsub('_',' ')}: #{(time_taken * 1000).to_i} ms",
+            text: "#{subsystem.to_s.gsub('_',' ')}: #{(time_taken * 1000).to_i} ms (max: #{(args.state.profile_record_data[subsystem] * 1000).to_i} ms)",
             size_enum: 0,
             r: 255,
             g: 255,
