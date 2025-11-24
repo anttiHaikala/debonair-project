@@ -171,6 +171,7 @@ class Hero < Entity
   def rest(args)
     args.state.kronos.spend_time(self, 1.0, args)
     apply_exhaustion(-0.05, args)
+    self.detect_traps(args)
   end
 
   def stealth_range
@@ -302,6 +303,48 @@ class Hero < Entity
       SoundFX.play_sound(:water_walk, args, 0.5)
     else
       SoundFX.play_sound(:walk, args, 0.5)
+    end
+  end
+
+  def detect_traps args
+    level = Utils.level(args)
+    detection_range = 2
+    level.traps.each do |trap|
+      distance = Utils.distance_between_entities(self, trap)
+      if distance <= detection_range
+        if !trap.found
+          printf "Checking for trap detection at trap location (%d,%d)\n" % [trap.x, trap.y]
+          # odds to detect trap depend on role, species, lighting, etc.
+          lighting_modifier = Lighting.light_level_at(trap.x, trap.y, level, args) 
+          printf "Trap detection lighting modifier: %.2f\n" % lighting_modifier
+          base_detection_chance = 0.3 
+          if @role == :detective || @role == :archeologist
+            base_detection_chance += 0.4
+          end
+          if @role == :ninja || @role == :thief
+            base_detection_chance += 0.2
+          end
+          if @species == :elf || @species == :dark_elf || @species == :halfling
+            base_detection_chance += 0.1
+          end
+          base_detection_chance *= lighting_modifier
+          final_detection_chance = base_detection_chance * 0.1
+          printf "Final trap detection chance: %.2f\n" % final_detection_chance
+          detection_roll = args.state.rng.nxt_float
+          if detection_roll < final_detection_chance
+            HUD.output_message(args, "You detect a #{trap.kind.to_s.gsub('_',' ')} trap nearby!")
+            trap.found = true
+            SoundFX.play_sound(:trap_detected, args)
+          end
+          if self.worn_items.include?(:ring_of_warning)
+            if args.state.rng.d6 == 1
+              HUD.output_message(args, "Your ring of warning tingles!")
+              trap.found = true
+              SoundFX.play_sound(:trap_detected, args)
+            end
+          end
+        end
+      end
     end
   end
 end

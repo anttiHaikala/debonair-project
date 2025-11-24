@@ -251,7 +251,7 @@ class Level
         # create a corridor from center of room to target_x, target_y
         current_x = room.x + (room.w / 2).to_i
         current_y = room.y + (room.h / 2).to_i
-        printf "  Corridor from (%d,%d) to (%d,%d)\n" % [current_x, current_y, target_x, target_y]
+        #printf "  Corridor from (%d,%d) to (%d,%d)\n" % [current_x, current_y, target_x, target_y]
         safety = 0
         horizontal_mode = [true, false].sample
         previous_x = current_x
@@ -283,7 +283,7 @@ class Level
               current_y -= 1
             end
           end
-          printf "      Digging at (%d,%d) - level width %d height %d\n" % [current_x, current_y, @tiles[0].size, @tiles.size ]
+          #printf "      Digging at (%d,%d) - level width %d height %d\n" % [current_x, current_y, @tiles[0].size, @tiles.size ]
           @tiles[current_y][current_x] = :floor if @tiles[current_y][current_x] == :rock || @tiles[current_y][current_x] == :wall 
         end
         corridors += 1

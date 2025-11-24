@@ -32,6 +32,10 @@ module Utils
     return Math.sqrt((x1 - x0)**2 + (y1 - y0)**2)
   end
 
+  def self.distance_between_entities(entity1, entity2)
+    return self.distance(entity1.x, entity1.y, entity2.x, entity2.y)
+  end
+
   def self.move_entity_to_level(entity, target_depth, args)
     # remove from current level
     current_level = self.level_by_depth(entity.depth, args)

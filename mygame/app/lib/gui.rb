@@ -330,7 +330,6 @@ class GUI
             # rest
             args.state.hero.rest(args)
             @@input_cooldown = 8
-            SoundFX.play_sound(:rest, args)
           end
         end
       end

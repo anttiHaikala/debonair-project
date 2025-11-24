@@ -35,7 +35,7 @@ class Ring < Item
     :ring_of_teleportation,
     :ring_of_accuracy,
     # :ring_of_night_vision,
-    # :ring_of_warning,
+    :ring_of_warning,
     :ring_of_telepathy]
   end
 

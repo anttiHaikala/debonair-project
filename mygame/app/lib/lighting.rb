@@ -6,6 +6,10 @@ class Lighting
     @@lighting_stale = true
   end
 
+  def self.light_level_at(x, y, level, args)
+    return level.lighting && level.lighting[y] && level.lighting[y][x] || 0.2 
+  end
+
   def self.calculate_light_level_at(level, x, y)
     # iterate through all light sources on the level
     light_level = 0.2

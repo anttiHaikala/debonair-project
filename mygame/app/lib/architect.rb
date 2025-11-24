@@ -9,6 +9,7 @@ class Architect
   end
 
   def self.create_seed(args)
+    srand
     dictionary_adjectives = ['Brave', 'Cunning', 'Wise', 'Fierce', 'Nimble', 'Sturdy', 'Gentle', 'Bold']
     dictionary_subjectives = ['Battle', 'Shadow', 'Light', 'Storm', 'Flame', 'Frost', 'Stone', 'Wind']
     dictionary_prepositions = ['of the', 'from the', 'under the', 'above the', 'beyond the', 'within the', 'across the', 'through the']
@@ -20,12 +21,12 @@ class Architect
     seed += dictionary_prepositions.sample + ' '
     seed += dictionary_location_adjectives.sample + ' '
     seed += dictionary_locations.sample
-    args.state.seed = seed.downcase.gsub(' ','_')
-    printf "Generated seed: %s\n" % args.state.seed
-    return args.state.seed
+    final_seed = seed.downcase.gsub(' ','_')
+    printf "Generated seed: %s\n" % final_seed
+    return final_seed
   end
 
-  def self.set_seed(args, seed)
+  def self.set_seed(seed, args)
     printf "Setting seed to: %s\n" % seed
     args.state.seed = seed
   end

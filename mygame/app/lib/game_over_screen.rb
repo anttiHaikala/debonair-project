@@ -1,8 +1,11 @@
 class GameOverScreen
+
   @@played_game_over_sound = false
+
   def self.reset args
     @@played_game_over_sound = false
   end
+
   def self.play_game_over_sound sound, args
     if @@played_game_over_sound
       return
@@ -10,6 +13,7 @@ class GameOverScreen
     SoundFX.play_sound(sound, args)
     @@played_game_over_sound = true
   end
+
   def self.tick args
     if !args.state.final_score
       Score.calculate(args.state.hero, args)
@@ -37,7 +41,6 @@ class GameOverScreen
     args.outputs.labels << { x: 640, y: 320, text: "Thanks for Playing", size_enum: 5, alignment_enum: 1, r: 250, g: 250, b: 250 }
     args.outputs.labels << { x: 640, y: 280, text: "press A to continue", size_enum: 3, alignment_enum: 1, r: 250, g: 250, b: 250 }
     if args.inputs.keyboard.key_down.space || args.inputs.controller_one.key_down.a
-      args.gtk.reset
       args.state.scene = :high_score_list
     end
   end

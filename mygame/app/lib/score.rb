@@ -5,7 +5,7 @@ class Score
   end
 
   def self.save_high_scores(args)
-    lines = args.state.high_scores.map { |s| "#{s.name}|#{s.score}|#{s.depth}|#{s.time_taken}" }
+    lines = args.state.high_scores.map { |s| "#{s.name}|#{s.score}|#{s.depth}|#{s.time_taken}|#{s.seed}" }
     args.gtk.write_file("high_scores.txt", lines.join("\n"))
   end
 
@@ -13,12 +13,11 @@ class Score
     data = args.gtk.read_file("high_scores.txt")
     return [] unless data
     scorez = data.split("\n").map do |line|
-      name, score, depth, time_taken = line.split("|")
-      { name: name, score: score.to_i, depth: depth.to_i, time_taken: time_taken.to_i }
+      name, score, depth, time_taken, seed = line.split("|")
+      { name: name, score: score.to_i, depth: depth.to_i, time_taken: time_taken.to_i, seed: seed }
     end
     args.state.high_scores = scorez
-    printf("Loaded high scores: %p\n", scorez)
-    printf("Current high scores in state: %p\n", args.state.high_scores)
+    printf("Loaded high scores: %p\n", scorez.size)
     return scorez
   end
 
@@ -81,14 +80,14 @@ class Score
     final_score = 100.0 * score / (100 + (time_used / 600.0))
     # round the final score DOWN to the nearest integer
     args.state.final_score = final_score.floor
-    self.update_high_scores(hero.name, final_score.floor, depth, time_used, args)
+    self.update_high_scores(hero.name, final_score.floor, depth, time_used, args.state.seed, args)
     return final_score
   end
 
-  def self.update_high_scores(name, score, depth, time_taken, args)
-    printf("Updating high scores with %s: %d points, depth %d, time %d \n", name, score, depth, time_taken)
+  def self.update_high_scores(name, score, depth, time_taken, seed, args)
+    printf("Updating high scores with %s: %d points, depth %d, time %d, seed %s \n", name, score, depth, time_taken, seed)
     high_scores = self.high_score_list(args)
-    high_scores << { name: name, score: score, depth: depth, time_taken: time_taken }
+    high_scores << { name: name, score: score, depth: depth, time_taken: time_taken, seed: seed }
     high_scores = high_scores.sort_by { |s| -s[:score] }
     high_scores = high_scores.first(10) # keep top 10
     args.state.high_scores = high_scores
@@ -104,13 +103,14 @@ class Score
       x: 640, y: 240, text: "Press A To Continue", size_enum: 3, alignment_enum: 1, r: 255, g: 255, b: 255, font: "fonts/greek-freak.ttf"
     }
     if args.inputs.keyboard.key_down.space || args.inputs.controller_one.key_down.a
+      args.gtk.reset
       args.state.scene = :title_screen
     end
     # print a list of hiscores
     dem_funky_scorez = self.high_score_list(args) # make sure they are loaded 
     if dem_funky_scorez.any?  
       y = 540
-      x = 360
+      x = 140
       args.outputs.labels << {
         x: x,
         y: y + 30,
@@ -159,6 +159,17 @@ class Score
         x: x + 500,
         y: y + 30,
         text: "Time taken",
+        size_enum: 2,
+        r: 255,
+        g: 255,
+        b: 255,
+        a: 255,
+        font: "fonts/greek-freak.ttf"
+      }
+      args.outputs.labels << {
+        x: x + 650,
+        y: y + 30,
+        text: "Seed",
         size_enum: 2,
         r: 255,
         g: 255,
@@ -229,6 +240,19 @@ class Score
           b: 255,
           a: 255,
           font: "fonts/greek-freak.ttf"
+        }
+      end
+      dem_funky_scorez.each_with_index do |entry, index|
+        args.outputs.labels << {
+          x: x+650,
+          y: y - index * 20,
+          text: "#{entry[:seed]}",
+          size_enum: 0,
+          r: 255,
+          g: 255,
+          b: 255,
+          a: 255,
+          font: "fonts/olivetti.ttf"
         }
       end
     end

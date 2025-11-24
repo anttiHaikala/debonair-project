@@ -9,11 +9,11 @@ class Run
   def setup args
     printf "Setting up new run...\n"
     args.state.architect = Architect.new
-    Architect.create_seed(args)
+    seed = Architect.create_seed(args)
     if $fixed_seed
       seed = $fixed_seed
-      Architect.set_seed(args, seed) # for testing purposes
     end
+    Architect.set_seed(seed, args)
     Architect.apply_seed(args)
     printf "Dungeon seed: %s\n" % args.state.seed
     args.state.architect.architect_dungeon(args)
@@ -22,7 +22,7 @@ class Run
     @hero.carried_items << Scroll.new(:scroll_of_fireball)
     @hero.carried_items << Scroll.new(:scroll_of_fireball)
     @hero.carried_items << Scroll.new(:scroll_of_fireball)
-    @hero.carried_items << Scroll.new(:scroll_of_fireball)
+    @hero.carried_items << Ring.new(:ring_of_warning)
     args.state.current_depth = 0
     args.state.kronos = Kronos.new
   end

@@ -68,7 +68,7 @@ class Behaviour
 
   def execute args
     if args.state.hero.sees?(@npc, args)
-      printf "Executing behaviour #{@kind} for NPC #{@npc.species} at (#{@npc.x}, #{@npc.y}) - level #{@npc.depth} - time #{args.state.kronos.world_time.round(2)}\n"  
+      #printf "Executing behaviour #{@kind} for NPC #{@npc.species} at (#{@npc.x}, #{@npc.y}) - level #{@npc.depth} - time #{args.state.kronos.world_time.round(2)}\n"  
     end
     method_name = @kind.to_s
     if self.respond_to?(method_name)
@@ -160,7 +160,7 @@ class Behaviour
           end
           target_x = npc.x + step_x
           target_y = npc.y + step_y
-          printf "Target x,y: #{target_x}, #{target_y}, hero x,y #{hero.x}, #{hero.y}, npc x,y #{npc.x}, #{npc.y}\n"
+          #printf "Target x,y: #{target_x}, #{target_y}, hero x,y #{hero.x}, #{hero.y}, npc x,y #{npc.x}, #{npc.y}\n"
           level = args.state.dungeon.levels[depth]
           target_tile = level.tiles[target_y][target_x]
           if !Tile.is_walkable?(target_tile, args) && Tile.occupied?(target_x, target_y, args)

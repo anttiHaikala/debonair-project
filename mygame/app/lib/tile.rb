@@ -74,6 +74,7 @@ class Tile
     args.state.kronos.spend_time(entity, time_spent, args)
     Lighting.mark_lighting_stale
     GUI.mark_tiles_stale
+    entity.detect_traps args if entity == args.state.hero
     entity.walking_sound(tile, args)
   end
 

@@ -34,6 +34,9 @@ class Kronos
   end
 
   def advance_time args
+    if args.state.game_over
+      return
+    end
     # every entity needs to be busy most of the time. even idling.
     # due to performance reasons, we only advance time on the current level
     # and assume other levels are frozen.

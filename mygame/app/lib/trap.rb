@@ -70,7 +70,7 @@ class Trap
 
   def self.populate_for_level(level, args)
     # place traps randomly in the level
-    number_of_traps = args.state.rng.rand(6) + (level.depth/2).floor - 4 + 40
+    number_of_traps = args.state.rng.rand(6) + (level.depth/2).floor - 2
     if number_of_traps < 0
       number_of_traps = 0
     end

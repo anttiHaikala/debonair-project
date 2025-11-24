@@ -258,6 +258,9 @@ class Entity
       HUD.output_message(args, "#{self.name.capitalize} has perished!")
     end
     level.entities.delete(self)
+    if self == args.state.hero
+      args.state.game_over = true
+    end
   end
 
   def wield_info(item)
