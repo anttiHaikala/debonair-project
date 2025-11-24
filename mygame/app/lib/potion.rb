@@ -42,7 +42,7 @@ class Potion < Item
     mask_index = Potion.kinds.index(self.kind) % Potion.masks.length
     mask = Potion.masks[mask_index]
     if args.state.hero.known_potions.include?(self.kind)
-      "#{self.attributes.join(' ')} #{self.kind.to_s.gsub('_',' ')}".trim
+      "#{self.attributes.join(' ')} #{mask} potion (#{self.kind.to_s.gsub('potion_of_','')})".trim
     else
       "#{mask} potion".trim
     end
@@ -83,10 +83,10 @@ class Potion < Item
         end
       end
       if effect == 0
-        HUD.output_message(args, "You feel no different after drinking the potion.")
+        HUD.output_message(args, "You feel no different after drinking the #{self.title(args)}.")
       else
         self.identify(args)
-        HUD.output_message(args, "You feel better after drinking the potion.")
+        HUD.output_message(args, "You feel better after drinking the #{self.title(args)}.")
       end
       SoundFX.play(:potion, args)
     when :potion_of_strength

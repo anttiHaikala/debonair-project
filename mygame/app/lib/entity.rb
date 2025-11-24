@@ -233,6 +233,7 @@ class Entity
 
   def perish(args)
     @perished = true
+    level = Utils.level_by_depth(self.depth, args) # monsters should probably keep knowledge of their
     self.drop_all_items(args)
     if self.undead?
       HUD.output_message(args, "#{self.name.capitalize} is destroyed!")
@@ -242,7 +243,6 @@ class Entity
       corpse.depth = self.depth
       corpse.x = self.x
       corpse.y = self.y
-      level = args.state.dungeon.levels[self.depth]
       level.items << corpse
       HUD.output_message(args, "#{self.name.capitalize} has perished!")
     end
@@ -263,5 +263,16 @@ class Entity
   end
   def undead?
     return Species.undead_species.include?(self.species)
+  end
+
+  def recover_shock(args)
+    # default: do nothing
+    if self.has_status?(:shock)
+      if args.state.rng.d20 == 20
+        # recover some shock over time
+        self.remove_status(:shock)
+        HUD.output_message(args, "#{self.name} recovers from shock.")
+      end
+    end
   end
 end

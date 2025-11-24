@@ -84,6 +84,10 @@ class Kronos
     hero = args.state.hero
     # hunger
     hero.apply_hunger args
+    # shock recovery
+    Utils.level(args).entities.each do |entity|
+      entity.recover_shock args
+    end
     # worn rings
     hero.worn_items.each do |item|
       if item.category == :ring

@@ -60,7 +60,7 @@ class NPC < Entity
     when :skeleton
       return [0, 0, 100]
     when :minotaur
-      return [150, 75, 0]
+      return [150, 75, 80]
     else
       return [255, 255, 255]
     end
@@ -198,7 +198,7 @@ class NPC < Entity
       species_speed = 1.4 # seconds per tile
     when :grid_bug
       species_speed = 0.2
-    when :rat, :newt
+    when :rat, :newt, :minotaur
       species_speed = 0.8
     when :gelatinous_cube # these guys keep the dungeon clean??
       species_speed = 5.0
@@ -208,7 +208,8 @@ class NPC < Entity
 
   def take_action args
     #printf "NPC #{@species} at (#{@x}, #{@y}) taking action at time #{args.state.kronos.world_time}\n"
-    Behaviour.select_for_npc(self).execute(args)
+    behaviour = Behaviour.select_for_npc(self)
+    behaviour.execute(args) if behaviour
   end
 
   def title(args)

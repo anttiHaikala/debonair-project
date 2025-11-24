@@ -82,12 +82,13 @@ class Scroll < Item
     level = Utils.level(args)
     height = level.height
     width = level.width
-    affected_tiles = []
     radius = 5
     (user.x - radius).upto(user.x + radius) do |x|
       (user.y - radius).upto(user.y + radius) do |y|
-        printf "Checking tile at #{x}, #{y}\n"
         if x < 0 || x >= width || y < 0 || y >= height
+          next
+        end
+        if x == user.x && y == user.y
           next
         end
         # damage entities straight up for now (later to it in fire mechanism)
