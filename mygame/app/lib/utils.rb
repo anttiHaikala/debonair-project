@@ -32,6 +32,57 @@ module Utils
     return Math.sqrt((x1 - x0)**2 + (y1 - y0)**2)
   end
 
+  def self.move_entity_to_level(entity, target_depth, args)
+    # remove from current level
+    current_level = self.level_by_depth(entity.depth, args)
+    current_level.entities.delete(entity)
+    # add to target level
+    target_level = self.level_by_depth(target_depth, args)
+    entity.depth = target_depth
+    target_level.entities << entity
+    # check the target tile - is it a wall or rock?
+    target_tile = target_level.tiles[entity.y][entity.x]
+    if Tile.is_solid?(target_tile, args)
+      # find nearest walkable tile
+      found = false
+      radius = 1
+      while !found
+        low_x = [entity.x - radius, 0].max
+        high_x = [entity.x + radius, target_level.width - 1].min
+        low_y = [entity.y - radius, 0].max
+        high_y = [entity.y + radius, target_level.height - 1].min
+        (low_x..high_x).each do |x|
+          (low_y..high_y).each do |y|
+            if !Tile.is_solid?(target_level.tiles[y][x], args) && !Tile.occupied?(x, y, args)
+              entity.x = x
+              entity.y = y
+              found = true
+              break
+            end
+          end
+          break if found
+        end
+        radius += 1
+      end
+    end
+
+
+    if entity == args.state.hero
+      args.state.current_depth = target_depth
+      GUI.mark_tiles_stale
+      Lighting.mark_lighting_stale
+    end
+  end
+
+  def self.within_viewport?(x, y, args)
+    tile_viewport = self.tile_viewport args
+    x_start = tile_viewport[0]
+    y_start = tile_viewport[1]
+    x_end = tile_viewport[2]
+    y_end = tile_viewport[3]
+    return x >= x_start && x <= x_end && y >= y_start && y <= y_end
+  end
+
   def self.tile_viewport args
     # return an array [x_start, y_start, x_end, y_end] of tiles that are visible in the current viewport
     # use zoom level and pan offsets to calculate

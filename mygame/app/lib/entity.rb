@@ -53,12 +53,23 @@ class Entity
     @statuses << status unless @statuses.include?(status)
   end
 
+  # eats both status objects and kind symbols
   def remove_status(status)
-    @statuses.delete(status)  
+    @statuses.delete(status) if @statuses.include?(status)
+    @statuses.each do |s|
+      if s.kind == status
+        @statuses.delete(s)
+      end
+    end
   end
 
-  def has_status?(status)
-    return @statuses.include?(status)
+  def has_status?(kind)
+    @statuses.each do |status|
+      if status.kind == kind
+        return true
+      end
+    end
+    return false
   end
   
   def color

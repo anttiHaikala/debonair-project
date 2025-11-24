@@ -57,6 +57,8 @@ require 'app/lib/score'
 require 'app/lib/foliage'
 require 'app/lib/effect'
 require 'app/lib/room'
+require 'app/lib/trap'
+require 'app/lib/status'
 
 def boot args
   args.state = {}
@@ -156,6 +158,7 @@ def gameplay_tick args
   GUI.draw_tiles args
   start_profile(:foliage_drawing, args)
   GUI.draw_foliage args
+  Trap.draw_traps args
   GUI.draw_effects args
   end_profile(:foliage_drawing, args)
   start_profile(:light_drawing, args)

@@ -208,7 +208,7 @@ class NPC < Entity
 
   def take_action args
     #printf "NPC #{@species} at (#{@x}, #{@y}) taking action at time #{args.state.kronos.world_time}\n"
-    behaviour = Behaviour.select_for_npc(self)
+    behaviour = Behaviour.select_for_npc(self, args)
     behaviour.execute(args) if behaviour
   end
 

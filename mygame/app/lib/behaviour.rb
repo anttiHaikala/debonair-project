@@ -34,10 +34,10 @@ class Behaviour
   def self.setup_for_npc(npc)
     species = npc.species
     case species
-    when :goblin, :orc, :skeleton, :wraith
+    when :goblin, :orc, :skeleton, :wraith, :minotaur
       npc.behaviours << Behaviour.new(:fight, npc)
       # npc.behaviours << Behaviour.new(:attack, npc)
-      # npc.behaviours << Behaviour.new(:escape, npc)
+      npc.behaviours << Behaviour.new(:flee, npc)
     when :grid_bug
       npc.behaviours << Behaviour.new(:wander, npc)
       # npc.behaviours << Behaviour.new(:escape, npc)
@@ -49,10 +49,20 @@ class Behaviour
     end
   end
 
-  def self.select_for_npc(npc)
-    # logic to select appropriate behaviour for npc based on its state
-    # and environment
-    # for now, just return a random behaviour
+  def self.select_for_npc(npc, args)
+    # priority one - flee
+    npc.behaviours.each do |behaviour|
+      if behaviour.kind == :flee && npc.traumas.size > args.state.rng.rand(6)
+        return behaviour
+      end
+    end
+    # prriority two - fight
+    npc.behaviours.each do |behaviour|
+      if behaviour.kind == :fight
+        return behaviour
+      end
+    end
+    # fallback - wander
     return npc.behaviours.sample
   end
 
@@ -63,6 +73,59 @@ class Behaviour
     method_name = @kind.to_s
     if self.respond_to?(method_name)
       self.send(method_name, args)
+    end
+  end
+
+  def flee args
+    # flee from hero (and other enemies)
+    npc = @npc
+    enemies = npc.enemies
+    if enemies.empty?
+      # no enemies, wander instead
+      wander args
+      return
+    end
+    # find the closest enemy
+    closest_enemy = nil
+    min_distance = nil
+    enemies.each do |enemy|
+      if enemy.depth != npc.depth
+        next
+      end
+      dx = enemy.x - npc.x
+      dy = enemy.y - npc.y
+      distance = Math.sqrt(dx * dx + dy * dy)
+      if min_distance.nil? || distance < min_distance
+        min_distance = distance
+        closest_enemy = enemy
+      end
+    end
+    if closest_enemy.nil?
+      # no enemies on this level, wander instead
+      wander args
+      return
+    end
+    # move away from closest enemy
+    dx = npc.x - closest_enemy.x
+    dy = npc.y - closest_enemy.y
+    if dy.abs < dx.abs || closest_enemy.y == npc.y # north-south movement   
+      step_x = dx > 0 ? 1 : -1
+      step_y = 0
+    else
+      step_y = dy > 0 ? 1 : -1
+      step_x = 0  
+    end
+    target_x = npc.x + step_x
+    target_y = npc.y + step_y
+    level = args.state.dungeon.levels[npc.depth]
+    target_tile = level.tiles[target_y][target_x]
+    if Tile.is_walkable?(target_tile, args) && !Tile.occupied?(target_x, target_y, args)
+      Tile.enter(npc, target_x, target_y, args)
+      return
+    else
+      # cannot move away, wander instead
+      wander args
+      return
     end
   end
 
@@ -142,7 +205,6 @@ class Behaviour
   def wander args
     if @npc.has_status?(:shock)
       args.state.kronos.spend_time(@npc, @npc.walking_speed * 4, args)
-      HUD.output_message args, "#{@npc.name} is shocked and cannot move!"
       return
     end
     #printf "NPC #{@npc.species} is wandering.\n"
@@ -174,6 +236,11 @@ class Behaviour
     end
     if target_coordinates
       level = args.state.dungeon.levels[npc.depth]
+      if level.trapped_at?(target_coordinates[0], target_coordinates[1], args)
+        # do not walk into traps
+        args.state.kronos.spend_time(npc, npc.walking_speed, args)
+        return
+      end
       target_tile = level.tiles[target_coordinates[1]][target_coordinates[0]]
       if Tile.is_walkable?(target_tile, args) && !Tile.occupied?(target_coordinates[0], target_coordinates[1], args)
         Tile.enter(npc, target_coordinates[0], target_coordinates[1], args)

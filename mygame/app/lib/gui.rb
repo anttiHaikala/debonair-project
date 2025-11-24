@@ -122,6 +122,12 @@ class GUI
         visible_things << item
       end
     end
+    # find visible traps
+    level.traps.each do |trap|
+      if trap.found && Tile.is_tile_visible?(trap.x, trap.y, args)
+        visible_things << trap
+      end
+    end
     # find visible entities
     level.entities.each do |entity|
       next if entity == hero
@@ -134,7 +140,7 @@ class GUI
       if @@look_mode_index == nil
         @@look_mode_index = 0
         thing = visible_things[@@look_mode_index]
-        HUD.output_message args, "You see a #{thing.traits.join(', ')} #{thing.title(args)}."
+        HUD.output_message args, "You see a #{thing.title(args)}."
       else
         if args.inputs.up && @@look_mode_cooldown == 0
           @@look_mode_index -= 1
@@ -142,7 +148,7 @@ class GUI
             @@look_mode_index = visible_things.size - 1
           end
           thing = visible_things[@@look_mode_index]
-          HUD.output_message args, "You see a #{thing.traits.join(', ')} #{thing.title(args)}."
+          HUD.output_message args, "You see #{thing.title(args)}."
           @@look_mode_cooldown = 10
         elsif args.inputs.down && @@look_mode_cooldown == 0
           @@look_mode_index += 1
@@ -150,7 +156,7 @@ class GUI
             @@look_mode_index = 0
           end
           thing = visible_things[@@look_mode_index]
-          HUD.output_message args, "You see a #{thing.traits.join(', ')} #{thing.title(args)}."
+          HUD.output_message args, "You see a #{thing.title(args)}."
           @@look_mode_cooldown = 10
         else
           thing = visible_things[@@look_mode_index]
@@ -453,7 +459,7 @@ class GUI
       x = entity.visual_x
       y = entity.visual_y
       if entity.invisible?
-        alpha = 77
+        alpha = 80
       end
       lighting = level.lighting[y][x] # 0.0 to 1.0
       hue = entity.hue
@@ -473,7 +479,8 @@ class GUI
         tile_h: 16,
         r: color[:r],
         g: color[:g],
-        b: color[:b]
+        b: color[:b],
+        a: alpha 
       }
     end
   end
@@ -486,7 +493,7 @@ class GUI
   def self.move_player dx, dy, args
     hero = args.state.hero
     if hero.has_status?(:shock)
-      HUD.output_message args, "You are shocked and cannot move!"
+      HUD.output_message args, "You attempt to move but cannot due to shock!"
       args.state.kronos.spend_time(hero, hero.walking_speed * 4, args)
       return true
     end
@@ -599,7 +606,6 @@ class GUI
   end
 
   def self.lock_hero
-    printf "Locking hero for movement\n"
     @@hero_locked = true
     @@just_used_staircase = false
     # input cooldown depends on moving frames
@@ -619,7 +625,6 @@ class GUI
   end
 
   def self.unlock_hero(args)
-    printf "Unlocking hero after movement\n"
     @@hero_locked = false
     @@tiles_observed = false
     # check if we stepped on something?

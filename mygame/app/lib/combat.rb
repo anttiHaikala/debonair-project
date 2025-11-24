@@ -81,7 +81,7 @@ class Combat
     HUD.output_message args, "#{aname} bruises #{dname}'s #{body_part.to_s.gsub('_', ' ')} #{hit_severity}ly."
     defender_shocked = Trauma.determine_shock(defender)
     if defender_shocked
-      defender.add_status(:shock)
+      Status.new(defender, :shock, nil, args)
       defender.drop_wielded_items(args)
       HUD.output_message args, "#{dname} is in shock from trauma!"
     end

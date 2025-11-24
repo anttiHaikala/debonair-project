@@ -4,8 +4,8 @@ class Architect
   def initialize
     @settings = {}
     @settings[:levels] ||= 10
-    @settings[:level_width] ||= 70   
-    @settings[:level_height] ||= 42
+    @settings[:level_width] ||= 58   
+    @settings[:level_height] ||= 34
   end
 
   def self.create_seed(args)
@@ -89,7 +89,6 @@ class Architect
       level.create_rooms(args)
       level.create_corridors(args)
       level.add_waters(args)
-      level.add_foliage(args)
 
       # dig corridor from staircase up to entry room
       printf level.rooms.size.to_s + " rooms created at depth %d with vibe %s\n" % [depth, vibe.to_s]
@@ -127,6 +126,9 @@ class Architect
         amulet_item.y = amulet_y
         level.items << amulet_item
       end
+
+      level.add_foliage(args)
+      Trap.populate_for_level(level, args)
 
     end
     args.state.dungeon = dungeon

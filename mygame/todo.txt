@@ -1,13 +1,8 @@
+NOTES ON TTRPG LEGACY
+- Tomb Of Horros (original D&D book)
+
 NOTES ON HACK
 
-Traps are:
-bear trap
-arrow trap
-dart trap
-trapdoor
-teleportation trap
-pit
-sleeping gas trap
 
 NOTES ON GAME SYSTEM
 
@@ -15,10 +10,8 @@ NOTES ON GAME SYSTEM
 - how many seconds is the time unit? (maybe 10?)
 
 TODO LIST
-- fireball animation - and other animations too, how should they be handled?
-    - world time speed or gui animation speed???
-    - world time speed feels more realistic
-- traps
+- minimap
+- separate map screen
 - make the game slow down properly when there is danger/combat!!!
 - status / emotion markers!!!
 - drop weapon when hand is hit, skill modifiers, handedness, wield-hand
@@ -43,6 +36,9 @@ TODO LIST
 
 
 DONE LIST
+- traps
+- smaller levels
+- fireball animation - tiles now have Effects that have durations
 - bigger level area, more levels
  o- potion identification
 - show wielded items in inventory (handedness)

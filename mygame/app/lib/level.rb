@@ -9,6 +9,7 @@ class Level
   attr_accessor :foliage
   attr_accessor :effects
   attr_accessor :fire
+  attr_accessor :traps
 
   def initialize(depth, vibe = :hack)
     @depth = depth
@@ -21,6 +22,7 @@ class Level
     @rooms = []
     @entities = []
     @items = []
+    @traps = []
     @lights = []
     @lighting = nil # lighting value of each tile
     @los_cache = {}
@@ -336,6 +338,16 @@ class Level
         self.effects.delete(effect)
       end
     end
+  end
+
+  def trapped_at?(x, y, args)
+    return false unless @traps
+    @traps.each do |trap|
+      if trap.x == x && trap.y == y
+        return true
+      end
+    end
+    return false
   end
 
 end

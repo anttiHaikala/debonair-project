@@ -25,9 +25,6 @@ class Score
   def self.calculate(hero, args)
     time_used = args.state.time_elapsed || 0
     score = 0
-    if !hero.perished
-      score += 1000 # bonus for staying alive
-    end
     hero.carried_items.each do |item|
       score += 5
       case item.category
@@ -57,21 +54,27 @@ class Score
       end
     end
     if !hero.perished
+      survival_modifier = 4.0
       hero.traumas.each do |trauma|
         if trauma.severity == :minor
-          score -= 10
+          survival_modifier -= 0.1
         elsif trauma.severity == :major
-          score -= 50
+          survival_modifier -= 0.3
         elsif trauma.severity == :severe
-          score -= 150
+          survival_modifier -= 0.5
         elsif trauma.severity == :critical
-          score -= 250
+          survival_modifier -= 0.7
         end
+      end
+      if survival_modifier < 1.0
+        survival_modifier = 1.0
       end
     end
     score += hero.max_depth * 100
     score += 5000 if hero.has_item?(:amulet_of_skandor)
-    final_score = score / (1 + (time_used / 600.0))
+    # in the very end - survival modifier and time modifier
+    score = (score * survival_modifier).to_i
+    final_score = 100 * score / (100 + (time_used / 600.0))
     args.state.final_score = final_score.round
     self.update_high_scores(hero.name, final_score.round, hero.max_depth, time_used, args)
     return final_score

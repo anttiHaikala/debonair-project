@@ -20,6 +20,10 @@ class Tile
     [:floor, :rock, :wall, :water, :staircase_up, :staircase_down, :chasm]
   end
 
+  def self.is_solid?(tile_type, args)
+    return [:wall, :rock, :closed_door, :chasm].include?(tile_type)
+  end
+
   def self.blocks_line_of_sight?(tile_type)
     return [:wall, :rock, :closed_door].include?(tile_type)
   end
@@ -66,6 +70,7 @@ class Tile
     base_walking_speed = entity.walking_speed || 1.0
     random_element = 0.8 + (args.state.rng.nxt_float * 0.4) # 0.8 to 1.2
     time_spent = base_walking_speed * self.terrain_modifier_for_entity(tile, entity, args) * random_element
+    Trap.trigger_trap_at(entity, x, y, args)
     args.state.kronos.spend_time(entity, time_spent, args)
     Lighting.mark_lighting_stale
     GUI.mark_tiles_stale
