@@ -5,7 +5,7 @@ class Score
   end
 
   def self.save_high_scores(args)
-    lines = args.state.high_scores.map { |s| "#{s.name}|#{s.score}" }
+    lines = args.state.high_scores.map { |s| "#{s.name}|#{s.score}|#{s.depth}|#{s.time_taken}" }
     args.gtk.write_file("high_scores.txt", lines.join("\n"))
   end
 
@@ -13,8 +13,8 @@ class Score
     data = args.gtk.read_file("high_scores.txt")
     return [] unless data
     scorez = data.split("\n").map do |line|
-      name, score = line.split("|")
-      { name: name, score: score.to_i }
+      name, score, depth, time_taken = line.split("|")
+      { name: name, score: score.to_i, depth: depth.to_i, time_taken: time_taken.to_i }
     end
     args.state.high_scores = scorez
     printf("Loaded high scores: %p\n", scorez)
@@ -23,7 +23,8 @@ class Score
   end
 
   def self.calculate(hero, args)
-    time_used = args.state.time_elapsed || 0
+    time_used = args.state.kronos.world_time.to_i
+    depth = hero.max_depth + 1
     score = 0
     hero.carried_items.each do |item|
       score += 5
@@ -69,18 +70,23 @@ class Score
       if survival_modifier < 1.0
         survival_modifier = 1.0
       end
+    else
+      survival_modifier = 0.5
     end
     score += hero.max_depth * 100
     score += 5000 if hero.has_item?(:amulet_of_skandor)
     # in the very end - survival modifier and time modifier
-    score = (score * survival_modifier).to_i
-    final_score = 100 * score / (100 + (time_used / 600.0))
-    args.state.final_score = final_score.round
-    self.update_high_scores(hero.name, final_score.round, hero.max_depth, time_used, args)
+    score = (score.to_f * survival_modifier)
+    # apply time penalty
+    final_score = 100.0 * score / (100 + (time_used / 600.0))
+    # round the final score DOWN to the nearest integer
+    args.state.final_score = final_score.floor
+    self.update_high_scores(hero.name, final_score.floor, depth, time_used, args)
     return final_score
   end
 
   def self.update_high_scores(name, score, depth, time_taken, args)
+    printf("Updating high scores with %s: %d points, depth %d, time %d \n", name, score, depth, time_taken)
     high_scores = self.high_score_list(args)
     high_scores << { name: name, score: score, depth: depth, time_taken: time_taken }
     high_scores = high_scores.sort_by { |s| -s[:score] }
@@ -103,8 +109,63 @@ class Score
     # print a list of hiscores
     dem_funky_scorez = self.high_score_list(args) # make sure they are loaded 
     if dem_funky_scorez.any?  
-      y = 580
-      x = 460
+      y = 540
+      x = 360
+      args.outputs.labels << {
+        x: x,
+        y: y + 30,
+        text: "No.",
+        size_enum: 2,
+        r: 255,
+        g: 255,
+        b: 255,
+        a: 255,  
+        font: "fonts/greek-freak.ttf"
+      }
+      args.outputs.labels << {
+        x: x + 50,
+        y: y + 30,
+        text: "Name",
+        size_enum: 2,
+        r: 255,
+        g: 255,
+        b: 255,
+        a: 255,
+        font: "fonts/greek-freak.ttf"
+      }
+      args.outputs.labels << {
+        x: x + 200,
+        y: y + 30,
+        text: "Score",
+        size_enum: 2,
+        r: 255,
+        g: 255,
+        b: 255,
+        a: 255,
+        font: "fonts/greek-freak.ttf"
+      }
+      args.outputs.labels << {
+        x: x + 310,
+        y: y + 30,
+        text: "Depth reached",
+        size_enum: 2,
+        r: 255,
+        g: 255,
+        b: 255,
+        a: 255,
+        font: "fonts/greek-freak.ttf"
+      }
+      args.outputs.labels << {
+        x: x + 500,
+        y: y + 30,
+        text: "Time taken",
+        size_enum: 2,
+        r: 255,
+        g: 255,
+        b: 255,
+        a: 255,
+        font: "fonts/greek-freak.ttf"
+      }
       dem_funky_scorez.each_with_index do |entry, index|
         args.outputs.labels << {
           x: x,
@@ -146,7 +207,7 @@ class Score
       end
       dem_funky_scorez.each_with_index do |entry, index|
         args.outputs.labels << {
-          x: x+400,
+          x: x+370,
           y: y - index * 20,
           text: "#{entry[:depth]}",
           size_enum: 1,
@@ -159,7 +220,7 @@ class Score
       end
       dem_funky_scorez.each_with_index do |entry, index|
         args.outputs.labels << {
-          x: x+500,
+          x: x+550,
           y: y - index * 20,
           text: "#{entry[:time_taken]}",
           size_enum: 1,
