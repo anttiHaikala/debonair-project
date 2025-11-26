@@ -139,11 +139,12 @@ class Trauma
       when :moderate
         death_score += 2
       when :severe
-        death_score += 4
+        death_score += 3
       when :critical
         death_score += 6
       end    
     end
+    printf "Total death score is %d (threshold %d).\n" % [death_score, death_threshold]
     if death_score >= death_threshold
       return true
     else

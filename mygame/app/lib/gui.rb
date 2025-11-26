@@ -27,6 +27,10 @@ class GUI
     return @@input_cooldown
   end
 
+  def self.add_input_cooldown frames
+    @@input_cooldown += frames
+  end
+
   def self.hero_locked
     return @@hero_locked
   end
@@ -633,6 +637,7 @@ class GUI
     dungeon = args.state.dungeon
     tile = dungeon.levels[level].tiles[y][x]
     Lighting.mark_lighting_stale
+    HUD.mark_minimap_stale
   end
 
   def self.pan_to_player args

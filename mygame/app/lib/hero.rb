@@ -334,7 +334,8 @@ class Hero < Entity
           if detection_roll < final_detection_chance
             HUD.output_message(args, "You detect a #{trap.kind.to_s.gsub('_',' ')} trap nearby!")
             trap.found = true
-            SoundFX.play_sound(:trap_detected, args)
+            SoundFX.play_sound(:clue, args)
+            GUI.add_input_cooldown(30)
           end
           if self.worn_items.include?(:ring_of_warning)
             if args.state.rng.d6 == 1

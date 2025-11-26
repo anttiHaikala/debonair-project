@@ -63,7 +63,8 @@ class Kronos
     if self.should_level_effects_be_applied?
       self.apply_effects args
     end
-    idle_entity.take_action args 
+    idle_entity.take_action args
+    HUD.mark_minimap_stale
   end
 
   def should_level_effects_be_applied?

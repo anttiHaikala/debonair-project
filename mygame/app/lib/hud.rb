@@ -1,5 +1,8 @@
 class HUD
 
+  @@minimap_tiles = nil
+  @@minimap_stale = true
+
   def self.draw args
     self.draw_hero_info args
     self.draw_health args
@@ -7,6 +10,10 @@ class HUD
     self.draw_seed args
     self.draw_messages args
     self.debug_info args if $debug
+  end
+
+  def self.mark_minimap_stale
+    @@minimap_stale = true
   end
 
   def self.draw_health args
@@ -297,7 +304,7 @@ class HUD
     end
   end 
 
-  def self.draw_minimap args
+  def self.update_minimap args
     level = Utils.level(args)
     return unless level
     # first get the tile memory for the hero
@@ -305,18 +312,26 @@ class HUD
     #print tile_memory.inspect
     return unless tile_memory
     # copy the tile memory without side effects
-    compacted_tile_memory = []
+    @@minimap_tiles = []
     # iterate through tile_memory and copy
     tile_memory.each_with_index do |row, row_index|
-      compacted_tile_memory[row_index] ||= []
+      @@minimap_tiles[row_index] ||= []
       if row == nil
         next
       end
       row.each_with_index do |tile, col_index|
-        compacted_tile_memory[row_index][col_index] = tile
+        @@minimap_tiles[row_index][col_index] = tile
       end
     end
-    # compact the tile memory by removing empty rows and columns
+    hero = args.state.hero
+    level.entities.each do |entity|
+      if Tile.is_tile_visible?(entity.x, entity.y, args)
+        @@minimap_tiles[entity.y][entity.x] = :npc
+      end
+    end
+    @@minimap_tiles[hero.y][hero.x] = :hero if hero
+    # compact the minimap by removing empty rows and columns
+    compacted_tile_memory = @@minimap_tiles
     compacted_offset_x = 0
     compacted_offset_y = 0
     # remove empty rows and columns from compacted_tile_memory
@@ -337,33 +352,41 @@ class HUD
     # remove empty columns from right
     while compacted_tile_memory.first && compacted_tile_memory.all? { |row| row.last == nil }
       compacted_tile_memory.each { |row| row.pop }
-    end  
+    end
+    @@minimap_tiles = compacted_tile_memory
+    @@minimap_stale = false
+  end
+
+  def self.draw_minimap args
+    if @@minimap_stale
+      self.update_minimap args
+    end
     tile_size = 3
-    map_height = compacted_tile_memory.first ? compacted_tile_memory.first.size * tile_size : 0
-    map_width = compacted_tile_memory.size * tile_size
+    map_height = @@minimap_tiles.first ? @@minimap_tiles.first.size * tile_size : 0
+    map_width = @@minimap_tiles.size * tile_size
     buffer = 20
     x_offset = 1200 - map_width - buffer 
     y_offset = buffer
-    printf "Drawing minimap at x_offset #{x_offset} y_offset #{y_offset} map_width #{map_width} map_height #{map_height}\n"
     return if map_width <= 0 || map_height <= 0
-    compacted_tile_memory.each_with_index do |row, row_index| # Y rows
+    @@minimap_tiles.each_with_index do |row, row_index| # Y rows
       row.each_with_index do |tile, col_index| # X columns
-        printf "Drawing minimap tile at row #{row_index} col #{col_index} tile #{tile}\n"
+        #printf "Drawing minimap tile at row #{row_index} col #{col_index} tile #{tile}\n"
         color = { r: 10, g: 10, b: 10 }
         color = case tile
           when :floor then { r: 30, g: 30, b: 30 }
-          when :wall then { r: 120, g: 100, b: 100 }
-          when :rock then { r: 100, g: 100, b: 100 }
+          when :wall then { r: 120, g: 120, b: 120 }
+          when :rock then { r: 80, g: 80, b: 80 }
           when :staircase_down then { r: 0, g: 255, b: 0 }
           when :staircase_up then { r: 0, g: 255, b: 0 }
-          when :water then { r: 40, g: 40, b: 250 }
+          when :water then { r: 10, g: 10, b: 110 }
           when :lava then { r: 255, g: 0, b: 0 }
-          when :chasm then { r: 50, g: 50, b: 50 }
+          when :hero then { r: 255, g: 255, b: 255 }
+          when :npc then { r: 220, g: 120, b: 0 }
         else
-          { r: 10, g: 10, b: 10 }
+          { r: 0, g: 0, b: 0 }
         end
-        if args.state.hero.x - compacted_offset_x == col_index && args.state.hero.y - compacted_offset_y == row_index
-          color = { r: 255, g: 255, b: 255 }
+        if tile == nil
+          next
         end
         args.outputs.primitives << {
           x: x_offset + col_index * tile_size,
