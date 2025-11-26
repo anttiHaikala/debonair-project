@@ -1,4 +1,5 @@
 class Level
+
   attr_accessor :depth, :tiles, :items, :lights
   attr_accessor :floor_hsl # this determines the color scheme of the level
   attr_accessor :vibe # :hack, :lush, :swamp, :fiery, :ice, :rocky, :water

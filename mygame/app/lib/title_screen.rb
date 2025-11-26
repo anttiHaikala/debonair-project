@@ -16,6 +16,7 @@ class TitleScreen
       args.state.run = Run.new args
       args.state.run.setup args
       GUI.initialize_state args
+      Tile.reset_memory_and_visibility
       printf "Game start complete.\n"
       printf "Dungeon has %d levels.\n" % args.state.dungeon.levels.size
       args.state.dungeon.levels.each_with_index do |level, index|

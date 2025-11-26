@@ -296,4 +296,87 @@ class HUD
       args.state.hud_messages.shift 
     end
   end 
+
+  def self.draw_minimap args
+    level = Utils.level(args)
+    return unless level
+    # first get the tile memory for the hero
+    tile_memory = Tile.tile_memory(level.depth, args)
+    #print tile_memory.inspect
+    return unless tile_memory
+    # copy the tile memory without side effects
+    compacted_tile_memory = []
+    # iterate through tile_memory and copy
+    tile_memory.each_with_index do |row, row_index|
+      compacted_tile_memory[row_index] ||= []
+      if row == nil
+        next
+      end
+      row.each_with_index do |tile, col_index|
+        compacted_tile_memory[row_index][col_index] = tile
+      end
+    end
+    # compact the tile memory by removing empty rows and columns
+    compacted_offset_x = 0
+    compacted_offset_y = 0
+    # remove empty rows and columns from compacted_tile_memory
+    # remove empty rows from top
+    while compacted_tile_memory.size > 0 && (compacted_tile_memory.first == nil || compacted_tile_memory.first.all? { |t| t == nil } || compacted_tile_memory.first == [])
+      compacted_tile_memory.shift
+      compacted_offset_y += 1
+    end
+    # remove empty rows from bottom
+    while compacted_tile_memory.size > 0 && (compacted_tile_memory.last == nil || compacted_tile_memory.last.all? { |t| t == nil } || compacted_tile_memory.last == [])
+      compacted_tile_memory.pop
+    end  
+    # remove empty columns from left
+    while compacted_tile_memory.first && compacted_tile_memory.all? { |row| row.first == nil }
+      compacted_tile_memory.each { |row| row.shift }
+      compacted_offset_x += 1
+    end  
+    # remove empty columns from right
+    while compacted_tile_memory.first && compacted_tile_memory.all? { |row| row.last == nil }
+      compacted_tile_memory.each { |row| row.pop }
+    end  
+    tile_size = 3
+    map_height = compacted_tile_memory.first ? compacted_tile_memory.first.size * tile_size : 0
+    map_width = compacted_tile_memory.size * tile_size
+    buffer = 20
+    x_offset = 1200 - map_width - buffer 
+    y_offset = buffer
+    printf "Drawing minimap at x_offset #{x_offset} y_offset #{y_offset} map_width #{map_width} map_height #{map_height}\n"
+    return if map_width <= 0 || map_height <= 0
+    compacted_tile_memory.each_with_index do |row, row_index| # Y rows
+      row.each_with_index do |tile, col_index| # X columns
+        printf "Drawing minimap tile at row #{row_index} col #{col_index} tile #{tile}\n"
+        color = { r: 10, g: 10, b: 10 }
+        color = case tile
+          when :floor then { r: 30, g: 30, b: 30 }
+          when :wall then { r: 120, g: 100, b: 100 }
+          when :rock then { r: 100, g: 100, b: 100 }
+          when :staircase_down then { r: 0, g: 255, b: 0 }
+          when :staircase_up then { r: 0, g: 255, b: 0 }
+          when :water then { r: 40, g: 40, b: 250 }
+          when :lava then { r: 255, g: 0, b: 0 }
+          when :chasm then { r: 50, g: 50, b: 50 }
+        else
+          { r: 10, g: 10, b: 10 }
+        end
+        if args.state.hero.x - compacted_offset_x == col_index && args.state.hero.y - compacted_offset_y == row_index
+          color = { r: 255, g: 255, b: 255 }
+        end
+        args.outputs.primitives << {
+          x: x_offset + col_index * tile_size,
+          y: y_offset + row_index * tile_size,
+          w: tile_size,
+          h: tile_size,
+          r: color[:r],
+          g: color[:g],
+          b: color[:b],
+          a: 255,
+          path: :solid
+        }
+      end
+    end
+  end
 end

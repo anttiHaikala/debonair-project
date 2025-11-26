@@ -11,6 +11,9 @@ NOTES ON GAME SYSTEM
 
 TODO LIST
 - minimap
+- architect secret doors
+- architect secret/hidden items
+- detective should detect secret doors automagically
 - separate map screen
 - make the game slow down properly when there is danger/combat!!!
 - status / emotion markers!!!
@@ -24,9 +27,6 @@ TODO LIST
 - taming grid bugs with food
 - doors
 - fix levels that do not have exit
-- architect secret doors
-- architect secret/hidden items
-- detective should detect secret doors automagically
 - stealth/hearing mechanics
 - tending to wounds
 - pickaxe cheat / mining bombs / hold down y to dig

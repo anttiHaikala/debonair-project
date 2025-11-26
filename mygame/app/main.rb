@@ -169,6 +169,7 @@ def gameplay_tick args
   GUI.pan_to_player args
   GUI.update_screen_flash args
   HUD.draw args
+  HUD.draw_minimap args
 end
 
 def staircase_tick args
