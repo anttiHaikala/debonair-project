@@ -787,12 +787,20 @@ class GUI
           item = hero.carried_items[selected_index]
           hero.use_item(item, args)
           SoundFX.play_sound(:use_item, args)
+          self.add_input_cooldown 10
+          return true
         end
-      elsif
-        args.inputs.controller_one.key_down.b || args.inputs.keyboard.key_down.enter
+      elsif args.inputs.controller_one.key_down.b || args.inputs.keyboard.key_down.right
         # drop selected item
         selected_index = args.state.selected_item_index
         hero.drop_item(hero.carried_items[selected_index], args)
+        args.state.selected_item_index -= 1
+        if args.state.selected_item_index < 0
+          args.state.selected_item_index = 0
+        end
+        SoundFX.play_sound(:drop_item, args)
+        self.add_input_cooldown 10
+        return true
       end
     end
   end
