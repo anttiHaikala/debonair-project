@@ -9,9 +9,11 @@ NOTES ON GAME SYSTEM
 - how long distance is one square?
 - how many seconds is the time unit? (maybe 10?)
 
-TODO LIST
-- facing to direction + field of view!!!! this could be huge for immersion, horror elements, crazy situations
+TODO LIST'
+- strafing (lock your facing while moving alt+direction)
+- changing your facing (command + direction)
 - more monster emotes (textual ones)
+- stealth/hearing mechanics
 - if we have field of view, how to communicate hearing to the player (and/or smell)
 - drop weapon when hand is hit, skill modifiers, handedness, wield-hand
 - make the game slow down properly when there is danger/combat by adding input cooldown
@@ -28,13 +30,13 @@ TODO LIST
 - taming grid bugs with food
 - doors
 - fix levels that do not have exit
-- stealth/hearing mechanics
 - tending to wounds
 - pickaxe cheat / mining bombs / hold down y to dig
 - body parts have a tree
 - armor
 
 DONE LIST
+- facing to direction + field of view!!!! this could be huge for immersion, horror elements, crazy situations
 - walking speed modifiers for wounds below waist
 - different weapons make different damage, cutting/slicing weapons (not just bruises)
 - temporary status effects like poison

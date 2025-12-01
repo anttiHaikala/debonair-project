@@ -106,7 +106,9 @@ class Tile
     for y in 0...level_height
       tile_memory[y] ||= []
       for x in 0...level_width
-        tile_memory[y][x] = level.tiles[y][x]
+        unless level.tiles[y][x] == :rock
+          tile_memory[y][x] = level.tiles[y][x]
+        end
       end
     end
     @@tile_memory_per_level[depth] = tile_memory

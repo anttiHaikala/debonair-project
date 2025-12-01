@@ -13,6 +13,7 @@ class GUI
     @@look_mode_index = nil
     @@look_mode_cooldown = 0
     @@look_mode_frames = nil
+    @@strafing = false
   end
 
   def self.standing_still_frames
@@ -221,6 +222,11 @@ class GUI
         args.state.scene = :game_over
       end
       return
+    end
+    if args.inputs.keyboard.key_held.alt
+      @@strafing = true
+    else
+      @@strafing = false
     end
     if args.controller_one.key_held.l2 || args.inputs.keyboard.key_held.tab
       # look mode
@@ -510,7 +516,7 @@ class GUI
       hero.rest(args)
       return true
     end
-    if args.inputs.keyboard.key_held.alt || args.inputs.controller_one.key_held.r1
+    if args.inputs.keyboard.key_held.z || args.inputs.controller_one.key_held.r1
       @@auto_move = [dx, dy] # move until blocked
     end
     @@standing_still_frames = 0
@@ -570,7 +576,9 @@ class GUI
     # we are cleared to move
     GUI.lock_hero
     Tile.enter(hero, hero.x + dx, hero.y + dy, args)
-    hero.apply_new_facing(dx, dy)
+    unless @@strafing
+      hero.apply_new_facing(dx, dy)
+    end
     hero.apply_walking_exhaustion(args)
     return true
   end
