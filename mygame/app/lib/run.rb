@@ -23,6 +23,10 @@ class Run
     @hero.carried_items << Scroll.new(:scroll_of_fireball)
     @hero.carried_items << Scroll.new(:scroll_of_fireball)
     @hero.carried_items << Ring.new(:ring_of_warning)
+    @hero.carried_items << Potion.new(:potion_of_poison)
+    @hero.carried_items << Potion.new(:potion_of_speed)
+    @hero.carried_items << Potion.new(:potion_of_strength)
+    @hero.carried_items << Potion.new(:potion_of_telepathy)
     args.state.current_depth = 0
     args.state.kronos = Kronos.new
   end

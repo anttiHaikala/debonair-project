@@ -16,6 +16,19 @@ class Weapon < Item
     ]
   end
 
+  def hit_kind(args)
+    case @kind
+    when :dagger, :sword, :katana, :axe
+      return :cut
+    when :mace, :club
+      return :blunt
+    when :spear
+      return :pierce
+    else
+      return :blunt
+    end
+  end
+
   def self.common_attributes
     [
       :rusty,

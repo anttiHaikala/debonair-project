@@ -139,7 +139,14 @@ class Hero < Entity
     if @role == :ninja || @role == :thief
       seconds_per_tile -= 0.2
     end
-    return seconds_per_tile / Trauma.walking_speed_modifier(self) 
+    traumatized_speed = seconds_per_tile / Trauma.walking_speed_modifier(self)
+    if self.has_status?(:speedy)
+      status_modifier = 0.5
+    else
+      status_modifier = 1.0
+    end
+    statuzed_speed = traumatized_speed * status_modifier
+    return statuzed_speed
   end
 
   def mental_speed
@@ -311,7 +318,7 @@ class Hero < Entity
     detection_range = 2
     level.traps.each do |trap|
       distance = Utils.distance_between_entities(self, trap)
-      if distance <= detection_range
+      if distance <= detection_range && Tile.is_tile_visible?(trap.x, trap.y, args)
         if !trap.found
           printf "Checking for trap detection at trap location (%d,%d)\n" % [trap.x, trap.y]
           # odds to detect trap depend on role, species, lighting, etc.

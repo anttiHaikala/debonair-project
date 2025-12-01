@@ -13,6 +13,7 @@ class Foliage
   }
 
   def self.draw args, level
+    return
     tile_size = Utils.tile_size(args)
     x_offset = Utils.offset_x(args)
     y_offset = Utils.offset_y(args)

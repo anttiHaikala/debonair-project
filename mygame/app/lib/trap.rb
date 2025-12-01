@@ -48,7 +48,7 @@ class Trap
       end
       HUD.output_message args, "#{entity.name} is impaled by #{amount_of_spikes} spikes!"
     when :poison_dart
-      Status.new(entity, :poisoned, 10, args)
+      Status.new(entity, :poisoned, 10 + args.state.rng.d10, args)
       HUD.output_message args, "#{entity.name} is poisoned by a poison dart!"
 
     # when :fire
@@ -69,7 +69,7 @@ class Trap
 
   def self.populate_for_level(level, args)
     # place traps randomly in the level
-    number_of_traps = args.state.rng.rand(6) + (level.depth/2).floor - 2 + 30
+    number_of_traps = args.state.rng.rand(6) + (level.depth/2).floor - 2
     if number_of_traps < 0
       number_of_traps = 0
     end

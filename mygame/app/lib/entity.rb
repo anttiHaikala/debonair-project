@@ -11,6 +11,7 @@ class Entity
   attr_accessor :statuses
   attr_accessor :traits
   attr_accessor :hands
+  attr_accessor :facing # :south, :north, :east, :west
 
   def self.kinds
     [:generic, :item, :pc, :npc, :plant, :furniture]
@@ -35,6 +36,7 @@ class Entity
     @statuses = []
     @traits = []
     @hands = [:right, :left] # in order of preference
+    @facing = :west
   end
 
   def is_hostile_to?(other_entity)
@@ -92,7 +94,7 @@ class Entity
     when :rat
       return Species.mammal_body_parts
     else
-      return Species.humanoid_body_parts
+      return Species.humanoid_hit_locations
     end
   end
 
@@ -111,9 +113,12 @@ class Entity
     if self.worn_items
       self.worn_items.each do |item|
         if item.kind == :ring_of_telepathy
-          range += 20
+          range += 16
         end
       end
+    end
+    if self.has_status?(:telepathic)
+      range += 20
     end
     return range
   end
@@ -288,5 +293,32 @@ class Entity
         HUD.output_message(args, "#{self.name} recovers from shock.")
       end
     end
+  end
+
+  def has_trait?(trait)
+    return self.traits.include?(trait)
+  end
+
+  def hit_kind(args)
+    hit_kind = :blunt # sensible default for unarmed attacks
+    self.wielded_items.each do |item|
+      if item.category == :weapon
+        hit_kind = item.hit_kind(args)
+        break
+      end
+    end
+    return hit_kind
+  end
+
+  def apply_new_facing(dx, dy)
+    if dx > 0
+      @facing = :east
+    elsif dx < 0
+      @facing = :west
+    elsif dy > 0
+      @facing = :north
+    elsif dy < 0
+      @facing = :south
+    end   
   end
 end

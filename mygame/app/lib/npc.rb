@@ -203,7 +203,14 @@ class NPC < Entity
     when :gelatinous_cube # these guys keep the dungeon clean??
       species_speed = 5.0
     end
-    return species_speed / Trauma.walking_speed_modifier(self)
+    traumatized_speed = species_speed / Trauma.walking_speed_modifier(self)
+    if self.has_status?(:speedy)
+      status_modifier = 0.5
+    else
+      status_modifier = 1.0
+    end
+    statuzed_speed = traumatized_speed * status_modifier
+    return statuzed_speed
   end
 
   def take_action args

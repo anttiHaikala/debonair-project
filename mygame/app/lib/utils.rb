@@ -36,6 +36,39 @@ module Utils
     return self.distance(entity1.x, entity1.y, entity2.x, entity2.y)
   end
 
+  def self.in_hero_fov?(target_x, target_y, args)
+    hero = args.state.hero
+    return self.within_fov(hero.x, hero.y, target_x, target_y, hero.facing, 210)
+  end
+
+  def self.within_fov_of(eye_entity, target_entity, fov_angle)
+    return self.within_fov(eye_entity.x, eye_entity.y, target_entity.x, target_entity.y, eye_entity.facing, fov_angle)
+  end
+
+  def self.within_fov(eye_x, eye_y, target_x, target_y, facing, fov_angle)
+    if eye_x == target_x && eye_y == target_y
+      return true
+    end
+    dx = target_x - eye_x
+    dy = target_y - eye_y
+    angle_to_target = Math.atan2(dy, dx) * (180.0 / Math::PI)
+    facing_angle = case facing
+                   when :east
+                     0
+                   when :north
+                     90
+                   when :west
+                     180
+                   when :south
+                     -90
+                   else
+                     0
+                   end
+    angle_diff = (angle_to_target - facing_angle + 360) % 360
+    angle_diff = 360 - angle_diff if angle_diff > 180
+    return angle_diff <= (fov_angle / 2)
+  end
+
   def self.move_entity_to_level(entity, target_depth, args)
     # remove from current level
     current_level = self.level_by_depth(entity.depth, args)

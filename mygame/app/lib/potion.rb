@@ -7,15 +7,15 @@ class Potion < Item
   def self.kinds
     [
     :potion_of_healing,
-    # :potion_of_strength,
-    # :potion_of_speed,
+    :potion_of_strength,
+    :potion_of_speed,
     # :potion_of_invisibility,
     # :potion_of_fire_resistance,
     # :potion_of_cold_resistance,
-    # :potion_of_poison,
+    :potion_of_poison,
     # :potion_of_water_breathing,
     # :potion_of_levitation,
-    # :potion_of_telepathy,
+    :potion_of_telepathy,
     :potion_of_extra_healing,
     :potion_of_teleportation,
     ]
@@ -60,6 +60,8 @@ class Potion < Item
   end
 
   def use(entity, args)
+    identify = true
+    base_duration = 70
     case self.kind
     when :potion_of_teleportation
       HUD.output_message(args, "You feel disoriented...")
@@ -83,21 +85,32 @@ class Potion < Item
         end
       end
       if effect == 0
-        HUD.output_message(args, "You feel no different after drinking the #{self.title(args)}.")
+        HUD.output_message(args, "You don't feel that different after drinking the #{self.title(args)}.")
+        identify = false
       else
-        self.identify(args)
         HUD.output_message(args, "You feel better after drinking the #{self.title(args)}.")
       end
       SoundFX.play(:potion, args)
+    when :potion_of_poison
+      HUD.output_message(args, "Ouch! This potion did not improve my well-being.")
+      Status.new(entity, :poison, 20 + args.state.rng.d10, args)
     when :potion_of_strength
       HUD.output_message(args, "You feel stronger!")
+      Status.new(entity, :strenghtened, base_duration + args.state.rng.d20 * 2, args)
     when :potion_of_speed
-      HUD.output_message(args, "You feel faster!")
+      HUD.output_message(args, "You feel world around you slowing down!")
+      Status.new(entity, :speedy, base_duration + args.state.rng.d20 * 2, args)
     when :potion_of_invisibility
       HUD.output_message(args, "You become invisible!")
+      Status.new(entity, :invisible, base_duration + args.state.rng.d20 * 2, args)
+    when :potion_of_telepathy
+      HUD.output_message(args, "You feel more connected to other beings!")
+      Status.new(entity, :telepathic, base_duration + args.state.rng.d20 * 2, args)
     else
       HUD.output_message(args, "You feel strange...")
+      identify = false
     end
+    self.identify(args) if identify
     entity.carried_items.delete(self)
     args.state.kronos.spend_time(entity, entity.walking_speed, args)
   end

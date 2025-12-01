@@ -75,10 +75,11 @@ class Combat
     # hit!
     body_part = defender.random_body_part(args)
     hit_severity = self.hit_severity(attacker, defender, attack_roll, args)
-    hit_kind = :bruise
+    hit_kind = attacker.hit_kind(args)
     Trauma.inflict(defender, body_part, hit_kind, hit_severity, args)
     SoundFX.play_sound(:hit, args)
-    HUD.output_message args, "#{aname} bruises #{dname}'s #{body_part.to_s.gsub('_', ' ')} #{hit_severity}ly."
+    verb = "#{hit_kind}s"
+    HUD.output_message args, "#{aname} #{verb} #{dname}'s #{body_part.to_s.gsub('_', ' ')} #{hit_severity}ly."
     defender_shocked = Trauma.determine_shock(defender)
     if defender_shocked
       Status.new(defender, :shocked, nil, args)
@@ -159,6 +160,10 @@ class Combat
           severity_modifier -= 5
         end
       end
+    end
+    # attacker strong status
+    if attacker.has_status?(:strenghtened)
+      severity_modifier += 5
     end
     # roll for severity
     severity_roll = args.state.rng.d20 + severity_modifier

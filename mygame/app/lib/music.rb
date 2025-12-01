@@ -7,7 +7,7 @@ class Music
 
   def self.setup(args)
     args.state.music = Music.new
-    args.state.music.start
+    args.state.music.start args
   end
 
   def initialize
@@ -15,22 +15,22 @@ class Music
     @samples = {}
     scan_samples
     @bpm = 80
-    @pattern_length = 8 # bars
+    @pattern_length = 4 # bars
   end
 
-  def start
+  def start args
     printf "Starting music system...\n"
     now = Time.now
     @start_time = now
     @beat_count = nil 
     @bar_count = nil
     @pattern_count = nil
-    @music_volume = 0.0
+    @music_volume = 0.5
     @scale = Music.scales.keys.sample
-    alter_pattern!
+    alter_pattern! args
   end
 
-  def alter_pattern!
+  def alter_pattern! args
     @pattern ||= {}
     @pattern[:notes] ||= {}
     printf "Altering music pattern...\n"
@@ -56,6 +56,11 @@ class Music
       (0...@pattern_length * 4).each do |beat|
         counter += 1
         if beat % 8 == 0
+          @pattern[kind] ||= []
+          @pattern[kind] << string_sample if string_sample
+          @pattern[:notes][kind] ||= []
+          @pattern[:notes][kind] << [0,3,7].sample
+        elsif beat % 8 == 3 && Numeric.rand(0.0..1.0) < 0.3
           @pattern[kind] ||= []
           @pattern[kind] << string_sample if string_sample
           @pattern[:notes][kind] ||= []
@@ -143,6 +148,28 @@ class Music
         end
       end
     end
+    if Numeric.rand(0.0..1.0) < 0.8
+      # bass track
+      @pattern[:bass] = nil
+      primary_sample = @samples[:bass].sample
+      interval = [1,2,3,4,6].sample
+      (0...@pattern_length * 4).each do |beat|
+        the_sample = Numeric.rand(0.0..1.0) < 0.7 ? primary_sample : secondary_sample
+        if beat % interval == 0
+          @pattern[:bass] ||= []
+          @pattern[:bass] << the_sample if @samples[:bass] && !@samples[:bass].empty?
+          @pattern[:notes][:bass] ||= []
+          relative_note = [0,3,7].sample
+          note = Music.scales[@scale].take(relative_note + 1).sum
+          @pattern[:notes][:bass] << note
+        else
+          @pattern[:bass] ||= []
+          @pattern[:bass] << nil
+          @pattern[:notes][:bass] ||= []
+          @pattern[:notes][:bass] = nil
+        end
+      end
+    end
     printf "New pattern is ready.\n"
     @pattern.each do |kind, beats|
       if kind == :notes
@@ -208,7 +235,7 @@ class Music
     new_pattern_count = self.calc_pattern
     if old_pattern_count != new_pattern_count  
       @pattern_count = new_pattern_count
-      alter_pattern!
+      alter_pattern! args
     end
     old_beat_count = @beat_count
     new_beat_count = self.calc_beat

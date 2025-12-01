@@ -27,7 +27,7 @@ class Status
     if @duration
       time_now = args.state.kronos.world_time
       time_then = @created_at
-      printf "Status times #{@kind} #{time_then} - #{time_now} - #{@duration}\n"
+      #printf "Status times #{@kind} #{time_then} - #{time_now} - #{@duration}\n"
       time_elapsed = time_now - time_then
       if time_elapsed > @duration
         # status can be deleted

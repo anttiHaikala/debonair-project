@@ -436,6 +436,7 @@ class GUI
     level.entities.each do |entity|
       telepathic_connection = false
       unless entity == args.state.hero
+        # then check tile visibility
         visible = Tile.is_tile_visible?(entity.x, entity.y, args) && !entity.invisible?
         if args.state.hero.telepathy_range > 0
           dist_x = (entity.x - args.state.hero.x).abs
@@ -446,6 +447,10 @@ class GUI
             visible = true
             telepathic_connection = true 
           end
+        end
+        # check fov last
+        if Utils.in_hero_fov?(entity.x, entity.y, args) == false && telepathic_connection == false
+          visible = false
         end
         if visible
           entity.has_been_seen = true
@@ -565,6 +570,7 @@ class GUI
     # we are cleared to move
     GUI.lock_hero
     Tile.enter(hero, hero.x + dx, hero.y + dy, args)
+    hero.apply_new_facing(dx, dy)
     hero.apply_walking_exhaustion(args)
     return true
   end

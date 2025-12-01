@@ -24,10 +24,18 @@ class Trauma
 
   def self.kinds
     {
-      physical: [:cut, :bruise, :pierce, :fracture, :burn, :cold, :sprain, :bite, :internal_injury, :poison],
+      physical: [:cut, :blunt, :pierce, :fracture, :burn, :cold, :sprain, :bite, :internal_injury, :poison],
       mental: [:concussion, :stress],
       emotional: [:grief, :anxiety, :fear, :depression]
     }
+  end
+
+  def self.trauma_score(entity, args)
+    score = 0
+    entity.traumas.each do |t|
+      score += t.numeric_severity
+    end
+    return score
   end
 
   def heal_one_step
@@ -89,6 +97,14 @@ class Trauma
           printf "Entity dropped wielded item due to hand trauma.\n"
         end
       end
+      if trauma.body_part == :left_arm
+        if entity.wielded_items.size > 1
+          dropped_item = entity.wielded_items[1]
+          entity.wielded_items.delete(dropped_item)
+          entity.carried_items << dropped_item
+          printf "Entity dropped wielded item due to hand trauma.\n"
+        end
+      end 
     end
     shocked = self.determine_shock(entity)
     if shocked
@@ -105,6 +121,9 @@ class Trauma
 
   def self.determine_shock(entity)
     if entity.undead?
+      return false
+    end
+    if entity.has_trait?(:zombie)
       return false
     end
     shock_score = 0

@@ -329,7 +329,7 @@ class HUD
         @@minimap_tiles[entity.y][entity.x] = :npc
       end
     end
-    @@minimap_tiles[hero.y][hero.x] = :hero if hero
+    @@minimap_tiles[hero.y][hero.x] = :hero if hero && @@minimap_tiles[hero.y]
     # compact the minimap by removing empty rows and columns
     compacted_tile_memory = @@minimap_tiles
     compacted_offset_x = 0

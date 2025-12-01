@@ -124,17 +124,24 @@ class Tile
     y_start = tile_viewport[1]
     x_end = tile_viewport[2]
     y_end = tile_viewport[3]
+    hero_x = args.state.hero.x
+    hero_y = args.state.hero.y
 
     for y in (y_start..y_end)
       tile_visibility[y] ||= []
       for x in (x_start..x_end)
-        if Utils::distance(args.state.hero.x, args.state.hero.y, x, y) > vision_range
+        if Utils::distance(hero_x, hero_y, x, y) > vision_range
+          tile_visibility[y][x] = false
+          next
+        end
+        # check fov
+        if Utils.in_hero_fov?(x, y, args) == false
           tile_visibility[y][x] = false
           next
         end
         # cache the los value
-        los_cache_key = "#{args.state.hero.x},#{args.state.hero.y}->#{x},#{y}"
-        level.los_cache[los_cache_key] ||= Utils.line_of_sight?(args.state.hero.x, args.state.hero.y, x, y, level)
+        los_cache_key = "#{hero_x},#{hero_y}->#{x},#{y}"
+        level.los_cache[los_cache_key] ||= Utils.line_of_sight?(hero_x, hero_y, x, y, level)
         if level.los_cache[los_cache_key]
           tile_visibility[y][x] = true
         else

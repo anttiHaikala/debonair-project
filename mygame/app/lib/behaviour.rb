@@ -52,7 +52,7 @@ class Behaviour
   def self.select_for_npc(npc, args)
     # priority one - flee
     npc.behaviours.each do |behaviour|
-      if behaviour.kind == :flee && npc.traumas.size > args.state.rng.rand(6)
+      if behaviour.kind == :flee && Trauma.trauma_score(npc, args) > args.state.rng.rand(6)
         return behaviour
       end
     end

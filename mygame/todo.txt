@@ -10,19 +10,18 @@ NOTES ON GAME SYSTEM
 - how many seconds is the time unit? (maybe 10?)
 
 TODO LIST
+- facing to direction + field of view!!!! this could be huge for immersion, horror elements, crazy situations
+- more monster emotes (textual ones)
+- if we have field of view, how to communicate hearing to the player (and/or smell)
+- drop weapon when hand is hit, skill modifiers, handedness, wield-hand
 - make the game slow down properly when there is danger/combat by adding input cooldown
     - new entity detected
     - sustaining damage
 - wands
-- temporary status effects like poison
 - architect secret doors
 - architect secret/hidden items
 - detective should detect secret doors automagically
 - status / emotion markers!!!
-- drop weapon when hand is hit, skill modifiers, handedness, wield-hand
-- walking speed modifiers for wounds below waist
-- different weapons make different damage
-- cutting/slicing weapons (not just bruises)
 - do undead get shock or do they just crumble to dust?
 - magic missiles
 - grid bug coloring (can we get gradients or something??)
@@ -36,6 +35,10 @@ TODO LIST
 - armor
 
 DONE LIST
+- walking speed modifiers for wounds below waist
+- different weapons make different damage, cutting/slicing weapons (not just bruises)
+- temporary status effects like poison
+- do not detect traps if there is a wall (no LOS)
 - minimap
 - detect traps
 - traps
