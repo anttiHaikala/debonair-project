@@ -80,6 +80,8 @@ class Combat
     SoundFX.play_sound(:hit, args)
     verb = "#{hit_kind}s"
     HUD.output_message args, "#{aname} #{verb} #{dname}'s #{body_part.to_s.gsub('_', ' ')} #{hit_severity}ly."
+    attacker.apply_exhaustion(0.05, args) if attacker == args.state.hero
+    # check for shock or death
     defender_shocked = Trauma.determine_shock(defender)
     if defender_shocked
       Status.new(defender, :shocked, nil, args)

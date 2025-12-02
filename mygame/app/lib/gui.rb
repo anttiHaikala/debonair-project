@@ -589,6 +589,8 @@ class GUI
           args.state.kronos.spend_time(hero, hero.walking_speed, args) # todo fix speed depending on action
           # mark lighting stale
           Lighting.mark_lighting_stale
+          self.mark_tiles_stale
+          HUD.mark_minimap_stale
           return true
         else
           return false

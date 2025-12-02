@@ -49,7 +49,7 @@ module Utils
     if eye_x == target_x && eye_y == target_y
       return true
     end
-    if (eye_x - target_x).abs == 1 && (eye_y - target_y).abs == 1
+    if (eye_x - target_x).abs < 2 && (eye_y - target_y).abs < 2
       return true
     end
     dx = target_x - eye_x
