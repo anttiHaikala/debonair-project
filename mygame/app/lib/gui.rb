@@ -214,10 +214,10 @@ class GUI
   end
 
   def self.handle_changing_facing args
-    if !args.inputs.keyboard.key_held.command # || args.inputs.controller_one.key_held.l2
+    if !args.inputs.keyboard.key_held.command && !args.inputs.controller_one.key_held.r2
       return false
     end
-    printf "Changing facing direction based on input\n"
+    #printf "Changing facing direction based on input\n"
     hero = args.state.hero
     original_face = hero.facing
     new_face = nil
@@ -254,13 +254,13 @@ class GUI
       end
       return
     end
-    if args.inputs.keyboard.key_held.alt
+    if args.inputs.keyboard.key_held.alt || args.inputs.controller_one.key_held.l2
       @@strafing = true
     else
       @@strafing = false
     end
 
-    if args.controller_one.key_held.l2 || args.inputs.keyboard.key_held.tab
+    if args.controller_one.key_held.l1 || args.inputs.keyboard.key_held.tab
       # look mode
       self.handle_look_mode(args)
       return
@@ -279,7 +279,7 @@ class GUI
       if args.inputs.keyboard.key_down.t || args.controller_one.key_down.y
         args.state.hero.teleport(args)
       end
-      if args.inputs.keyboard.key_down.l || args.controller_one.key_down.r1
+      if args.inputs.keyboard.key_down.l || args.controller_one.key_down.r3
         Debug.press_l(args)
         return
       end
@@ -295,13 +295,13 @@ class GUI
         @@moving_frames += 1
       else
       # player movement
-        if args.inputs.up && !args.controller_one.key_held.r2 && !args.keyboard.key_held.shift
+        if args.inputs.up && !args.controller_one.key_held.r1 && !args.controller_one.key_held.r2 && !args.keyboard.key_held.shift
           GUI.move_player(0, 1, args)
-        elsif args.inputs.down && !args.controller_one.key_held.r2 && !args.keyboard.key_held.shift
+        elsif args.inputs.down && !args.controller_one.key_held.r1 && !args.controller_one.key_held.r2 && !args.keyboard.key_held.shift
           GUI.move_player(0, -1, args)
-        elsif args.inputs.left && !args.controller_one.key_held.r2 && !args.keyboard.key_held.shift 
+        elsif args.inputs.left && !args.controller_one.key_held.r1 && !args.controller_one.key_held.r2 && !args.keyboard.key_held.shift 
           GUI.move_player(-1, 0, args)
-        elsif args.inputs.right && !args.controller_one.key_held.r2 && !args.keyboard.key_held.shift
+        elsif args.inputs.right && !args.controller_one.key_held.r1 && !args.controller_one.key_held.r2 && !args.keyboard.key_held.shift
           GUI.move_player(1, 0, args)
         elsif @@auto_move
           dx, dy = @@auto_move
@@ -345,7 +345,7 @@ class GUI
             end
             tile = level.tiles[hero.y][hero.x]
             if tile == :staircase_down || tile == :staircase_up 
-              unless args.inputs.keyboard.key_held.shift || args.inputs.controller_one.key_held.r2
+              unless args.inputs.keyboard.key_held.shift || args.inputs.controller_one.key_held.r1
                 unless @@just_used_staircase
                   # staircase? use if one is present
                   
@@ -434,7 +434,7 @@ class GUI
     Foliage.draw(args, level)
   end
 
-  def self.draw_items args
+  def self.draw_inventory args
     level = Utils.level(args)
     return unless level
     tile_size = Utils.tile_size(args)
@@ -584,7 +584,11 @@ class GUI
         # check that the direction button was pressed, not just held
         if args.inputs.keyboard.key_down.up || args.inputs.keyboard.key_down.down || args.inputs.keyboard.key_down.left || args.inputs.keyboard.key_down.right || args.inputs.controller_one.key_down.dpad_up || args.inputs.controller_one.key_down.dpad_down || args.inputs.controller_one.key_down.dpad_left || args.inputs.controller_one.key_down.dpad_right
           Combat.resolve_attack(hero, npc, args)
+          hero.apply_new_facing(dx, dy)
+          self.add_input_cooldown 20
           args.state.kronos.spend_time(hero, hero.walking_speed, args) # todo fix speed depending on action
+          # mark lighting stale
+          Lighting.mark_lighting_stale
           return true
         else
           return false
@@ -758,7 +762,7 @@ class GUI
       @@menu_cooldown -= 1
     end
     return unless hero
-    if args.inputs.controller_one.key_held.r2 || args.inputs.keyboard.key_held.shift
+    if args.inputs.controller_one.key_held.r1 || args.inputs.keyboard.key_held.shift
       args.state.selected_item_index ||= 0
     else
       args.state.selected_item_index = nil

@@ -10,7 +10,7 @@ NOTES ON GAME SYSTEM
 - how many seconds is the time unit? (maybe 10?)
 
 TODO LIST
-- changing your facing (command + direction)
+- rework gamepad controls: strafing, turning, interaction, looking, attacking
 - more monster emotes (textual ones) - when behaviour changes!
 - stealth/hearing mechanics
 - if we have field of view, how to communicate hearing to the player (and/or smell)
@@ -35,6 +35,9 @@ TODO LIST
 - armor
 
 DONE LIST
+- changing your facing (command + direction)
+- turn character when attacking
+- always see the tiles just behind you
 - strafing (lock your facing while moving alt+direction)
 - facing to direction + field of view!!!! this could be huge for immersion, horror elements, crazy situations
 - walking speed modifiers for wounds below waist

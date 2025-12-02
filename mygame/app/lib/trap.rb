@@ -49,6 +49,7 @@ class Trap
       HUD.output_message args, "#{entity.name} is impaled by #{amount_of_spikes} spikes!"
     when :poison_dart
       Status.new(entity, :poisoned, 10 + args.state.rng.d10, args)
+      SoundFX.play_sound(:hero_hurt, args)
       HUD.output_message args, "#{entity.name} is poisoned by a poison dart!"
 
     # when :fire

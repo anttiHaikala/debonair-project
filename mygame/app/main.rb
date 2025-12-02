@@ -164,7 +164,7 @@ def gameplay_tick args
   start_profile(:light_drawing, args)
   Light.draw_lights args
   end_profile(:light_drawing, args)
-  GUI.draw_items args
+  GUI.draw_inventory args
   GUI.draw_entities args
   GUI.pan_to_player args
   GUI.update_screen_flash args
@@ -176,7 +176,7 @@ def staircase_tick args
   Lighting.calculate_lighting(args.state.dungeon.levels[args.state.current_depth], args) if $dynamic_light_system
   GUI.draw_background args
   GUI.draw_tiles args
-  GUI.draw_items args
+  GUI.draw_inventory args
   GUI.draw_entities args
   GUI.staircase_animation args
   GUI.pan_to_player args

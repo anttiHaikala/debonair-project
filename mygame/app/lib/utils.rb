@@ -49,6 +49,9 @@ module Utils
     if eye_x == target_x && eye_y == target_y
       return true
     end
+    if (eye_x - target_x).abs == 1 && (eye_y - target_y).abs == 1
+      return true
+    end
     dx = target_x - eye_x
     dy = target_y - eye_y
     angle_to_target = Math.atan2(dy, dx) * (180.0 / Math::PI)
