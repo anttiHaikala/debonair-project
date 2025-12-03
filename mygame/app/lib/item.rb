@@ -221,7 +221,7 @@ class Item
     return false
   end
 
-  def self.setup_items_for_new_character(hero, args)
+  def self.setup_items_for_new_hero(hero, args)
     # give starting items
     starting_items = [
       :food_ration,
