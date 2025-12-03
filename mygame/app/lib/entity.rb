@@ -85,7 +85,7 @@ class Entity
     parts[args.state.rng.rand(parts.length)]
   end
 
-  def title
+  def title args
     self.name
   end
 

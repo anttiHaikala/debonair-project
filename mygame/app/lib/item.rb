@@ -117,7 +117,7 @@ class Item
           item.y = room.center_y
           level.items << item
         when 3
-          if args.state.rng.d6 < 4
+          if args.state.rng.d20 < level.depth + 5
             item = Ring.new(Ring.kinds.sample)
             item.depth = level.depth
             item.x = room.center_x
@@ -219,5 +219,44 @@ class Item
 
   def protects_against_trauma?(kind)
     return false
+  end
+
+  def self.setup_items_for_new_character(hero, args)
+    # give starting items
+    starting_items = [
+      :food_ration,
+      :potion_of_healing
+    ]
+    starting_items.each do |kind|
+      item = nil
+      case kind
+      when :food_ration
+        item = Food.new(:food_ration, args)
+      when :potion_of_healing
+        item = Potion.new(:potion_of_healing)
+      when :scroll_of_mapping
+        item = Scroll.new(:scroll_of_mapping)
+      when :dagger
+        item = Weapon.new(:dagger)
+      end
+      if item
+        hero.carried_items << item
+      end
+    end
+    case hero.role
+    when :wizard
+      hero.carried_items << Scroll.new(:scroll_of_mapping)
+    when :archaeologist
+      hero.carried_items << Weapon.new(:whip)
+    when :detective
+      hero.carried_items << Weapon.new(:revolver)
+    when :cleric
+      hero.carried_items << Weapon.new(:mace)
+    when :druid
+      hero.carried_items << Weapon.new(:staff)
+    when :monk
+      hero.carried_items << Weapon.new(:staff)
+    end
+
   end
 end

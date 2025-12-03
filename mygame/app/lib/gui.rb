@@ -13,6 +13,8 @@ class GUI
     @@look_mode_index = nil
     @@look_mode_cooldown = 0
     @@look_mode_frames = nil
+    @@look_mode_x = nil
+    @@look_mode_y = nil
     @@strafing = false
   end
 
@@ -117,109 +119,6 @@ class GUI
     end
   end
 
-  def self.handle_look_mode(args)
-    if @@look_mode_cooldown && @@look_mode_cooldown > 0
-      @@look_mode_cooldown -= 1
-    end
-    if @@look_mode_frames
-      @@look_mode_frames += 1
-    else
-      @@look_mode_frames = 1
-    end
-    hero = args.state.hero
-    level = args.state.dungeon.levels[hero.depth]
-    visible_things = []
-    # find visible items
-    level.items.each do |item|
-      if Tile.is_tile_visible?(item.x, item.y, args)
-        visible_things << item
-      end
-    end
-    # find visible traps
-    level.traps.each do |trap|
-      if trap.found 
-        visible_things << trap
-      end
-    end
-    # find visible entities
-    level.entities.each do |entity|
-      next if entity == hero
-      if Tile.is_tile_visible?(entity.x, entity.y, args)
-        visible_things << entity
-      end
-    end
-    thing = nil
-    if visible_things.size > 0
-      
-      if @@look_mode_index == nil
-        @@look_mode_index = 0
-        thing = visible_things[@@look_mode_index]
-        HUD.output_message args, "This is a #{thing.title(args)}."
-      else
-        if args.inputs.controller_one.key_down.r1 || args.inputs.keyboard.key_down.q && @@look_mode_cooldown == 0
-          @@look_mode_index -= 1
-          if @@look_mode_index < 0
-            @@look_mode_index = visible_things.size - 1
-          end
-          thing = visible_things[@@look_mode_index]
-          HUD.output_message args, "This is a #{thing.title(args)}."
-          @@look_mode_cooldown = 10
-        elsif args.inputs.controller_one.key_down.r3 || args.inputs.keyboard.key_down.e && @@look_mode_cooldown == 0
-          @@look_mode_index += 1
-          if @@look_mode_index >= visible_things.size
-            @@look_mode_index = 0
-          end
-          thing = visible_things[@@look_mode_index]
-          HUD.output_message args, "This is a #{thing.title(args)}."
-          @@look_mode_cooldown = 10
-        else
-          thing = visible_things[@@look_mode_index]
-        end
-      end
-      # show a marker on the thing
-      if thing
-        tile_size = $tile_size * $zoom
-        level_height = level.tiles.size
-        level_width = level.tiles[0].size
-        x_offset = $pan_x + (1280 - (level_width * tile_size)) / 2
-        y_offset = $pan_y + (720 - (level_height * tile_size)) / 2
-        #printf "Look mode marker at #{thing.x*tile_size},#{thing.y*tile_size} x_offset: #{x_offset}, y_offset: #{y_offset}\n"
-        args.outputs.primitives << {
-          x: x_offset + thing.x * tile_size,
-          y: y_offset + thing.y * (tile_size+1.38),
-          w: tile_size,
-          h: tile_size,
-          r: 255,
-          g: 255, 
-          b: 255,
-          w: tile_size,
-          h: tile_size,
-          path: "sprites/sm16px.png",
-          tile_x: 15*16,
-          tile_y: 1*16,
-          tile_w: 16,
-          tile_h: 16,
-        }
-        # also label it
-        # calculate screen position
-        screen_x = x_offset + (thing.x + 0.5)* tile_size
-        screen_y = y_offset + (thing.y + 2.4) * tile_size
-        args.outputs.labels << {
-          x: screen_x,
-          y: screen_y,
-          text: thing.title(args),
-          size_enum: 0,
-          alignment_enum: 1,
-          r: 255,
-          g: 255,
-          b: 255,
-          a: 255,
-          font: "fonts/olivetti.ttf"
-        }
-      end
-    end
-  end
-
   def self.handle_changing_facing args
     if !args.inputs.keyboard.key_held.command && !args.inputs.controller_one.key_held.r2
       return false
@@ -302,13 +201,13 @@ class GUI
         @@moving_frames += 1
       else
       # player movement
-        if args.inputs.up && !args.controller_one.key_held.r1 && !args.controller_one.key_held.r2 && !args.keyboard.key_held.shift
+        if args.inputs.up && !args.controller_one.key_held.r1 && !args.controller_one.key_held.b && !args.keyboard.key_held.shift
           GUI.move_player(0, 1, args)
-        elsif args.inputs.down && !args.controller_one.key_held.r1 && !args.controller_one.key_held.r2 && !args.keyboard.key_held.shift
+        elsif args.inputs.down && !args.controller_one.key_held.r1 && !args.controller_one.key_held.b && !args.keyboard.key_held.shift
           GUI.move_player(0, -1, args)
-        elsif args.inputs.left && !args.controller_one.key_held.r1 && !args.controller_one.key_held.r2 && !args.keyboard.key_held.shift 
+        elsif args.inputs.left && !args.controller_one.key_held.r1 && !args.controller_one.key_held.b && !args.keyboard.key_held.shift 
           GUI.move_player(-1, 0, args)
-        elsif args.inputs.right && !args.controller_one.key_held.r1 && !args.controller_one.key_held.r2 && !args.keyboard.key_held.shift
+        elsif args.inputs.right && !args.controller_one.key_held.r1 && !args.controller_one.key_held.b && !args.keyboard.key_held.shift
           GUI.move_player(1, 0, args)
         elsif @@auto_move
           dx, dy = @@auto_move
@@ -352,7 +251,7 @@ class GUI
             end
             tile = level.tiles[hero.y][hero.x]
             if tile == :staircase_down || tile == :staircase_up 
-              unless args.inputs.keyboard.key_held.shift || args.inputs.controller_one.key_held.r1
+              unless args.inputs.keyboard.key_held.shift || args.inputs.controller_one.key_held.b
                 unless @@just_used_staircase
                   # staircase? use if one is present
                   
@@ -441,40 +340,6 @@ class GUI
     Foliage.draw(args, level)
   end
 
-  def self.draw_inventory args
-    level = Utils.level(args)
-    return unless level
-    tile_size = Utils.tile_size(args)
-    level_height = Utils.level_height(args)
-    level_width = Utils.level_width(args)
-    x_offset = Utils.offset_x(args)
-    y_offset = Utils.offset_y(args)
-    level.items.each do |item|
-      visible = Tile.is_tile_visible?(item.x, item.y, args)
-      next unless visible
-      lighting = level.lighting[item.y][item.x] # 0.0 to 1.0
-      hue = item.color[0]
-      saturation = item.color[1]
-      brightness = item.color[2]
-      brightness *= lighting
-      color = Color::hsl_to_rgb(hue, saturation, brightness)
-      args.outputs.sprites << {
-        x: x_offset + item.x * tile_size,
-        y: y_offset + item.y * tile_size,
-        w: tile_size,
-        h: tile_size,
-        path: "sprites/sm16px.png",
-        tile_x: item.c[0]*16,
-        tile_y: item.c[1]*16,
-        tile_w: 16,
-        tile_h: 16,
-        r: color[:r],
-        g: color[:g],
-        b: color[:b],
-        a: 255
-      }
-    end
-  end
 
   def self.draw_entities args
     level = Utils.level(args)
@@ -490,7 +355,6 @@ class GUI
           # pythagorean distance
           dist = Math.sqrt(dist_x**2 + dist_y**2)
           if dist <= args.state.hero.telepathy_range
-            visible = true
             telepathic_connection = true 
           end
         end
@@ -501,7 +365,9 @@ class GUI
         if visible
           entity.has_been_seen = true
         end
-        next unless visible
+        next unless visible || telepathic_connection
+      else
+        visible = true
       end
       tile_size = $tile_size * $zoom
       dungeon = args.state.dungeon
@@ -520,6 +386,12 @@ class GUI
       saturation = entity.color[1]
       level = entity.color[2]
       level *= lighting unless telepathic_connection
+      tile_x = entity.c[0]
+      tile_y = entity.c[1]
+      if telepathic_connection && !visible && !entity.has_been_seen
+        tile_x = 9
+        tile_y = 0
+      end
       color = Color::hsl_to_rgb(hue, saturation, level)
       args.outputs.primitives << {
         x: x_offset + x * tile_size,
@@ -527,8 +399,8 @@ class GUI
         w: tile_size,
         h: tile_size,
         path: "sprites/sm16px.png",
-        tile_x: entity.c[0]*16,
-        tile_y: entity.c[1]*16,
+        tile_x: tile_x*16,
+        tile_y: tile_y*16,
         tile_w: 16,
         tile_h: 16,
         r: color[:r],
@@ -693,6 +565,8 @@ class GUI
     # check if we stepped on something?
     x = args.state.hero.x
     y = args.state.hero.y
+    @@look_mode_x = x
+    @@look_mode_y = y
     level = args.state.hero.depth
     dungeon = args.state.dungeon
     tile = dungeon.levels[level].tiles[y][x]
@@ -764,57 +638,4 @@ class GUI
     end
   end
 
-  def self.handle_inventory_input args
-    hero = args.state.hero
-    @@menu_cooldown ||= 0
-    if @@menu_cooldown > 0
-      @@menu_cooldown -= 1
-    end
-    return unless hero
-    if args.inputs.controller_one.key_held.r1 || args.inputs.keyboard.key_held.shift
-      args.state.selected_item_index ||= 0
-    else
-      args.state.selected_item_index = nil
-    end 
-    if args.state.selected_item_index
-      if args.inputs.up
-        if @@menu_cooldown <= 0
-          args.state.selected_item_index -= 1
-          if args.state.selected_item_index < 0
-            args.state.selected_item_index = hero.carried_items.size - 1
-          end
-          @@menu_cooldown = 5
-        end
-      elsif args.inputs.down
-        if @@menu_cooldown <= 0
-          args.state.selected_item_index += 1
-          if args.state.selected_item_index >= hero.carried_items.size
-            args.state.selected_item_index = 0
-          end
-          @@menu_cooldown = 5
-        end
-      elsif args.inputs.controller_one.key_down.a || args.inputs.keyboard.key_down.space
-        # use selected item
-        selected_index = args.state.selected_item_index
-        if selected_index >= 0 && selected_index < hero.carried_items.size
-          item = hero.carried_items[selected_index]
-          hero.use_item(item, args)
-          SoundFX.play_sound(:use_item, args)
-          self.add_input_cooldown 10
-          return true
-        end
-      elsif args.inputs.controller_one.key_down.b || args.inputs.keyboard.key_down.right
-        # drop selected item
-        selected_index = args.state.selected_item_index
-        hero.drop_item(hero.carried_items[selected_index], args)
-        args.state.selected_item_index -= 1
-        if args.state.selected_item_index < 0
-          args.state.selected_item_index = 0
-        end
-        SoundFX.play_sound(:drop_item, args)
-        self.add_input_cooldown 10
-        return true
-      end
-    end
-  end
 end
