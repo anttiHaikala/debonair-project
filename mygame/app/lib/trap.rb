@@ -52,7 +52,35 @@ class Trap
       SoundFX.play_sound(:hero_hurt, args)
       HUD.output_message args, "#{entity.name} is poisoned by a poison dart!"
 
-    # when :fire
+    when :fire
+      SoundFX.play("fireball", args)
+      level = Utils.level(args)
+      height = level.height
+      width = level.width
+      radius = [args.state.rng.d6 - 1, 1].max
+      (self.x - radius).upto(self.x + radius) do |x|
+        (self.y - radius).upto(self.y + radius) do |y|
+          if x < 0 || x >= width || y < 0 || y >= height
+            next
+          end
+          # damage entities straight up for now (later to it in fire mechanism)
+          if Math.sqrt((x - self.x)**2 + (y - self.y)**2) <= radius
+            # add fire to the tile
+            level.add_effect(:fire, x, y, args)
+            target = Tile.entity_at(x, y, args)
+            if target 
+              amount_of_burns = Numeric.rand(1..3)
+              amount_of_burns.times do
+                body_part = target.random_body_part(args) 
+                severity = Trauma.severities[Numeric.rand(1..4)] # skip the healed one
+                HUD.output_message args, "The #{body_part} of #{target.species} suffers #{severity} burns!"
+                Trauma.inflict(target, body_part, :burn, severity, args)            
+              end
+            end
+          end
+        end
+      end
+
     # when :rock
     # when :sleep_gas
     # when :bear_trap, :pit etc

@@ -7,8 +7,49 @@ class Scroll < Item
     [
       :scroll_of_mapping,
       :scroll_of_digging,
-      :scroll_of_fireball
+      :scroll_of_fireball,
+      :scroll_of_ice
     ]
+  end
+
+  def self.masks
+    [
+      :elbin_yoh,
+      :epsiloon_gamalon,
+      :zeta_zeta_zet,
+      :ioot_iota_io,
+      :lambda_mu_nu_xi,
+      :omicron_dat_whad,
+      :upsilonec_pepis_min,
+      :daiyen_fools,
+      :elamy_ebowed,
+      :foobie_bletch,
+      :juyed_awk_yacc,
+      :lep_gex_ven_zea,
+      :erne_ved_fobryd,
+      :venzar_borgavve,
+      :zelgo_mer,
+      :tharr_hilloob,
+      :kernod_wellt,
+      :duam_xanthe,
+      :andova_begareen
+    ]
+  end
+
+  def title(args)
+    mask_index = Scroll.kinds.index(self.kind) % Potion.masks.length
+    mask = Scroll.masks[mask_index]
+    if args.state.hero.known_scrolls.include?(self.kind)
+      "#{self.attributes.join(' ')} scroll labeled #{mask} (#{self.kind.to_s.gsub('scroll_of_','')})".gsub('_', ' ').trim
+    else
+      "#{self.attributes.join(' ')} scroll labeled #{mask}".gsub('_', ' ').trim
+    end
+  end
+
+  def identify(args)
+    unless args.state.hero.known_scrolls.include?(self.kind)
+      args.state.hero.known_scrolls << self.kind
+    end
   end
 
   def self.randomize(level_depth, args)
@@ -32,6 +73,7 @@ class Scroll < Item
     when :cleric, :druid, :detective
       role_modifier += 2
     end
+    identify = true
     effective_roll = roll + role_modifier
     if effective_roll < 4
       HUD.output_message args, "You fail to decipher the scroll's magical script. It crumbles to dust."
@@ -45,15 +87,21 @@ class Scroll < Item
       HUD.output_message args, "You gain knowledge of the level layout! The scroll crumbles to dust."
       Tile.auto_map_whole_level args
     when :scroll_of_digging
-      Scroll.dig_around_entity user, effective_roll/2, args
-      HUD.output_message args, "You dig a through the walls around you. The scroll crumbles to dust."
+      Scroll.dig_around_entity user, effective_roll/4, args
+      HUD.output_message args, "Spell of digging is launched around you. The scroll crumbles to dust."
     when :scroll_of_fireball
       HUD.output_message args, "You unleash a fiery explosion around you! The scroll crumbles to dust."
       Scroll.fireball(user, args)
+    when :scroll_of_ice
+      HUD.output_message args, "You unleash a freezing cloud of frost! The scroll crumbles to dust."
+      Scroll.ice(user, args)
     else
       printf "Unknown scroll kind: %s\n" % [@kind.to_s]
     end
     args.state.hero.carried_items.delete(self)
+    if identify
+      identify(args)
+    end 
     args.state.kronos.spend_time(args.state.hero, args.state.hero.mental_speed, args)
   end
 
@@ -69,6 +117,7 @@ class Scroll < Item
         if Math.sqrt((x - entity.x)**2 + (y - entity.y)**2) <= radius
           if level.tiles[y][x] == :wall || level.tiles[y][x] == :rock
             level.tiles[y][x] = :floor
+            level.add_effect(:dig, x, y, args)
           end
         end
       end
@@ -109,4 +158,43 @@ class Scroll < Item
       end
     end
   end
+
+  def self.ice(user, args)
+    raise "There must be an entity to call this method on." if user.nil?
+    printf user.kind.to_s + " casts frost cloud\n"
+    SoundFX.play("ice", args)
+    level = Utils.level(args)
+    height = level.height
+    width = level.width
+    radius = 5
+    (user.x - radius).upto(user.x + radius) do |x|
+      (user.y - radius).upto(user.y + radius) do |y|
+        if x < 0 || x >= width || y < 0 || y >= height
+          next
+        end
+        if x == user.x && y == user.y
+          next
+        end
+        # damage entities straight up for now (later to it in fire mechanism)
+        if Math.sqrt((x - user.x)**2 + (y - user.y)**2) <= radius
+          # add frost to the tile
+          level.add_effect(:frost, x, y, args)
+          level.tiles[y][x] = :ice if level.tiles[y][x] == :water
+          target = Tile.entity_at(x, y, args)
+          if target && target != args.state.hero            
+            amount_of_frostbites = Numeric.rand(1..3)
+            amount_of_frostbites.times do
+              body_part = target.random_body_part(args) 
+              severity = Trauma.severities[Numeric.rand(1..4)] # skip the healed one
+              HUD.output_message args, "The #{body_part} of #{target.species} suffers #{severity} frostbite!"
+              Trauma.inflict(target, body_part, :frostbite, severity, args)            
+            end
+          end
+          GUI.mark_tiles_stale
+          HUD.mark_minimap_stale
+        end
+      end
+    end
+  end
+
 end

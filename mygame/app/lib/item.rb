@@ -212,7 +212,12 @@ class Item
         end
         HUD.output_message(args, "#{user.name} wields the #{self.title(args)}.")
       end
+      Lighting.mark_lighting_stale
       return
     end
+  end
+
+  def protects_against_trauma?(kind)
+    return false
   end
 end

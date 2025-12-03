@@ -56,9 +56,9 @@ class Behaviour
         return behaviour
       end
     end
-    # prriority two - fight
+    # priority two - fight or threaten
     npc.behaviours.each do |behaviour|
-      if behaviour.kind == :fight
+      if behaviour.kind == :fight && npc.enemies.any? 
         return behaviour
       end
     end
@@ -127,6 +127,18 @@ class Behaviour
       wander args
       return
     end
+  end
+
+  def threaten args
+    # find target (e.g., hero) and make threatening emote
+    npc = @npc
+    hero = args.state.hero
+    if npc.sees?(hero, args)          
+      # make angry emote towards hero if here is not yet enemy!
+      HUD.output_message args, "#{npc.name} glares threateningly at you, hurling insults!"
+      args.state.kronos.spend_time(npc, npc.walking_speed*0.5, args)
+      return
+    end  
   end
 
   def fight args

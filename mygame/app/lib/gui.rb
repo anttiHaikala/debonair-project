@@ -89,15 +89,23 @@ class GUI
         next
       end
       case effect.kind
-      when :fire
+      when :fire, :frost, :poison
+        case effect.kind
+        when :fire
+          char = [7,15]
+        when :frost
+          char = [10,2]
+        when :poison
+          char = [7,15]
+        end
         args.outputs.sprites << {
           x: x_offset + effect.x * tile_size,
           y: y_offset + effect.y * tile_size,
           w: tile_size,
           h: tile_size,
           path: "sprites/sm16px.png",
-          tile_x: 7*16,
-          tile_y: 15*16,
+          tile_x: char[0]*16,
+          tile_y: char[1]*16,
           tile_w: 16,
           tile_h: 16,
           r: color[:r],
@@ -129,7 +137,7 @@ class GUI
     end
     # find visible traps
     level.traps.each do |trap|
-      if trap.found && Tile.is_tile_visible?(trap.x, trap.y, args)
+      if trap.found 
         visible_things << trap
       end
     end
@@ -140,28 +148,29 @@ class GUI
         visible_things << entity
       end
     end
+    thing = nil
     if visible_things.size > 0
-      thing = nil
+      
       if @@look_mode_index == nil
         @@look_mode_index = 0
         thing = visible_things[@@look_mode_index]
-        HUD.output_message args, "You see a #{thing.title(args)}."
+        HUD.output_message args, "This is a #{thing.title(args)}."
       else
-        if args.inputs.up && @@look_mode_cooldown == 0
+        if args.inputs.controller_one.key_down.r1 || args.inputs.keyboard.key_down.q && @@look_mode_cooldown == 0
           @@look_mode_index -= 1
           if @@look_mode_index < 0
             @@look_mode_index = visible_things.size - 1
           end
           thing = visible_things[@@look_mode_index]
-          HUD.output_message args, "You see #{thing.title(args)}."
+          HUD.output_message args, "This is a #{thing.title(args)}."
           @@look_mode_cooldown = 10
-        elsif args.inputs.down && @@look_mode_cooldown == 0
+        elsif args.inputs.controller_one.key_down.r3 || args.inputs.keyboard.key_down.e && @@look_mode_cooldown == 0
           @@look_mode_index += 1
           if @@look_mode_index >= visible_things.size
             @@look_mode_index = 0
           end
           thing = visible_things[@@look_mode_index]
-          HUD.output_message args, "You see a #{thing.title(args)}."
+          HUD.output_message args, "This is a #{thing.title(args)}."
           @@look_mode_cooldown = 10
         else
           thing = visible_things[@@look_mode_index]
@@ -170,8 +179,6 @@ class GUI
       # show a marker on the thing
       if thing
         tile_size = $tile_size * $zoom
-        dungeon = args.state.dungeon
-        level = dungeon.levels[args.state.current_depth]
         level_height = level.tiles.size
         level_width = level.tiles[0].size
         x_offset = $pan_x + (1280 - (level_width * tile_size)) / 2
@@ -179,7 +186,7 @@ class GUI
         #printf "Look mode marker at #{thing.x*tile_size},#{thing.y*tile_size} x_offset: #{x_offset}, y_offset: #{y_offset}\n"
         args.outputs.primitives << {
           x: x_offset + thing.x * tile_size,
-          y: y_offset + thing.y * (tile_size+1.5),
+          y: y_offset + thing.y * (tile_size+1.38),
           w: tile_size,
           h: tile_size,
           r: 255,
@@ -196,7 +203,7 @@ class GUI
         # also label it
         # calculate screen position
         screen_x = x_offset + (thing.x + 0.5)* tile_size
-        screen_y = y_offset + (thing.y + 3) * tile_size
+        screen_y = y_offset + (thing.y + 2.4) * tile_size
         args.outputs.labels << {
           x: screen_x,
           y: screen_y,

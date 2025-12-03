@@ -23,8 +23,8 @@ class Ring < Item
   def self.kinds
     return [
     :ring_of_endurance, 
-    # :ring_of_fire_resistance, 
-    # :ring_of_cold_resistance,
+    :ring_of_fire_resistance, 
+    :ring_of_cold_resistance,
     :ring_of_invisibility,
     :ring_of_protection, 
     :ring_of_strength, 
@@ -50,7 +50,10 @@ class Ring < Item
       :amethyst,
       :garnet,
       :opal,
-      :turquoise
+      :turquoise,
+      :quartz,
+      :jade,
+      :pearl
     ]
   end
 
@@ -106,4 +109,15 @@ class Ring < Item
       end
     end 
   end
+
+  def protects_against_trauma?(kind)
+    if self.kind == :ring_of_fire_resistance && kind == :burn
+      return true
+    end
+    if self.kind == :ring_of_cold_resistance && kind == :frostbite
+      return true
+    end
+    return false
+  end
+
 end

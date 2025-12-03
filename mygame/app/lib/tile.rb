@@ -21,7 +21,7 @@ class Tile
   end 
 
   def self.tile_types
-    [:floor, :rock, :wall, :water, :staircase_up, :staircase_down, :chasm]
+    [:floor, :rock, :wall, :water, :staircase_up, :staircase_down, :chasm, :ice, :open_door, :closed_door, :secret_door]
   end
 
   def self.is_solid?(tile_type, args)
@@ -33,7 +33,7 @@ class Tile
   end
 
   def self.is_walkable?(tile_type, args)
-    return [:floor, :staircase_up, :staircase_down, :water].include?(tile_type)
+    return [:floor, :staircase_up, :staircase_down, :water, :ice, :open_door].include?(tile_type)
   end
 
   def self.occupied?(x, y, args)
@@ -86,6 +86,8 @@ class Tile
     case tile
     when :floor
       return 1.0
+    when :ice
+      return 1.5
     when :water
       if entity.slowed_in_water?
         return 2.0
@@ -221,6 +223,10 @@ class Tile
         # blue 360 hue
         hue = 220
         Color.hsl_to_rgb(hue, 100 * saturation_modifier, 0 * lightness_modifier)
+      when :ice
+        # blue 360 hue
+        hue = 220
+        Color.hsl_to_rgb(hue, 80 * saturation_modifier, 255 * lightness_modifier)
       when :chasm
         { r: 0, g: 0, b: 120 }
       else
@@ -315,6 +321,23 @@ class Tile
           path: "sprites/sm16px.png",
           tile_x: 14*16,
           tile_y: 3*16,
+          tile_w: 16,
+          tile_h: 16,
+          r: c[:r],
+          g: c[:g],
+          b: c[:b]
+        }
+      end
+      if tile == :ice
+        c = Color.hsl_to_rgb(hue, 50 * saturation_modifier, 180 * lightness_modifier)
+        args.outputs.sprites << {
+          x: x_offset + x * tile_size,
+          y: y_offset + y * tile_size,
+          w: tile_size,
+          h: tile_size,
+          path: "sprites/sm16px.png",
+          tile_x: 10*16,
+          tile_y: 2*16,
           tile_w: 16,
           tile_h: 16,
           r: c[:r],

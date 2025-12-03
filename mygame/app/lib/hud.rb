@@ -52,7 +52,7 @@ class HUD
     return unless args.inputs.controller_one.key_held.r1 || args.inputs.keyboard.key_held.shift
     title = "Items Carried (#{Item.carried_weight(hero).round(2)} kg)"
     args.outputs.labels << {
-      x: 960,
+      x: 860,
       y: 422,
       text: title,
       size_enum: 1,
@@ -63,7 +63,7 @@ class HUD
       font: "fonts/olivetti.ttf"
     }
     carried_items = hero.carried_items
-    x = 960
+    x = 860
     y = 400
     item_size = 20
     carried_items.each_with_index do |item, index|
@@ -103,7 +103,7 @@ class HUD
       args.outputs.solids << {
         x: x - 5,
         y: 400 - (selected_item_index + 1) * item_size - 5,
-        w: 300,
+        w: 400,
         h: item_size + 5,
         r: 255,
         g: 255,

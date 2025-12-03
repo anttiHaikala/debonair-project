@@ -10,8 +10,11 @@ NOTES ON GAME SYSTEM
 - how many seconds is the time unit? (maybe 10?)
 
 TODO LIST
+- look mode: ability to move cursor freely
+- look mode: ability to select actions to perform to target square
 - rework gamepad controls: strafing, turning, interaction, looking, attacking
 - more monster emotes (textual ones) - when behaviour changes!
+- skeletons vs pierce damage!!!!
 - stealth/hearing mechanics
 - if we have field of view, how to communicate hearing to the player (and/or smell)
 - drop weapon when hand is hit, skill modifiers, handedness, wield-hand

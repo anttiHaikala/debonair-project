@@ -21,7 +21,7 @@ class Run
     @hero = args.state.hero
     @hero.carried_items << Scroll.new(:scroll_of_fireball)
     @hero.carried_items << Scroll.new(:scroll_of_fireball)
-    @hero.carried_items << Scroll.new(:scroll_of_fireball)
+    @hero.carried_items << Scroll.new(:scroll_of_ice)
     @hero.carried_items << Ring.new(:ring_of_warning)
     @hero.carried_items << Potion.new(:potion_of_poison)
     @hero.carried_items << Potion.new(:potion_of_speed)

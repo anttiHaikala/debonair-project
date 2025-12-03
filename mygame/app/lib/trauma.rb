@@ -24,7 +24,7 @@ class Trauma
 
   def self.kinds
     {
-      physical: [:cut, :blunt, :pierce, :fracture, :burn, :cold, :sprain, :bite, :internal_injury, :poison],
+      physical: [:cut, :blunt, :pierce, :fracture, :burn, :frostbite, :sprain, :bite, :internal_injury, :poison],
       mental: [:concussion, :stress],
       emotional: [:grief, :anxiety, :fear, :depression]
     }
@@ -78,6 +78,13 @@ class Trauma
   def self.inflict(entity, body_part, kind, severity, args)
     category = kinds.find { |cat, kinds| kinds.include?(kind) }&.first
     raise 'Unknown trauma kind' unless category
+    # check for "protection" items
+    entity.worn_items.each do |item|
+      if item.protects_against_trauma?(kind)
+        HUD.output_message args, "#{entity.name.capitalize}'s #{item.name} protects against #{kind} trauma!"
+        return nil
+      end
+    end
     trauma = Trauma.new(kind, body_part, severity, entity)
     trauma.instance_variable_set(:@body_part, body_part)  
     entity.traumas << trauma

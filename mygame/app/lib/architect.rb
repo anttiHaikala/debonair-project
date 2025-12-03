@@ -11,10 +11,10 @@ class Architect
   def self.create_seed(args)
     srand
     dictionary_adjectives = ['Brave', 'Cunning', 'Wise', 'Fierce', 'Nimble', 'Sturdy', 'Gentle', 'Bold']
-    dictionary_subjectives = ['Battle', 'Shadow', 'Light', 'Storm', 'Flame', 'Frost', 'Stone', 'Wind']
-    dictionary_prepositions = ['of the', 'from the', 'under the', 'above the', 'beyond the', 'within the', 'across the', 'through the']
-    dictionary_location_adjectives = ['Dark', 'Silent', 'Ancient', 'Mystic', 'Hidden', 'Forgotten', 'Enchanted', 'Sacred']
-    dictionary_locations = ['Forest', 'Mountain', 'River', 'Desert', 'Cave', 'Swamp', 'Plains', 'Valley']
+    dictionary_subjectives = ['Battle', 'Shadow', 'Light', 'Storm', 'Flame', 'Frost', 'Stone', 'Wind', 'Wave', 'Leaf', 'Moon', 'Star', 'Sun', 'Villain', 'Hero', 'Dragon', 'Phoenix', 'Tiger', 'Wolf', 'Eagle', 'Progeny', 'Guardian', 'Seeker']
+    dictionary_prepositions = ['of the', 'from the', 'under the', 'above the', 'beyond the', 'within the', 'across the', 'through the', 'near the']
+    dictionary_location_adjectives = ['Dark', 'Silent', 'Ancient', 'Mystic', 'Hidden', 'Forgotten', 'Enchanted', 'Sacred', 'Forgotten', 'Lost', 'Cursed', 'Blessed', 'Haunted']
+    dictionary_locations = ['Forest', 'Mountain', 'River', 'Desert', 'Cave', 'Swamp', 'Plains', 'Valley', 'Ruins', 'Temple', 'Citadel', 'Grove', 'Isle']
     seed = ''
     seed += dictionary_adjectives.sample + ' '
     seed += dictionary_subjectives.sample + ' '
