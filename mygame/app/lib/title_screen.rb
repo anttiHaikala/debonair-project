@@ -24,6 +24,7 @@ class TitleScreen
       end
       args.state.scene = :gameplay
       Lighting.mark_lighting_stale
+      Lighting.calculate_lighting(Utils.level(args), args)
       SoundFX.play_sound(:staircase, args)
       Tile.observe_tiles(args)
       HUD.output_message args, "You enter the dungeon seeking the legendary Amulet of Skandor. Good luck!"

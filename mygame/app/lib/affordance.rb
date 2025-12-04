@@ -21,7 +21,6 @@ class Affordance
 
   def self.populate_for_tile(hero, x, y, level, args)
     affordances = []
-    affordances << Affordance.new(level, x, y, :do_nothing, nil, nil)
 
     # affordances given by magic wands
     # affordances given by spells
@@ -62,6 +61,7 @@ class Affordance
     #     affordances << Affordance.new(level, x, y, :disarm_trap, nil, nil)
     #   end
     # end
+    affordances << Affordance.new(level, x, y, :do_nothing, nil, nil)
     return affordances
   end
 
@@ -80,6 +80,8 @@ class Affordance
       return
     when :shoot
       Combat.resolve_ranged_attack(hero, @item, @target_entity, args)
+      args.state.kronos.spend_time(hero, hero.walking_speed * 0.7, args) # todo fix speed depending on action
+
     # when :throw
     #   Hero.throw_item_at(@item, @target_entity, args)
     # when :zap

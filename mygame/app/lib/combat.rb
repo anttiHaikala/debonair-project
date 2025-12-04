@@ -1,6 +1,21 @@
 # never instantiated
 class Combat
 
+  def self.distance_modifier(attacker, defender, args)
+    dx = (attacker.x - defender.x).abs
+    dy = (attacker.y - defender.y).abs
+    distance = Math.sqrt(dx * dx + dy * dy)
+    if distance <= 3
+      return 2
+    elsif distance <= 6
+      return 0
+    elsif distance <= 10
+      return -2
+    else
+      return -4
+    end
+  end
+
   def self.resolve_ranged_attack(attacker, item, defender, args)
     aname = attacker.name
     dname = defender.name
@@ -21,7 +36,8 @@ class Combat
     end
     base_attack_roll = args.state.rng.d20
     attack_roll = base_attack_roll - inaccuracy_penalty
-    to_hit = 7 # should depend on size, speed and distance of the target! TODO
+    to_hit = 12 # should depend on size, speed and distance of the target! TODO
+    to_hit += self.distance_modifier(attacker, defender, args)
     if base_attack_roll == 1
       fumble_roll = args.state.rng.d10
       if fumble_roll < 3
@@ -32,8 +48,24 @@ class Combat
       end
     end
     attack_roll += Combat.role_bonus(attacker, args)
+    # species bonus
+    if attacker.species == :elf || attacker.species == :dark_elf
+      attack_roll += 2
+    end
+    # items that affect accuracy
+    if attacker.worn_items
+      attacker.worn_items.each do |item|
+        if item.kind == :ring_of_accuracy
+          attack_roll += 5
+        end
+        # TODO: helmet that decreases accuracy 
+      end
+    end
+    if defender.has_status?(:shocked)
+      to_hit -= 5
+    end
     # does it even hit?
-    if base_attack_roll < to_hit 
+    if attack_roll < to_hit 
       HUD.output_message args, "#{aname} shoots #{item.title(args)} at #{dname} but misses."
       SoundFX.play_sound(:miss, args)
       return # miss
@@ -136,6 +168,7 @@ class Combat
   end
 
   def self.resolve_defender_on_hit_effects(defender, args)
+    aname = args.state.run.hero.name
     dname = defender.name
     # check for shock or death
     defender_shocked = Trauma.determine_shock(defender)
@@ -245,7 +278,7 @@ class Combat
     when :warrior, :samurai, :ninja
       return 3
     when :rogue
-      return 1
+      return 2
     when :tourist, :monk, :detective
       return -1
     when :mage, :druid, :archeologist

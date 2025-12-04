@@ -2,17 +2,16 @@ NOTES ON TTRPG LEGACY
 - Tomb Of Horros (original D&D book)
 
 NOTES ON HACK
-
+- shopkeepers
+- dragons
 
 NOTES ON GAME SYSTEM
-
 - how long distance is one square?
 - how many seconds is the time unit? (maybe 10?)
 
 TODO LIST
-- look mode: ability to move cursor freely
-- look mode: ability to select actions to perform to target square
-- rework gamepad controls: strafing, turning, interaction, looking, attacking
+- keys and doors and chests and mimics
+- plots and plot devices
 - more monster emotes (textual ones) - when behaviour changes!
 - skeletons vs pierce damage!!!!
 - stealth/hearing mechanics
@@ -38,6 +37,9 @@ TODO LIST
 - armor
 
 DONE LIST
+- look mode: ability to move cursor freely
+- look mode: ability to select actions to perform to target square
+- rework gamepad controls: strafing, turning, interaction, looking, attacking
 - changing your facing (command + direction)
 - turn character when attacking
 - always see the tiles just behind you

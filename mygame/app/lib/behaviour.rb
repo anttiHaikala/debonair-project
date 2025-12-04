@@ -200,6 +200,7 @@ class Behaviour
               end
             else
               Tile.enter(npc, target_x, target_y, args)
+              SoundFX.play_sound_xy(:footsteps, target_x, target_y, args)
               return
             end
           else
@@ -256,6 +257,7 @@ class Behaviour
       target_tile = level.tiles[target_coordinates[1]][target_coordinates[0]]
       if Tile.is_walkable?(target_tile, args) && !Tile.occupied?(target_coordinates[0], target_coordinates[1], args)
         Tile.enter(npc, target_coordinates[0], target_coordinates[1], args)
+        SoundFX.play_walking_sound(npc, args)
         return # important to not spend time twice!
       end
     end

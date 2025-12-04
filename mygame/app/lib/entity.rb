@@ -205,6 +205,9 @@ class Entity
       self.visual_x = x
       self.visual_y = y
       SoundFX.play_sound(:teleport, args)
+      GUI.mark_tiles_stale
+      Lighting.mark_lighting_stale
+      HUD.mark_minimap_stale
     end
   end
 
