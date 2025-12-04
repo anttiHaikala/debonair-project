@@ -4,6 +4,14 @@ class Weapon < Item
     super(kind, :weapon)
   end
 
+  def self.is_ranged_weapon?(item)
+    return [:bow, :crossbow, :sling].include?(item.kind)
+  end
+
+  def self.is_throwable_weapon?(item)
+    return [:dagger, :spear, :shuriken].include?(item.kind)
+  end
+
   def self.kinds
     return [
       :dagger, 
@@ -12,7 +20,11 @@ class Weapon < Item
       :mace, 
       :spear,
       :katana,
-      :club
+      :club,
+      :bow,
+      :crossbow,
+      :sling,
+      :shuriken
     ]
   end
 
@@ -144,4 +156,30 @@ class Weapon < Item
     end
   end
   
+  def is_applied_to(target_entity, user, args)
+    HUD.output_message(args, "#{user.name} shoots the #{self.title(args)} at #{target_entity.name}!")
+    sound_name = "shoot_#{kind}".to_sym
+    SoundFX.play_sound(sound_name, args)
+    args.state.kronos.spend_time(user, user.walking_speed * 0.7, args)
+    # calculate hit
+    hit_roll = args.state.rng.d20 + 2 # ranged weapons get +2 to hit
+    target_ac = target_entity.ac
+    if hit_roll >= target_ac
+      damage = args.state.rng.d6 + 2 # ranged weapons do 1d6+2 damage
+      HUD.output_message(args, "The #{self.title(args)} hits #{target_entity.name} for #{damage} damage!")
+      target_entity.take_damage(damage, self.hit_kind(args), user, args)
+      self.break_check(args)
+      # if the target is killed, the weapon is retrieved
+      if target_entity.hp <= 0
+        HUD.output_message(args, "#{user.name} retrieves the #{self.title(args)} from #{target_entity.name}'s corpse.")
+        user.carried_items << self
+      end
+    else
+      HUD.output_message(args, "The #{self.title(args)} misses #{target_entity.name}.")
+      # missed shots are lost
+      SoundFX.play_sound(:item_drop, args)
+      HUD.output_message(args, "The #{self.title(args)} is lost.")
+    end
+  end
+
 end

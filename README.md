@@ -16,18 +16,23 @@ Double click the ./dragonruby executable to start up the game.
 |Input          | Function |
 |:----------------|:-------------------------------------------------------------------------------|
 |D-pad/Left Stick | move and attack enemies (no diagonal movement is permitted) |
-|A                | pick up objects, use staircases |
-|Left Trigger     | hold to enable look mode where you can use up/down controls to look at stuff |
-|Right Trigger    | hold to view inventory, A to use item, B to drop item |
+|A                | rest, pick up objects, use staircases |
+|Left Trigger     | hold to strafe (move without changing facing) |
+|Right Trigger    | hold to enable cursor mode where pressing A shows further options |
+|Left Shoulder    | hold to change facing without moving |
+|Right Shoulder   | hold to view inventory, up/down to select item, A to use item, B to drop item |
+
 
 ### Keyboard
 
 |Input          | Function |
 |:----------------|:-------------------------------------------------------------------------------|
 |WASD/arrow keys  | move and attack enemies (no diagonal movement is permitted) |
-|Space             | pick up objects, use staircases |
+|Space             | rest, pick up objects, use staircases |
 |Tab     | hold to enable look mode where you can use up/down controls to look at stuff |
-|Shift    | hold to view inventory, A to use item, B to drop item |
+|Shift    | hold to view inventory, A to use item, B to drop item, up/down to select |
+|Cmd        | hold to change facing without moving |
+|Option     | hold to strafe (move without changing facing) |
 
 ## Source code
 

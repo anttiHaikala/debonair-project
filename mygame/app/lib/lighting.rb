@@ -152,6 +152,7 @@ class Light
         when :bonfire
           [14,5]
         end
+        # TODO: why is this being draw on top of inspector?
         args.outputs.primitives << {
           x: x,
           y: y,
@@ -166,8 +167,7 @@ class Light
           r: 255,
           g: 140,
           b: 0,
-          a: 200,
-          blendmode: :additive
+          a: 200
         }
       end
     end

@@ -42,7 +42,7 @@ class GUI
       @@menu_cooldown -= 1
     end
     return unless hero
-    if args.inputs.controller_one.key_held.b || args.inputs.keyboard.key_held.shift
+    if args.inputs.controller_one.key_held.r1 || args.inputs.keyboard.key_held.shift
       args.state.selected_item_index ||= 0
     else
       args.state.selected_item_index = nil

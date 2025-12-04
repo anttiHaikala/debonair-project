@@ -1,5 +1,56 @@
 # never instantiated
 class Combat
+
+  def self.resolve_ranged_attack(attacker, item, defender, args)
+    aname = attacker.name
+    dname = defender.name
+    inaccuracy_penalty = 0
+    case item.kind
+    when :revolver
+      inaccuracy_penalty = 0    
+    when :crossbow
+      inaccuracy_penalty = 1
+    when :bow
+      inaccuracy_penalty = 2
+    when :sling
+      inaccuracy_penalty = 3
+    when :dagger, :spear, :shuriken
+      inaccuracy_penalty = 4
+    else
+      inaccuracy_penalty = 5
+    end
+    base_attack_roll = args.state.rng.d20
+    attack_roll = base_attack_roll - inaccuracy_penalty
+    to_hit = 7 # should depend on size, speed and distance of the target! TODO
+    if base_attack_roll == 1
+      fumble_roll = args.state.rng.d10
+      if fumble_roll < 3
+        HUD.output_message args, "#{aname} attempts to attack but fumbles!"
+        SoundFX.play_sound(:fumble, args)
+        item.break_check(args)
+        return
+      end
+    end
+    attack_roll += Combat.role_bonus(attacker, args)
+    # does it even hit?
+    if base_attack_roll < to_hit 
+      HUD.output_message args, "#{aname} shoots #{item.title(args)} at #{dname} but misses."
+      SoundFX.play_sound(:miss, args)
+      return # miss
+    end
+    # hit!
+    HUD.output_message args, "#{aname} shoots #{item.title(args)} at #{dname} and hits!"
+    body_part = defender.random_body_part(args)
+    hit_severity = self.hit_severity(attacker, defender, attack_roll, args)
+    hit_kind = item.hit_kind(args)
+    Trauma.inflict(defender, body_part, hit_kind, hit_severity, args)
+    SoundFX.play_sound(:hit, args)
+    verb = "#{hit_kind}s"
+    HUD.output_message args, "#{aname} #{verb} #{dname}'s #{body_part.to_s.gsub('_', ' ')} #{hit_severity}ly."
+    attacker.apply_exhaustion(0.01, args) if attacker == args.state.hero
+    self.resolve_defender_on_hit_effects(defender, args)
+  end
+
   def self.resolve_attack(attacker, defender, args)
     aname = attacker.name
     dname = defender.name
@@ -81,6 +132,11 @@ class Combat
     verb = "#{hit_kind}s"
     HUD.output_message args, "#{aname} #{verb} #{dname}'s #{body_part.to_s.gsub('_', ' ')} #{hit_severity}ly."
     attacker.apply_exhaustion(0.05, args) if attacker == args.state.hero
+    self.resolve_defender_on_hit_effects(defender, args)
+  end
+
+  def self.resolve_defender_on_hit_effects(defender, args)
+    dname = defender.name
     # check for shock or death
     defender_shocked = Trauma.determine_shock(defender)
     if defender_shocked

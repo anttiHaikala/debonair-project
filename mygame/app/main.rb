@@ -61,6 +61,7 @@ require 'app/lib/effect'
 require 'app/lib/room'
 require 'app/lib/trap'
 require 'app/lib/status'
+require 'app/lib/affordance'
 
 def boot args
   args.state = {}
@@ -170,6 +171,7 @@ def gameplay_tick args
   GUI.draw_entities args
   GUI.pan_to_player args
   GUI.update_screen_flash args
+  GUI.draw_look_mode args
   HUD.draw args
   HUD.draw_minimap args
 end

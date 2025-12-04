@@ -120,7 +120,7 @@ class GUI
   end
 
   def self.handle_changing_facing args
-    if !args.inputs.keyboard.key_held.command && !args.inputs.controller_one.key_held.r2
+    if !args.inputs.keyboard.key_held.command && !args.inputs.controller_one.key_held.l1
       return false
     end
     #printf "Changing facing direction based on input\n"
@@ -166,12 +166,23 @@ class GUI
       @@strafing = false
     end
 
-    if args.controller_one.key_held.l1 || args.inputs.keyboard.key_held.tab
+    if @@inspector_active
+      GUI.handle_inspector_input args
+      return
+    end
+
+    if args.controller_one.key_held.r2 || args.inputs.keyboard.key_held.tab
       # look mode
+      self.activate_look_mode args
       self.handle_look_mode(args)
       return
     else 
-      @@look_mode_index = nil 
+      unless @@inspector_active
+        self.deactivate_look_mode args
+        @@look_mode_index = nil
+        @@look_mode_x = nil
+        @@look_mode_y = nil
+      end
     end
     # debug inputs
     if args.inputs.controller_one.key_down.r3 || args.inputs.keyboard.key_down.escape

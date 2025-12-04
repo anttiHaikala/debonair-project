@@ -225,7 +225,9 @@ class Item
     # give starting items
     starting_items = [
       :food_ration,
-      :potion_of_healing
+      :potion_of_healing,
+      :bow,
+      :shuriken
     ]
     starting_items.each do |kind|
       item = nil
@@ -238,6 +240,10 @@ class Item
         item = Scroll.new(:scroll_of_mapping)
       when :dagger
         item = Weapon.new(:dagger)
+      when :bow
+        item = Weapon.new(:bow)
+      when :shuriken
+        item = Weapon.new(:shuriken)
       end
       if item
         hero.carried_items << item
