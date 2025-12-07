@@ -5,7 +5,7 @@ class Weapon < Item
   end
 
   def self.is_ranged_weapon?(item)
-    return [:bow, :crossbow, :sling].include?(item.kind)
+    return [:bow, :crossbow, :sling, :revolver].include?(item.kind)
   end
 
   def self.is_throwable_weapon?(item)

@@ -23,9 +23,30 @@ class Effect
     when :frost
       return [180, 100, 80]
     when :dig
-      return [40, 20, 70]
+      return [40, 40, 70]
+    when :lightning
+      return [240, 255, 255]
+    when :heal
+      return [120, 100, 100]
     else
       return [0, 100, 80]
+    end
+  end
+
+  def c
+    case @kind
+    when :fire
+      return [7,15]
+    when :frost
+      return [10,2]
+    when :poison
+      return [7,15]
+    when :dig
+      return [3,2]
+    when :heal
+      return [3,0]
+    else
+      return [10,2]
     end
   end
 end

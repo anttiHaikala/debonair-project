@@ -165,11 +165,8 @@ class Entity
       printf "ERROR: #{self.name} tries to drop a #{item.kind.to_s.gsub('_',' ')} but doesn't have it."
       return
     end
-    # check that it is not worn
-    # you cannot drop worn items
-    if self.worn_items && self.worn_items.include?(item)
-      printf "ERROR: #{self.name} tries to drop a #{item.kind.to_s.gsub('_',' ')} but is wearing it."
-      return
+    if self.wielded_items && self.wielded_items.include?(item)
+      self.wielded_items.delete(item)
     end
     self.carried_items.delete(item)
     level = args.state.dungeon.levels[self.depth]

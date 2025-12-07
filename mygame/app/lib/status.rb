@@ -14,7 +14,7 @@ class Status
   end
 
   def self.kinds
-    [:poisoned, :confused, :blind, :deaf, :shocked]
+    [:poisoned, :confused, :blind, :deaf, :shocked, :slowed]
   end
 
   def self.apply_statuses(entity, args)

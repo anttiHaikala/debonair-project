@@ -24,7 +24,7 @@ class Trauma
 
   def self.kinds
     {
-      physical: [:cut, :blunt, :pierce, :fracture, :burn, :frostbite, :sprain, :bite, :internal_injury, :poison],
+      physical: [:cut, :blunt, :pierce, :fracture, :burn, :frostbite, :sprain, :bite, :internal_injury, :poison, :electric, :magic],
       mental: [:concussion, :stress],
       emotional: [:grief, :anxiety, :fear, :depression]
     }

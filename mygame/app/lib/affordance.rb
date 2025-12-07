@@ -28,6 +28,9 @@ class Affordance
     # affordances given by throwing potions
     target_entity = level.entity_at(x, y)
     hero.wielded_items.each do |item|
+      if item.category == :wand
+        affordances << Affordance.new(level, x, y, :zap, target_entity, item)
+      end
       if Weapon.is_ranged_weapon?(item)
         if target_entity && target_entity != hero
           affordances << Affordance.new(level, x, y, :shoot, target_entity, item)
@@ -38,24 +41,17 @@ class Affordance
           affordances << Affordance.new(level, x, y, :throw, target_entity, item)
         end
       end
-      if item.kind == :wand_of_lightning
-        affordances << Affordance.new(level, x, y, :zap, nil, item)
-      end
-      if item.kind == :wand_of_death_ray
-        affordances << Affordance.new(level, x, y, :zap, nil, item)
-      end
-      if item.kind == :wand_of_fire
-        affordances << Affordance.new(level, x, y, :zap, nil, item)
-      end
     end
-    hero.carried_items.each do |item|
-      if item.category == :potion && item.kind
-        if target_entity && target_entity != hero
-          affordances << Affordance.new(level, x, y, :throw, target_entity, item)
-        end
-      end
-    end
-    # affordances for disarming traps
+    # throwing potions - not impelemented yet
+    # hero.carried_items.each do |item|
+    #   if item.category == :potion && item.kind
+    #     if target_entity && target_entity != hero
+    #       affordances << Affordance.new(level, x, y, :throw, target_entity, item)
+    #     end
+    #   end
+    # end
+    
+    # disarming traps - not implemented yet
     # level.traps.each do |trap|
     #   if trap.x == x && trap.y == y && trap.found
     #     affordances << Affordance.new(level, x, y, :disarm_trap, nil, nil)
@@ -81,7 +77,9 @@ class Affordance
     when :shoot
       Combat.resolve_ranged_attack(hero, @item, @target_entity, args)
       args.state.kronos.spend_time(hero, hero.walking_speed * 0.7, args) # todo fix speed depending on action
-
+    when :zap
+      Wand.zap_with(hero, @item, @x, @y, @target_entity, args)
+      args.state.kronos.spend_time(hero, hero.walking_speed * 0.5, args) # todo fix speed depending on action and user intellectual speed
     # when :throw
     #   Hero.throw_item_at(@item, @target_entity, args)
     # when :zap

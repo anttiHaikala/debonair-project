@@ -209,6 +209,9 @@ class NPC < Entity
     else
       status_modifier = 1.0
     end
+    if self.has_status?(:slowed)
+      status_modifier *= 2.0
+    end
     statuzed_speed = traumatized_speed * status_modifier
     return statuzed_speed
   end

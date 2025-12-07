@@ -1,3 +1,6 @@
+PHILOSOPHY
+- make a game that 14 year old me would love
+
 NOTES ON TTRPG LEGACY
 - Tomb Of Horros (original D&D book)
 
@@ -10,6 +13,8 @@ NOTES ON GAME SYSTEM
 - how many seconds is the time unit? (maybe 10?)
 
 TODO LIST
+- doors
+- banter!!! all npc's must have some kind of banter!!!
 - keys and doors and chests and mimics
 - plots and plot devices
 - more monster emotes (textual ones) - when behaviour changes!
@@ -29,7 +34,6 @@ TODO LIST
 - magic missiles
 - grid bug coloring (can we get gradients or something??)
 - taming grid bugs with food
-- doors
 - fix levels that do not have exit
 - tending to wounds
 - pickaxe cheat / mining bombs / hold down y to dig

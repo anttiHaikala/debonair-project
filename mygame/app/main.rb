@@ -62,6 +62,8 @@ require 'app/lib/room'
 require 'app/lib/trap'
 require 'app/lib/status'
 require 'app/lib/affordance'
+require 'app/lib/valuable'
+require 'app/lib/wand'
 
 def boot args
   args.state = {}
@@ -162,13 +164,13 @@ def gameplay_tick args
   start_profile(:foliage_drawing, args)
   GUI.draw_foliage args
   Trap.draw_traps args
-  GUI.draw_effects args
   end_profile(:foliage_drawing, args)
   start_profile(:light_drawing, args)
   Light.draw_lights args
   end_profile(:light_drawing, args)
-  GUI.draw_inventory args
+  GUI.draw_items args
   GUI.draw_entities args
+  GUI.draw_effects args
   GUI.pan_to_player args
   GUI.update_screen_flash args
   GUI.draw_look_mode args
@@ -180,7 +182,7 @@ def staircase_tick args
   Lighting.calculate_lighting(args.state.dungeon.levels[args.state.current_depth], args) if $dynamic_light_system
   GUI.draw_background args
   GUI.draw_tiles args
-  GUI.draw_inventory args
+  GUI.draw_items args
   GUI.draw_entities args
   GUI.staircase_animation args
   GUI.pan_to_player args

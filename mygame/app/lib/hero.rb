@@ -3,7 +3,7 @@ class Hero < Entity
   include Needy
 
   attr_reader :role, :species, :trait, :age, :name, :exhaustion, :sleep_deprivation, :insanity, :carried_items, :max_depth
-  attr_accessor :hunger, :hunger_level, :stress, :perished, :reason_of_death, :known_potions, :known_scrolls
+  attr_accessor :hunger, :hunger_level, :stress, :perished, :reason_of_death, :known_potions, :known_scrolls, :known_wands
 
   def initialize(x, y)
     super(x, y)
@@ -95,7 +95,7 @@ class Hero < Entity
     return names.sample
   end
 
-  def set_depth(depth)
+  def set_depth(depth, args)
     @depth = depth
     if depth > @max_depth
       @max_depth = depth
@@ -145,6 +145,9 @@ class Hero < Entity
       status_modifier = 0.5
     else
       status_modifier = 1.0
+    end
+    if self.has_status?(:slowed)
+      status_modifier *= 2.0
     end
     statuzed_speed = traumatized_speed * status_modifier
     return statuzed_speed

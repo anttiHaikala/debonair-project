@@ -122,6 +122,7 @@ class Scroll < Item
         end
       end
     end
+    SoundFX.play(:dig, args)
   end
 
   def self.fireball(user, args)

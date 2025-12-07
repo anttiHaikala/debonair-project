@@ -116,6 +116,7 @@ class Tile
       end
     end
     @@tile_memory_per_level[depth] = tile_memory
+    SoundFX.play(:mapping, args)
   end
 
   def self.observe_tiles args

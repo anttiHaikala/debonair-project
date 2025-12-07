@@ -9,7 +9,7 @@ class Potion < Item
     :potion_of_healing,
     :potion_of_strength,
     :potion_of_speed,
-    # :potion_of_invisibility,
+    :potion_of_invisibility,
     # :potion_of_fire_resistance,
     # :potion_of_cold_resistance,
     :potion_of_poison,
@@ -18,6 +18,8 @@ class Potion < Item
     :potion_of_telepathy,
     :potion_of_extra_healing,
     :potion_of_teleportation,
+    :potion_of_holy_water,
+    :potion_of_confusion
     ]
   end
 
@@ -89,6 +91,7 @@ class Potion < Item
         identify = false
       else
         HUD.output_message(args, "You feel better after drinking the #{self.title(args)}.")
+        SoundFX.play(:heal, args)
       end
       SoundFX.play(:potion, args)
     when :potion_of_poison
@@ -106,6 +109,15 @@ class Potion < Item
     when :potion_of_telepathy
       HUD.output_message(args, "You feel more connected to other beings!")
       Status.new(entity, :telepathic, base_duration + args.state.rng.d20 * 2, args)
+      SoundFX.play(:telepathy, args)
+    when :potion_of_holy_water
+      HUD.output_message(args, "You feel holy!")
+      Status.new(entity, :holy_water, base_duration + args.state.rng.d20 * 2, args)
+      SoundFX.play(:holy_water, args)
+    when :potion_of_confusion
+      HUD.output_message(args, "You feel confused!")
+      Status.new(entity, :confused, base_duration + args.state.rng.d20 * 2, args)
+      SoundFX.play(:confusion, args)
     else
       HUD.output_message(args, "You feel strange...")
       identify = false

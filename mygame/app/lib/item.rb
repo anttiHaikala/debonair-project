@@ -77,7 +77,7 @@ class Item
     when :scroll
       return [15,3]
     when :wand
-      return [4,0]
+      return [15,2]
     when :ring
       return [13,3]
     when :amulet
@@ -90,8 +90,10 @@ class Item
       return [9,0]
     when :corpse
       return [5,2]
+    when :valuable
+      return [10,2]
     else
-      return [10,0] # unknown
+      return [1,0] # unknown
     end
   end
 
@@ -110,7 +112,7 @@ class Item
           item.x = room.center_x
           item.y = room.center_y
           level.items << item
-        when 2
+        when 2, 6
           item = Potion.randomize(level.depth, args)
           item.depth = level.depth
           item.x = room.center_x
@@ -141,6 +143,18 @@ class Item
           item.x = room.center_x
           item.y = room.center_y
           level.items << item
+        when 7
+          item = Valuable.randomize(level.depth, args)
+          item.depth = level.depth
+          item.x = room.center_x
+          item.y = room.center_y
+          level.items << item   
+        when 8,9,10,11,12,13,14,15,16
+          item = Wand.randomize(level.depth, args)
+          item.depth = level.depth
+          item.x = room.center_x
+          item.y = room.center_y
+          level.items << item      
       end
     end
   end

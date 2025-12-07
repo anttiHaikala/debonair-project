@@ -49,20 +49,39 @@ class Behaviour
     end
   end
 
+  def self.trauma_threshold_for_fleeing(npc, args)
+    case npc.species
+    when :goblin
+      return 4
+    when :orc
+      return 5
+    when :skeleton
+      return 6
+    when :wraith
+      return 10
+    when :minotaur
+      return 8
+    when :rat, :newt, :grid_bug
+      return 1
+    else
+      return 3
+    end
+  end
+
   def self.select_for_npc(npc, args)
     # priority one - flee
     npc.behaviours.each do |behaviour|
-      if behaviour.kind == :flee && Trauma.trauma_score(npc, args) > args.state.rng.rand(6)
+      if behaviour.kind == :flee && Trauma.trauma_score(npc, args) >= self.trauma_threshold_for_fleeing(npc, args)
         return behaviour
       end
     end
     # priority two - fight or threaten
     npc.behaviours.each do |behaviour|
-      if behaviour.kind == :fight && npc.enemies.any? 
+      if behaviour.kind == :fight 
         return behaviour
       end
     end
-    # fallback - wander
+    # fallback - random behaviour
     return npc.behaviours.sample
   end
 

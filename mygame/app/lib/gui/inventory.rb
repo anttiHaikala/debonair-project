@@ -1,6 +1,6 @@
 class GUI
 
-  def self.draw_inventory args
+  def self.draw_items args
     level = Utils.level(args)
     return unless level
     tile_size = Utils.tile_size(args)

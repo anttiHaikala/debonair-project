@@ -89,6 +89,11 @@ class Trap
       HUD.output_message args, "#{entity.name} steps on a teleportation trap!"
       entity.teleport(args)
     when :trapdoor
+      # check for last level
+      if entity.depth >= args.state.dungeon.max_depth - 1
+        HUD.output_message args, "#{entity.name} steps on a trapdoor but it doesn't lead anywhere! Bedrock reached."
+        return
+      end
       HUD.output_message args, "#{entity.name} falls through a trapdoor to the level below!"
       Utils.move_entity_to_level(entity, entity.depth + 1, args)
       @target_x = entity.x

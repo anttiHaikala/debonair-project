@@ -58,7 +58,7 @@ class GUI
       old_level = args.state.dungeon.levels[args.state.current_depth]
       old_level.entities.delete(args.state.hero)
       new_depth = args.state.hero.depth + (args.state.staircase == :down ? 1 : -1)
-      args.state.hero.set_depth(new_depth)
+      args.state.hero.set_depth(new_depth, args)
       args.state.current_depth = args.state.hero.depth
       args.state.staircase = nil
       @@tiles_observed = false
@@ -85,37 +85,26 @@ class GUI
       hsl = effect.color
       rgb = Color::hsl_to_rgb(hsl[0], hsl[1], hsl[2])
       color = { r: rgb[:r], g: rgb[:g], b: rgb[:b] }
+      char = effect.c
       next unless visible
       # check if within viewport
       if effect.x < viewport[0] || effect.x > viewport[2] || effect.y < viewport[1] || effect.y > viewport[3]
         next
       end
-      case effect.kind
-      when :fire, :frost, :poison
-        case effect.kind
-        when :fire
-          char = [7,15]
-        when :frost
-          char = [10,2]
-        when :poison
-          char = [7,15]
-        end
-        args.outputs.sprites << {
-          x: x_offset + effect.x * tile_size,
-          y: y_offset + effect.y * tile_size,
-          w: tile_size,
-          h: tile_size,
-          path: "sprites/sm16px.png",
-          tile_x: char[0]*16,
-          tile_y: char[1]*16,
-          tile_w: 16,
-          tile_h: 16,
-          r: color[:r],
-          g: color[:g],
-          b: color[:b],
-
-        }
-      end
+      args.outputs.primitives << {
+        x: x_offset + effect.x * tile_size,
+        y: y_offset + effect.y * tile_size,
+        w: tile_size,
+        h: tile_size,
+        path: "sprites/sm16px.png",
+        tile_x: char[0]*16,
+        tile_y: char[1]*16,
+        tile_w: 16,
+        tile_h: 16,
+        r: color[:r],
+        g: color[:g],
+        b: color[:b],
+      }
     end
   end
 
