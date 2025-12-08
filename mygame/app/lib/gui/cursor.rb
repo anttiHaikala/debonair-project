@@ -78,6 +78,12 @@ class GUI
         description << effect.kind.to_s.gsub('_',' ')
       end
     end
+    # describe furniture
+    level.furniture.each do |furniture|
+      if furniture.x == x && furniture.y == y
+        description << furniture.title(args)
+      end
+    end
     # describe entities
     level.entities.each do |entity|
       if entity.x == x && entity.y == y

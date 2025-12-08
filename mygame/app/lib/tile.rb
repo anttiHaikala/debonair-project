@@ -277,6 +277,20 @@ class Tile
         b: c[:b]
       }
     end
+    if tile == :door
+      # highlight 
+      c = Color.hsl_to_rgb(hue, 50 * saturation_modifier, 40 * lightness_modifier)
+      args.outputs.sprites << {
+        x: x_offset + x * tile_size,
+        y: y_offset + y * tile_size,
+        w: tile_size,
+        h: tile_size,
+        path: "sprites/tile/door.png",
+        r: c[:r],
+        g: c[:g],
+        b: c[:b]
+      }
+    end
     # rock decoration
     if tile == :rock
       # highlight 

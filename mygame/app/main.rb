@@ -64,6 +64,7 @@ require 'app/lib/status'
 require 'app/lib/affordance'
 require 'app/lib/valuable'
 require 'app/lib/wand'
+require 'app/lib/furniture'
 
 def boot args
   args.state = {}
@@ -168,6 +169,7 @@ def gameplay_tick args
   start_profile(:light_drawing, args)
   Light.draw_lights args
   end_profile(:light_drawing, args)
+  GUI.draw_furniture args
   GUI.draw_items args
   GUI.draw_entities args
   GUI.draw_effects args

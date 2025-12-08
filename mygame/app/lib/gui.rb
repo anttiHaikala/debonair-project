@@ -640,4 +640,47 @@ class GUI
     end
   end
 
+  def self.draw_furniture args
+    level = Utils.level(args)
+    return unless level
+    tile_size = Utils.tile_size(args)
+    x_offset = Utils.offset_x(args)
+    y_offset = Utils.offset_y(args)
+    viewport = Utils.tile_viewport(args)
+    level.furniture.each do |furniture|
+      # check if within viewport
+      if furniture.x < viewport[0] || furniture.x > viewport[2] || furniture.y < viewport[1] || furniture.y > viewport[3]
+        next
+      end
+      # check visibility and memory
+      visible = Tile.is_tile_visible?(furniture.x, furniture.y, args)
+      remembered = furniture.seen_by_hero
+      if visible && !remembered
+        furniture.seen_by_hero = true
+      end
+      next unless visible || remembered
+      saturation_modifier = visible ? 1.0 : 0.7
+      lighting = level.lighting[furniture.y][furniture.x] # 0.0 to 1.0
+      if visible
+        lightness_modifier = 1.0 - (1.0 * (1.0 - lighting.clamp(0.0, 1.0)))
+      else
+        lightness_modifier = 0.3
+      end
+      hue = furniture.color[0]
+      saturation = furniture.color[1] * saturation_modifier
+      brightness = furniture.color[2] * lightness_modifier
+      color = Color::hsl_to_rgb(hue, saturation, brightness)
+      args.outputs.primitives << {
+        x: x_offset + furniture.x * tile_size,
+        y: y_offset + furniture.y * tile_size,
+        w: tile_size,
+        h: tile_size,
+        path: "sprites/furniture/#{furniture.kind}.png",
+        angle: furniture.rotation,
+        r: color[:r],
+        g: color[:g],
+        b: color[:b]
+      }
+    end
+  end
 end

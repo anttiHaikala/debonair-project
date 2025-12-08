@@ -1,6 +1,6 @@
 module Color
 
-  def self.hsl_to_rgb (hue,saturation,luminence)
+  def self.hsl_to_rgb(hue,saturation,luminence)
     r,g,b = self.hue_to_rgb(hue,saturation,luminence)
     color = {}
     color[:r] = r

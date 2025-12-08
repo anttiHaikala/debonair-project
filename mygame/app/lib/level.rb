@@ -11,6 +11,7 @@ class Level
   attr_accessor :effects
   attr_accessor :fire
   attr_accessor :traps
+  attr_accessor :furniture
 
   def initialize(depth, vibe = :hack)
     @depth = depth
@@ -25,6 +26,7 @@ class Level
     @items = []
     @traps = []
     @lights = []
+    @furniture = []
     @lighting = nil # lighting value of each tile
     @los_cache = {}
   end
@@ -211,21 +213,86 @@ class Level
   end
 
   def dig_corridor(args, x1, y1, x2, y2)
+    printf "Digging corridor from (%d,%d) to (%d,%d)\n" % [x1, y1, x2, y2]
+    return if x1 == x2 && y1 == y2 # no need to dig
     current_x = x1
     current_y = y1
+    direction = nil
+    safety = 0
     while current_x != x2 || current_y != y2 do
-      @tiles[current_y][current_x] = :floor if @tiles[current_y][current_x] == :rock || @tiles[current_y][current_x] == :wall
-      if current_x < x2
+      safety += 1
+      if safety > 500
+        printf "  Corridor digging aborted due to safety limit.\n"
+        break
+      end
+      if current_y < 0 || current_y >= @tiles.size || current_x < 0 || current_x >= @tiles[0].size
+        printf "  Digging out of bounds at (%d,%d), aborting corridor.\n" % [current_x, current_y]
+        break
+      end
+      new_tile = nil
+      create_door = false
+      current_tile = @tiles[current_y][current_x]
+      if current_tile == :rock
+        new_tile = :floor
+      end
+      if current_tile == :wall
+        # first make sure there is wall on both sides of this piece of wall
+        if direction == :east || direction == :west
+          if @tiles[current_y-1][current_x] == :wall && @tiles[current_y+1][current_x] == :wall
+            new_tile = :floor
+            create_door = true
+          else
+            new_tile = :wall
+          end
+          if direction == :east && @tiles[current_y][current_x+1] == :wall || direction == :west && @tiles[current_y][current_x-1] == :wall
+            printf "Running into double wall: sidestep!\n"
+            direction = :north
+            current_y += 1
+            next
+          end
+        elsif direction == :north || direction == :south
+          if @tiles[current_y][current_x-1] == :wall && @tiles[current_y][current_x+1] == :wall
+            new_tile = :floor
+            create_door = true
+          else
+            new_tile = :wall
+          end
+          if direction == :north && @tiles[current_y-1][current_x] == :wall || direction == :south && @tiles[current_y+1][current_x] == :wall
+            printf "Running into double wall: sidestep!\n"
+            direction = :east
+            current_x += 1
+            next
+          end
+        else
+          new_tile = :floor
+        end
+        if create_door
+          door_angle = [:east, :west].include?(direction) ? 0 : 90
+          door = Furniture.new(:door, :wood, current_x, current_y, @depth, door_angle)
+          @furniture << door
+        end
+      end
+      if current_tile == :water
+        new_tile = :water
+      end
+      if current_tile == :staircase_up || current_tile == :staircase_down
+        new_tile = current_tile # keep the staircase tile
+      end
+      @tiles[current_y][current_x] = new_tile if new_tile
+      if current_x < x2 # priority one: move horizontally east
+        direction = :east
         current_x += 1
-      elsif current_x > x2
+      elsif current_x > x2 # priority two: move horizontally west
+        direction = :west
         current_x -= 1
-      elsif current_y < y2
+      elsif current_y < y2 # priority three: move vertically north
+        direction = :north
         current_y += 1
-      elsif current_y > y2
+      elsif current_y > y2 # priority four: move vertically south
+        direction = :south
         current_y -= 1
       end
     end
-    @tiles[current_y][current_x] = :floor if @tiles[current_y][current_x] == :rock || @tiles[current_y][current_x] == :wall
   end
 
   def create_corridors(args)
@@ -245,10 +312,8 @@ class Level
         target_room = @rooms.sample
         next if target_room == room
         # random point in the target room
-        target_x = Numeric.rand(target_room.x...(target_room.x + target_room.w)).to_i
-        target_x = [self.width - 2, target_x].min
-        target_y = Numeric.rand(target_room.y...(target_room.y + target_room.h)).to_i
-        target_y = [self.height - 2, target_y].min
+        target_x = Numeric.rand((target_room.x+1)...(target_room.x + target_room.w - 1)).to_i
+        target_y = Numeric.rand((target_room.y+1)...(target_room.y + target_room.h - 1)).to_i
         # create a corridor from center of room to target_x, target_y
         current_x = room.x + (room.w / 2).to_i
         current_y = room.y + (room.h / 2).to_i
@@ -264,7 +329,7 @@ class Level
             printf "    Corridor creation aborted due to safety limit.\n"
             break
           end
-          if Numeric.rand < 0.1
+          if Numeric.rand < 0.2
             horizontal_mode = !horizontal_mode
           end
           if horizontal_mode

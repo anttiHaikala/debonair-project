@@ -276,6 +276,10 @@ class Item
       hero.carried_items << Weapon.new(:staff)
     when :monk
       hero.carried_items << Weapon.new(:staff)
+    when :knight
+      hero.carried_items << Weapon.new(:sword)
+    when :warrior
+      hero.carried_items << Weapon.new(:axe)
     end
 
   end
