@@ -379,8 +379,9 @@ class GUI
       y_offset = $pan_y + (720 - (level_height * tile_size)) / 2
       x = entity.visual_x
       y = entity.visual_y
+      alpha = 255
       if entity.invisible?
-        alpha = 80
+        alpha = 28
       end
       lighting = level.lighting[y][x] # 0.0 to 1.0
       hue = entity.hue

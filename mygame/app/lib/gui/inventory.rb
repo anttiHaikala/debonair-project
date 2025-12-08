@@ -70,7 +70,7 @@ class GUI
         if selected_index >= 0 && selected_index < hero.carried_items.size
           item = hero.carried_items[selected_index]
           hero.use_item(item, args)
-          SoundFX.play_sound(:use_item, args)
+          SoundFX.play_sound(item.kind, args)
           self.add_input_cooldown 10
           return true
         end

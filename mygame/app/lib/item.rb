@@ -105,14 +105,14 @@ class Item
 
   def self.populate_level(level, args)
     level.rooms.each do |room|
-      case args.state.rng.d12
+      case args.state.rng.d20
         when 1
           item = Food.new(:food_ration, args)
           item.depth = level.depth
           item.x = room.center_x
           item.y = room.center_y
           level.items << item
-        when 2, 6
+        when 2
           item = Potion.randomize(level.depth, args)
           item.depth = level.depth
           item.x = room.center_x
@@ -149,7 +149,7 @@ class Item
           item.x = room.center_x
           item.y = room.center_y
           level.items << item   
-        when 8,9,10,11,12,13,14,15,16
+        when 8
           item = Wand.randomize(level.depth, args)
           item.depth = level.depth
           item.x = room.center_x
@@ -278,5 +278,34 @@ class Item
       hero.carried_items << Weapon.new(:staff)
     end
 
+  end
+
+  def teleport(args, x=nil, y=nil)
+    level = args.state.dungeon.levels[self.depth]
+    if x.nil? || y.nil?
+      # random teleport
+      max_attempts = 100
+      attempts = 0
+      begin
+        x = args.state.rng.nxt_int(0, level.width-1)
+        y = args.state.rng.nxt_int(0, level.height-1)
+        attempts += 1
+        printf "Teleport attempt %d to (%d, %d)\n" % [attempts, x, y]
+      end while !level.is_walkable?(x,y) && attempts < max_attempts
+      if attempts >= max_attempts
+        HUD.output_message(args, "#{self.name} tries to teleport but fails!")
+        return
+      end
+    end
+    if level.is_walkable?(x,y)
+      self.x = x
+      self.y = y
+      self.visual_x = x
+      self.visual_y = y
+      SoundFX.play_sound(:teleport, args)
+      GUI.mark_tiles_stale
+      Lighting.mark_lighting_stale
+      HUD.mark_minimap_stale
+    end
   end
 end

@@ -211,7 +211,7 @@ class Hero < Entity
     item.y = nil
     item.depth = nil
     printf "Picked up item: %s\n" % item.kind.to_s
-    SoundFX.play_sound(:pick_up, args)
+    SoundFX.play_sound(item.kind, args)
     HUD.output_message(args, "You picked up #{item.title(args)}.")
     if item.kind == :amulet_of_skandor
       args.state.architect.setup_endgame(args)

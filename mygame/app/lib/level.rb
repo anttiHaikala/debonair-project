@@ -351,4 +351,13 @@ class Level
     return false
   end
 
+  def item_at(x, y)
+    @items.each do |item|
+      if item.x == x && item.y == y
+        return item
+      end
+    end
+    return nil
+  end
+
 end

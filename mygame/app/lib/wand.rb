@@ -18,7 +18,7 @@ class Wand < Item
     :wand_of_digging,
     :wand_of_polymorph,
     :wand_of_teleportation,
-    :wand_of_death
+    # :wand_of_death
   ]
   end
 
@@ -103,6 +103,10 @@ class Wand < Item
       Wand.cast_slowing(user, target_x, target_y, target_entity, args)
     when :wand_of_digging
       Wand.cast_digging(user, target_x, target_y, target_entity, args)
+    when :wand_of_polymorph
+      Wand.cast_polymorph(user, target_x, target_y, target_entity, args)
+    when :wand_of_teleportation
+      Wand.cast_teleportation(user, target_x, target_y, target_entity, args)
     else
       HUD.output_message(args, "The #{wand.title(args)} does nothing.")
     end
@@ -220,6 +224,54 @@ class Wand < Item
     else
       HUD.output_message(args, "The slowing spell hits nothing.")
     end
+    SoundFX.play_sound_xy(:slow, target_x, target_y, args)
+  end
+
+  def self.cast_teleportation(user, target_x, target_y, target_entity, args)
+    HUD.output_message(args, "#{user.name} zaps a teleportation spell!")
+    if target_entity
+      HUD.output_message(args, "#{target_entity.title(args)} vanishes in a flash of light!")
+      target_entity.teleport(args)
+    else
+      # is there an item? to teleport if no entity?
+      level = args.state.dungeon.levels[user.depth]
+      item = level.item_at(target_x, target_y)
+      if item
+        HUD.output_message(args, "The #{item.title(args)} vanishes in a flash of light!")
+        item.teleport(args)
+      else
+        HUD.output_message(args, "The teleportation spell hits nothing.")
+      end
+    end
+    SoundFX.play(:teleport, args)
+  end
+
+  def self.cast_polymorph(user, target_x, target_y, target_entity, args)
+    HUD.output_message(args, "#{user.name} zaps a polymorph spell towards (#{target_entity.title(args)})!")
+    if target_entity
+      old_species = target_entity.species
+      new_species = args.state.rng.choice(Species.npc_species)
+      target_entity.species = new_species
+      HUD.output_message(args, "#{target_entity.title(args)} is transformed from #{old_species} to #{new_species}!")
+    else
+      HUD.output_message(args, "The polymorph spell hits nothing.")
+    end
+    SoundFX.play_sound_xy(:polymorph, target_x, target_y, args)
+  end
+
+  def self.cast_clone(user, target_x, target_y, target_entity, args)
+    HUD.output_message(args, "#{user.name} zaps a cloning spell towards (#{target_entity.title(args)})!")
+    if target_entity
+      clone = target_entity.clone_entity(args)
+      level = args.state.dungeon.levels[user.depth]
+      clone.x = target_entity.x + 1
+      clone.y = target_entity.y
+      level.entities << clone
+      HUD.output_message(args, "A clone of #{target_entity.title(args)} appears!")
+    else
+      HUD.output_message(args, "The cloning spell hits nothing.")
+    end
+    SoundFX.play_sound_xy(:clone, target_x, target_y, args)
   end
 
 
