@@ -29,7 +29,7 @@ class Tile
   end
 
   def self.blocks_line_of_sight?(tile_type)
-    return [:wall, :rock, :closed_door].include?(tile_type)
+    return [:wall, :rock].include?(tile_type)
   end
 
   def self.is_walkable?(tile_type, args)

@@ -267,7 +267,7 @@ class Level
           new_tile = :floor
         end
         if create_door
-          door_angle = [:east, :west].include?(direction) ? 0 : 90
+          door_angle = [:east, :west].include?(direction) ? 90 : 0
           door = Furniture.new(:door, :wood, current_x, current_y, @depth, door_angle)
           @furniture << door
         end
@@ -317,41 +317,7 @@ class Level
         # create a corridor from center of room to target_x, target_y
         current_x = room.x + (room.w / 2).to_i
         current_y = room.y + (room.h / 2).to_i
-        #printf "  Corridor from (%d,%d) to (%d,%d)\n" % [current_x, current_y, target_x, target_y]
-        safety = 0
-        horizontal_mode = [true, false].sample
-        previous_x = current_x
-        previous_y = current_y
-        while current_x != target_x || current_y != target_y do
-          #printf "    At (%d,%d)\n" % [current_x, current_y]
-          safety += 1
-          if safety > 100 then
-            printf "    Corridor creation aborted due to safety limit.\n"
-            break
-          end
-          if Numeric.rand < 0.2
-            horizontal_mode = !horizontal_mode
-          end
-          if horizontal_mode
-            if current_x < target_x
-              previous_x = current_x
-              current_x += 1
-            elsif current_x > target_x
-              previous_x = current_x
-              current_x -= 1
-            end
-          else
-            if current_y < target_y
-              previous_y = current_y
-              current_y += 1
-            elsif current_y > target_y
-              previous_y = current_y
-              current_y -= 1
-            end
-          end
-          #printf "      Digging at (%d,%d) - level width %d height %d\n" % [current_x, current_y, @tiles[0].size, @tiles.size ]
-          @tiles[current_y][current_x] = :floor if @tiles[current_y][current_x] == :rock || @tiles[current_y][current_x] == :wall 
-        end
+        dig_corridor(args, current_x, current_y, target_x, target_y)
         corridors += 1
       end
     end

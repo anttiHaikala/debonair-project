@@ -454,6 +454,10 @@ class GUI
       @@auto_move = nil
       return false
     end
+    if Furniture.blocks_movement?(hero.x + dx, hero.y + dy, Utils.level(args), args)
+      @@auto_move = nil
+      return false
+    end
     if Tile.occupied?(hero.x + dx, hero.y + dy, args)
       if @@auto_move
         @@auto_move = nil # stop auto moving if blocked

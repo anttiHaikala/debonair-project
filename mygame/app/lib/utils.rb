@@ -146,6 +146,9 @@ module Utils
       if Tile.blocks_line_of_sight?(tile)
         return false
       end
+      if Furniture.blocks_line_of_sight?(point[:x], point[:y], level, nil)
+        return false
+      end
     end
     return true
   end
