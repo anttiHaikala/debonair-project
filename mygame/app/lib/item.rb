@@ -241,7 +241,7 @@ class Item
       :food_ration,
       :potion_of_healing,
       :bow,
-      :shuriken
+      :torch
     ]
     starting_items.each do |kind|
       item = nil
@@ -256,8 +256,9 @@ class Item
         item = Weapon.new(:dagger)
       when :bow
         item = Weapon.new(:bow)
-      when :shuriken
-        item = Weapon.new(:shuriken)
+      when :torch
+        item = PortableLight.new(:torch)
+        hero.wielded_items << item
       end
       if item
         hero.carried_items << item
@@ -265,21 +266,37 @@ class Item
     end
     case hero.role
     when :wizard
-      hero.carried_items << Scroll.new(:scroll_of_mapping)
+      hero.carried_items << Scroll.new(:scroll_of_digging)
+      hero.carried_items << Wand.new(Wand.kinds.sample, args)
+      hero.carried_items << Wand.new(Wand.kinds.sample, args)
     when :archaeologist
       hero.carried_items << Weapon.new(:whip)
+      hero.carried_items << Scroll.new(:scroll_of_mapping)
+    when :tourist
+      hero.carried_items << Weapon.new(:camera)
+      hero.carried_items << Scroll.new(:scroll_of_mapping)
     when :detective
       hero.carried_items << Weapon.new(:revolver)
     when :cleric
       hero.carried_items << Weapon.new(:mace)
+      hero.carried_items << Potion.new(:potion_of_extra_healing)
+      hero.carried_items << Potion.new(:potion_of_holy_water)
     when :druid
       hero.carried_items << Weapon.new(:staff)
+      hero.carried_items << Wand.new(Wand.kinds.sample, args)
+      hero.carried_items << Potion.new(Potion.kinds.sample, args)
+      hero.carried_items << Potion.new(Potion.kinds.sample, args)
     when :monk
       hero.carried_items << Weapon.new(:staff)
+      hero.carried_items << Potion.new(:potion_of_extra_healing, args)
+      hero.carried_items << Potion.new(:potion_of_holy_water, args)
     when :knight
       hero.carried_items << Weapon.new(:sword)
+      # plate armour
     when :warrior
       hero.carried_items << Weapon.new(:axe)
+      # fur shorts
+      
     end
 
   end

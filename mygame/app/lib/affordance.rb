@@ -2,6 +2,15 @@
 class Affordance
   attr_reader :level, :x, :y, :kind, :target_entity, :item
 
+  def initialize(level, x, y, kind, target_entity = nil, item = nil)
+    @level = level
+    @x = x
+    @y = y
+    @kind = kind
+    @target_entity = target_entity  
+    @item = item
+  end
+
   def title(args)
     case @kind
     when :do_nothing
@@ -14,6 +23,10 @@ class Affordance
       return "Zap with #{@item.title(args)}"
     when :disarm_trap
       return "Disarm trap"
+    when :open_door
+      return "Open door"
+    when :close_door
+      return "Close door"
     else
       return "Unknown affordance"
     end
@@ -42,6 +55,16 @@ class Affordance
         end
       end
     end
+    # opening and closing doors
+    furniture = Furniture.furniture_at(x, y, level, args)
+    if furniture && furniture.kind == :door
+      if furniture.openness == 0
+        affordances << Affordance.new(level, x, y, :open_door, nil, nil)
+      else
+        affordances << Affordance.new(level, x, y, :close_door, nil, nil)
+      end
+    end
+
     # throwing potions - not impelemented yet
     # hero.carried_items.each do |item|
     #   if item.category == :potion && item.kind
@@ -61,19 +84,20 @@ class Affordance
     return affordances
   end
 
-  def initialize(level, x, y, kind, target_entity = nil, item = nil)
-    @level = level
-    @x = x
-    @y = y
-    @kind = kind
-    @target_entity = target_entity  
-    @item = item
-  end
-
   def execute(hero, args)
     case @kind
     when :do_nothing
       return
+    when :open_door
+      furniture = Furniture.furniture_at(@x, @y, @level, args)
+      if furniture && furniture.kind == :door
+        furniture.is_toggled_by(hero, args )
+      end
+    when :close_door
+      furniture = Furniture.furniture_at(@x, @y, @level, args)
+      if furniture && furniture.kind == :door
+        furniture.is_toggled_by(hero, args )
+      end
     when :shoot
       Combat.resolve_ranged_attack(hero, @item, @target_entity, args)
       args.state.kronos.spend_time(hero, hero.walking_speed * 0.7, args) # todo fix speed depending on action

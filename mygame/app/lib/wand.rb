@@ -82,7 +82,7 @@ class Wand < Item
     args.state.kronos.spend_time(entity, entity.walking_speed * 0.5, args) 
   end
 
-  def self.zap_with(user, wand, target_x, target_y, target_entity, args)
+  def self.zap_with(user, wand, target_x, target_y, target_entity=nil, args)
     if wand.charges <= 0
       wand.known_to_be_empty = true
       HUD.output_message(args, "The #{wand.title(args)} has no charges left!")
@@ -216,7 +216,7 @@ class Wand < Item
   end
 
   def self.cast_slowing(user, target_x, target_y, target_entity, args)
-    HUD.output_message(args, "#{user.name} zaps a slowing spell towards (#{target_entity.title(args)})!")
+    HUD.output_message(args, "#{user.name} zaps a slowing spell!")
     if target_entity
       status = Status.new(target_entity, :slowed, 20, args)
       target_entity.add_status(status)

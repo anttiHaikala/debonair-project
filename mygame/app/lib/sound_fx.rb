@@ -1,6 +1,6 @@
 class SoundFX
 
-  @@fx_volume = 1.0
+  @@fx_volume = 0.0
 
   def self.play(kind, args)
     self.play_sound(kind, args)
@@ -18,8 +18,6 @@ class SoundFX
         gain: final_volume
     }
   end
-
-
 
   def self.play_sound_xy(kind, x, y, args)
     # adjust volume based on distance

@@ -204,7 +204,7 @@ class Behaviour
               target_y = npc.y 
             end
           end
-          if Tile.is_walkable?(target_tile, args) 
+          if Tile.is_walkable?(target_tile, args) && !Furniture.blocks_movement?(target_x, target_y, level, args)
             if Tile.occupied?(target_x, target_y, args)
               if hero.x == target_x && hero.y == target_y
                 # occupied, attack!
@@ -224,6 +224,7 @@ class Behaviour
             end
           else
             # cannot move towards hero, idle
+            printf "NPC #{@npc.species} cannot move towards hero, idling.\n"
             args.state.kronos.spend_time(npc, npc.walking_speed, args)
             return
           end
@@ -270,6 +271,11 @@ class Behaviour
       level = args.state.dungeon.levels[npc.depth]
       if level.trapped_at?(target_coordinates[0], target_coordinates[1], args)
         # do not walk into traps
+        args.state.kronos.spend_time(npc, npc.walking_speed, args)
+        return
+      end
+      # do not walk into furniture obstacles
+      if Furniture.blocks_movement?(target_coordinates[0], target_coordinates[1], level, args)
         args.state.kronos.spend_time(npc, npc.walking_speed, args)
         return
       end

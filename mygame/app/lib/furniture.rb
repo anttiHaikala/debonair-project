@@ -68,9 +68,9 @@ class Furniture
   end
 
   def self.furniture_at(x, y, level, args)
-    level.furniture.each do |furn|
-      if furn.x == x && furn.y == y
-        return furn
+    level.furniture.each do |f|
+      if f.x == x && f.y == y
+        return f
       end
     end
     return nil
@@ -96,6 +96,22 @@ class Furniture
         return false
       end
     end
+    return true
+  end
+
+  def is_toggled_by(entity, args)
+    if @openness < 0.5
+      SoundFX.play(:door_close, args)
+      @openness = 1.0
+      args.state.kronos.spend_time(entity, entity.walking_speed * 0.25, args)
+    else
+      @openness = 0.0
+      SoundFX.play(:door_open, args)
+      # opening door is slower than closing it
+      args.state.kronos.spend_time(entity, entity.walking_speed * 0.3333, args)
+    end 
+    GUI.mark_tiles_stale
+    HUD.mark_minimap_stale
     return true
   end
 end

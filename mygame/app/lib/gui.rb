@@ -250,6 +250,7 @@ class GUI
                 end
               end
             end
+            # check for staircase use
             tile = level.tiles[hero.y][hero.x]
             if tile == :staircase_down || tile == :staircase_up 
               unless args.inputs.keyboard.key_held.shift || args.inputs.controller_one.key_held.b
@@ -452,10 +453,20 @@ class GUI
     target_tile = args.state.dungeon.levels[hero.depth].tiles[hero.y + dy][hero.x + dx]
     unless Tile.is_walkable?(target_tile, args)
       @@auto_move = nil
+      # add input cooldown
+      self.add_input_cooldown 20
       return false
     end
     if Furniture.blocks_movement?(hero.x + dx, hero.y + dy, Utils.level(args), args)
       @@auto_move = nil
+      # check if there is an openable door
+      furniture = Furniture.furniture_at(hero.x + dx, hero.y + dy, Utils.level(args), args)
+      if furniture && furniture.kind == :door && furniture.openness == 0
+        affordance = Affordance.new(Utils.level(args), hero.x + dx, hero.y + dy, :open_door, nil, nil)
+        affordance.execute(hero, args)
+        self.add_input_cooldown 20
+        return true
+      end
       return false
     end
     if Tile.occupied?(hero.x + dx, hero.y + dy, args)
@@ -674,13 +685,29 @@ class GUI
       saturation = furniture.color[1] * saturation_modifier
       brightness = furniture.color[2] * lightness_modifier
       color = Color::hsl_to_rgb(hue, saturation, brightness)
+      x_offset_adjustment = 0
+      y_offset_adjustment = 0
+      angle = furniture.rotation
+      if furniture.kind == :door && furniture.openness > 0
+        # rotate door to open it
+        angle = furniture.rotation + 90
+        if furniture.rotation == 0
+          x_offset_adjustment = -(tile_size / 2) * furniture.openness  
+          y_offset_adjustment = (tile_size / 2) * furniture.openness
+        end
+        if furniture.rotation == 90
+          x_offset_adjustment = -(tile_size / 2) * furniture.openness  
+          y_offset_adjustment = (tile_size / 2) * furniture.openness
+        end
+      end
+      #printf "adjustments for open door: angle: #{angle} x: #{x_offset_adjustment}, y: #{y_offset_adjustment}\n"
       args.outputs.primitives << {
-        x: x_offset + furniture.x * tile_size,
-        y: y_offset + furniture.y * tile_size,
+        x: x_offset + x_offset_adjustment.to_i + furniture.x * tile_size,
+        y: y_offset + y_offset_adjustment.to_i + furniture.y * tile_size,
         w: tile_size,
         h: tile_size,
         path: "sprites/furniture/#{furniture.kind}.png",
-        angle: furniture.rotation,
+        angle: angle,
         r: color[:r],
         g: color[:g],
         b: color[:b]
