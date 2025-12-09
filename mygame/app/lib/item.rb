@@ -284,12 +284,12 @@ class Item
     when :druid
       hero.carried_items << Weapon.new(:staff)
       hero.carried_items << Wand.new(Wand.kinds.sample, args)
-      hero.carried_items << Potion.new(Potion.kinds.sample, args)
-      hero.carried_items << Potion.new(Potion.kinds.sample, args)
+      hero.carried_items << Potion.new(Potion.kinds.sample)
+      hero.carried_items << Potion.new(Potion.kinds.sample)
     when :monk
       hero.carried_items << Weapon.new(:staff)
-      hero.carried_items << Potion.new(:potion_of_extra_healing, args)
-      hero.carried_items << Potion.new(:potion_of_holy_water, args)
+      hero.carried_items << Potion.new(:potion_of_extra_healing)
+      hero.carried_items << Potion.new(:potion_of_holy_water)
     when :knight
       hero.carried_items << Weapon.new(:sword)
       # plate armour

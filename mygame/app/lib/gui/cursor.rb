@@ -3,6 +3,7 @@ class GUI
   @@inspector_active = false
   @@inspector_affordances = nil
   @@inspector_selected_affordance_index = nil
+  @@selected_poi = nil
 
   def self.activate_inspector args
     if @@inspector_active
@@ -30,6 +31,7 @@ class GUI
     unless args.state.look_mode_active
       printf("Activating look mode\n")
       args.state.look_mode_active = true
+      self.update_points_of_interest(args)
     end
   end
 
@@ -42,32 +44,62 @@ class GUI
     @@look_mode_x = nil
     @@look_mode_y = nil
     @@look_mode_index = nil
+    @@selected_poi = nil
+    @@pois = []
   end
 
-  def self.get_all_points_of_interest(args)
+  def self.set_selected_poi_by_coordinates(x, y, args)
+    @@pois.each do |poi|
+      if poi[0] == x && poi[1] == y
+        @@selected_poi = poi
+        return
+      end
+    end
+  end
+
+  def self.add_to_pois(thing)
+    coordinates = Utils.xy_of_thing(thing)
+    @@pois << coordinates unless @@pois.include?(coordinates)
+    return true
+  end
+
+  def self.update_points_of_interest(args)
     hero = args.state.hero
     level = args.state.dungeon.levels[hero.depth]
-    points_of_interest = []
+    @@pois = []
+
     # find visible items
     level.items.each do |item|
       if Tile.is_tile_visible?(item.x, item.y, args)
-        points_of_interest << item
+        self.add_to_pois(item)
       end
     end
     # find visible traps
     level.traps.each do |trap|
       if trap.found 
-        points_of_interest << trap
+        self.add_to_pois(trap)
       end
     end
     # find visible entities
     level.entities.each do |entity|
       next if entity == hero
       if Tile.is_tile_visible?(entity.x, entity.y, args)
-        points_of_interest << entity
+        self.add_to_pois(entity)
       end
     end
-    return points_of_interest
+    # find furniture
+    level.furniture.each do |furniture|
+      if Tile.is_tile_visible?(furniture.x, furniture.y, args)
+        self.add_to_pois(furniture)
+      end
+    end
+    # find lights
+    level.lights.each do |light|
+      if Tile.is_tile_visible?(light.x, light.y, args)
+        self.add_to_pois(light)
+      end
+    end
+    return @@pois
   end
 
   def self.describe_location(x, y, level, args)
@@ -131,6 +163,27 @@ class GUI
     # move cursor if directional inputs are used
     level_height = level.tiles.size
     level_width = level.tiles[0].size
+
+    # jumping to next POI
+    if args.inputs.controller_one.key_down.l2 || args.inputs.keyboard.key_down.q
+      if @@pois.size > 0
+        if @@selected_poi == nil
+          @@selected_poi = @@pois[0]
+        else
+          current_index = @@pois.index(@@selected_poi)
+          current_index -= 1
+          if current_index < 0
+            current_index = @@pois.size - 1
+          end
+          @@selected_poi = @@pois[current_index]
+        end
+        @@look_mode_x = @@selected_poi[0]
+        @@look_mode_y = @@selected_poi[1]
+        @@look_mode_cooldown = 10
+      end
+    end
+
+    # free navigation with cursor
     if (args.inputs.up || args.inputs.down || args.inputs.left || args.inputs.right) && @@look_mode_cooldown == 0 && @@inspector_active == false
       dx = 0
       dy = 0
@@ -153,8 +206,8 @@ class GUI
       # clamp to level bounds
       @@look_mode_x = @@look_mode_x.clamp(0, level_width - 1)
       @@look_mode_y = @@look_mode_y.clamp(0, level_height - 1)
+      set_selected_poi_by_coordinates(@@look_mode_x, @@look_mode_y, args)
       @@look_mode_cooldown = 10
-
     end
     # check for inspector activation
     if args.inputs.controller_one.key_held.r2 || args.inputs.keyboard.key_held.tab

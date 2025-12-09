@@ -227,17 +227,27 @@ class Hero < Entity
   end
 
   def apply_exhaustion (amount, args)
+    previous_exhaustion = @exhaustion
     @exhaustion += amount
     @exhaustion = 0.0 if @exhaustion < 0.0
     @exhaustion = 1.0 if @exhaustion > 1.0
-    if @exhaustion > 0.6
+    if @exhaustion > 0.6 && previous_exhaustion <= 0.6
       HUD.output_message(args, "You feel somewhat exhausted.")
     end
-    if @exhaustion > 0.8
+    if @exhaustion > 0.8 && previous_exhaustion <= 0.8
       HUD.output_message(args, "You feel proper exhausted.")
     end
-    if @exhaustion > 0.9
+    if @exhaustion > 0.9 && previous_exhaustion <= 0.9
       HUD.output_message(args, "You feel super exhausted, you really need to rest soon.")
+    end
+    if @exhaustion < 0.6 && previous_exhaustion >= 0.6
+      HUD.output_message(args, "You feel somewhat rested.")
+    end
+    if @exhaustion < 0.4 && previous_exhaustion >= 0.4
+      HUD.output_message(args, "You feel rested.")
+    end
+    if @exhaustion < 0.1 && previous_exhaustion >= 0.1
+      HUD.output_message(args, "You feel well rested.")
     end
   end
   

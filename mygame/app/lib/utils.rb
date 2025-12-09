@@ -8,6 +8,10 @@ module Utils
     return args.state.dungeon.levels[depth]
   end
 
+  def self.xy_of_thing(thing)
+    return [thing.x, thing.y]
+  end
+
   def self.tile_size(args)
     return 40 * $zoom
   end
