@@ -402,4 +402,27 @@ class HUD
       end
     end
   end
+
+  def self.draw_hero_status args
+    hero = args.state.hero
+    statuses = hero.statuses
+    return if statuses.empty?
+    x = 960
+    y = 600
+    status_size = 20
+    statuses.each_with_index do |status, index|
+      args.outputs.labels << {
+        x: x,
+        y: y - index * status_size,
+        text: status.title,
+        size_enum: 0,
+        r: 255,
+        g: 255,
+        b: 255,
+        a: 255,
+        font: "fonts/olivetti.ttf"
+      }
+    end
+  end
+
 end

@@ -68,6 +68,14 @@ class GUI
         # use selected item
         selected_index = args.state.selected_item_index
         if selected_index >= 0 && selected_index < hero.carried_items.size
+          if hero.has_status?(:confused)
+            if args.state.rng.d6 < 4
+              # randomize item
+              selected_index = args.state.rng.rand(hero.carried_items.size)
+              HUD.output_message("In your confused state, you fumble and use a random item!", args)
+              SoundFX.play_sound(:fumble, args)
+            end
+          end
           item = hero.carried_items[selected_index]
           hero.use_item(item, args)
           SoundFX.play_sound(item.kind, args)

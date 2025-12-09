@@ -124,6 +124,8 @@ class Behaviour
       wander args
       return
     end
+    # set emotions
+    npc.feel(:fear)
     # move away from closest enemy
     dx = npc.x - closest_enemy.x
     dy = npc.y - closest_enemy.y

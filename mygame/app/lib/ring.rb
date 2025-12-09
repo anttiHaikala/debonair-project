@@ -57,6 +57,12 @@ class Ring < Item
     ]
   end
 
+  def name
+    mask_index = Ring.kinds.index(self.kind) % Ring.masks.length
+    mask = Ring.masks[mask_index]
+    "#{self.attributes.join(' ')} #{mask} ring (#{self.kind.to_s.gsub('_',' ')})".trim
+  end
+
   def use(entity, args)
     # TODO: check that we have enough fingers free to wear the ring
     # TODO: maybe have a dexterity penalty if too many rings are being worn!!!

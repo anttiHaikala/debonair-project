@@ -23,6 +23,10 @@ class Status
     end
   end
 
+  def title
+    @kind.to_s.gsub('_', ' ')
+  end
+
   def apply(args)
     if @duration
       time_now = args.state.kronos.world_time

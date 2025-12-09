@@ -33,6 +33,10 @@ class Kronos
     entity.busy_until = @world_time + seconds
   end
 
+  def spend_extra_time entity, seconds, args
+    entity.busy_until += seconds
+  end
+
   def advance_time args
     if args.state.game_over
       return

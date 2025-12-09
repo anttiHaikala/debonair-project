@@ -178,6 +178,7 @@ def gameplay_tick args
   GUI.draw_look_mode args
   HUD.draw args
   HUD.draw_minimap args
+  HUD.draw_hero_status args
 end
 
 def staircase_tick args

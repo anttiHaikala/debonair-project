@@ -13,6 +13,7 @@ class Entity
   attr_accessor :hands
   attr_accessor :facing # :south, :north, :east, :west
   attr_accessor :mode_of_movement
+  attr_accessor :feels
 
   def self.kinds
     [:generic, :item, :pc, :npc, :plant, :furniture]
@@ -36,6 +37,7 @@ class Entity
     @wielded_items = []
     @statuses = []
     @traits = []
+    @feels = []
     @hands = [:right, :left] # in order of preference
     @facing = :west
     @mode_of_movement = :normal # :sneaking, :running, :walking
@@ -327,4 +329,9 @@ class Entity
   def set_depth(new_depth, args)
     @depth = new_depth
   end
+
+  def feel(feeling)
+    @feels << feeling unless @feels.include?(feeling)
+  end
+
 end

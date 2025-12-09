@@ -8,12 +8,13 @@ NOTES ON HACK
 - shopkeepers
 - dragons
 
-NOTES ON GAME SYSTEM
+NOTES ON GAME SYSTEM (the DEBONAIR!)
 - how long distance is one square?
-- how many seconds is the time unit? (maybe 10?)
+- how many seconds is the time unit? (maybe 10?) should we assume the 10 second unit?
+    - it's really hard to make the combat timescale match with exploration time scale then again the starvation and sleeping timescale
 
 TODO LIST
-- cursor shortcut (jumping between POIs)
+- npc emojis (scared - angry - sad - happy)
 - banter!!! all npc's must have some kind of banter!!!
 - stuck doors
 - locked doors
@@ -44,6 +45,7 @@ TODO LIST
 - armor
 
 DONE LIST
+- cursor shortcut (jumping between POIs)
 - doors
 - look mode: ability to move cursor freely
 - look mode: ability to select actions to perform to target square

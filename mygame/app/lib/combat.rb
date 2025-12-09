@@ -164,6 +164,7 @@ class Combat
     end
     # defender attempts to dodge
     if !attacker.invisible? && !defender.has_status?(:shocked)
+      args.state.kronos.spend_extra_time(defender, 0.2, args) # dodging takes time
       dodge_roll = args.state.rng.d20
       dodge_roll -= 3 # just to make it a bit less likely to dodge  
       if dodge_roll > attack_roll

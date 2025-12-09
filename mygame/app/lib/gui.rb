@@ -411,6 +411,18 @@ class GUI
         b: color[:b],
         a: alpha 
       }
+      if entity.feels
+        entity.feels.each do |feel|
+          args.outputs.primitives << {
+            x: x_offset + x * tile_size,
+            y: y_offset + y * tile_size,
+            w: tile_size,
+            h: tile_size,
+            path: "sprites/feels/#{feel}.png",
+            angle: 0
+          }
+        end
+      end
     end
   end
 
@@ -430,6 +442,15 @@ class GUI
       HUD.output_message args, "You are too exhausted to move!"
       hero.rest(args)
       return true
+    end
+    if hero.has_status?(:confused)
+      if args.state.rng.d6 <= 4
+        # randomize direction
+        directions = [[0,1],[0,-1],[-1,0],[1,0]]
+        random_direction = directions.sample
+        dx = random_direction[0]
+        dy = random_direction[1]
+      end
     end
     if args.inputs.keyboard.key_held.z || args.inputs.controller_one.key_held.r1
       @@auto_move = [dx, dy] # move until blocked
