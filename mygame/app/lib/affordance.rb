@@ -27,6 +27,8 @@ class Affordance
       return "Open door"
     when :close_door
       return "Close door"
+    when :break_door
+      return "Break door"
     else
       return "Unknown affordance"
     end
@@ -60,8 +62,10 @@ class Affordance
     if furniture && furniture.kind == :door
       if furniture.openness == 0
         affordances << Affordance.new(level, x, y, :open_door, nil, nil)
+        affordances << Affordance.new(level, x, y, :break_door, nil, nil)
       else
         affordances << Affordance.new(level, x, y, :close_door, nil, nil)
+        affordances << Affordance.new(level, x, y, :break_door, nil, nil)
       end
     end
 
@@ -98,6 +102,25 @@ class Affordance
       furniture = Furniture.furniture_at(@x, @y, @level, args)
       if furniture && furniture.kind == :door
         furniture.is_toggled_by(hero, args )
+      end
+    when :break_door
+      furniture = Furniture.furniture_at(@x, @y, @level, args)
+      if furniture && furniture.breakable
+        die_roll = args.state.rng.d20
+        bonuses = hero.strength_modifier + (hero.age == :elder ? -2 : 0) + (hero.age == :teenage ? -1 : 0)
+        required_roll = furniture.breakable
+        damage = die_roll - required_roll
+        if damage > 0 
+          furniture.breakable -= damage 
+          HUD.output_message(args, "#{hero.name} smashes the door, damaging it!")
+          if furniture.breakable <= 0
+            HUD.output_message(args, "The door breaks apart!")
+            level.furniture.delete(furniture)
+            SoundFX.play(:door_break, args) 
+          end
+        else
+          HUD.output_message(args, "#{hero.name} fails to damage the door.")
+        end
       end
     when :shoot
       Combat.resolve_ranged_attack(hero, @item, @target_entity, args)

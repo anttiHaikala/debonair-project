@@ -372,4 +372,29 @@ class Hero < Entity
       end
     end
   end
+
+  def strength_modifier
+    strength = 0
+    case self.role
+    when :warrior, :samurai
+      strength += 3
+    when :ninja, :rogue
+      strength += 1
+    when :thief, :detective, :monk
+      strength -= 1
+    when :wizard, :tourist
+      strength -= 3
+    end
+    case self.species
+    when :orc, :troll
+      strength += 2
+    when :dwarf
+      strength += 1
+    when :elf, :dark_elf, :duck, :gnome
+      strength -= 1
+    when :halfling
+      strength -= 2
+    end
+    return strength    
+  end
 end

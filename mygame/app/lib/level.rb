@@ -273,7 +273,11 @@ class Level
             if args.state.rng.d6 > 5
               door.openness = 1.0
             end
-            if args.state.rng.d8 != 1
+            door.breakable = 4 + args.state.rng.d8 + args.state.rng.d8  # door can be broken with enough force
+            # if args.state.rng.d8 == 12
+            #   door.locked = true
+            # end
+            if args.state.rng.d8 == 1
               door.stuck = args.state.rng.d12 + 8 # door is stuck, needs strength test to open
             end
             @furniture << door

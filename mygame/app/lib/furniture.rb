@@ -20,6 +20,7 @@ class Furniture
   attr_accessor :stuck
   attr_accessor :locked
   attr_accessor :key
+  attr_accessor :breakable # nil = unbreakable, else integer hit points that also determine how hard it is to damage
 
   def initialize(kind, material, x, y, depth, rotation=0)
     @kind = kind
@@ -33,6 +34,7 @@ class Furniture
     @stuck = nil
     @locker = false
     @key = nil
+    @breakable = 10
   end
 
   def  self.kinds
