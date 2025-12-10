@@ -14,7 +14,7 @@ NOTES ON GAME SYSTEM (the DEBONAIR!)
     - it's really hard to make the combat timescale match with exploration time scale then again the starvation and sleeping timescale
 
 TODO LIST
-- npc emojis (scared - angry - sad - happy)
+- npc emojis (scared - angry - sad - happy - shock)
 - banter!!! all npc's must have some kind of banter!!!
 - stuck doors
 - locked doors

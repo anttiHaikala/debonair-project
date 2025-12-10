@@ -396,11 +396,19 @@ class GUI
         tile_y = 0
       end
       color = Color::hsl_to_rgb(hue, saturation, level)
+      height = tile_size
+      angle = 0
+      y_adjustment = 0
+      if entity.has_status?(:shocked)
+        height = (tile_size * 0.8).to_i
+        angle = 15
+        y_adjustment += (tile_size * 0.4).to_i
+      end
       args.outputs.primitives << {
         x: x_offset + x * tile_size,
         y: y_offset + y * tile_size,
         w: tile_size,
-        h: tile_size,
+        h: height,
         path: "sprites/sm16px.png",
         tile_x: tile_x*16,
         tile_y: tile_y*16,
@@ -409,13 +417,14 @@ class GUI
         r: color[:r],
         g: color[:g],
         b: color[:b],
-        a: alpha 
+        a: alpha,
+        angle: angle
       }
       if entity.feels
         entity.feels.each do |feel|
           args.outputs.primitives << {
             x: x_offset + x * tile_size,
-            y: y_offset + y * tile_size,
+            y: y_offset + y * tile_size + y_adjustment,
             w: tile_size,
             h: tile_size,
             path: "sprites/feels/#{feel}.png",
