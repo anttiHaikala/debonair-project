@@ -92,6 +92,8 @@ class Item
       return [5,2]
     when :valuable
       return [10,2]
+    when :portable_light
+      return [13,10]
     else
       return [1,0] # unknown
     end
