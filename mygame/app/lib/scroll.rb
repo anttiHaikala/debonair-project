@@ -65,6 +65,8 @@ class Scroll < Item
     roll = args.state.rng.d20
     # role_modifier
     role_modifier = 0
+    age_modifier = 0
+    trait_modifier = 0
     case args.state.hero.role
     when :wizard
       role_modifier += 5
@@ -73,8 +75,26 @@ class Scroll < Item
     when :cleric, :druid, :detective
       role_modifier += 2
     end
+    if user.age
+      case user.age
+      when :teen
+        age_modifier -= 1
+      when :adult
+        age_modifier += 0
+      when :elder
+        age_modifier += 1
+      end
+    end
+    user.traits.each do |trait|
+      case trait
+      when :zombie
+        trait_modifier -= 3
+      when :robot
+        trait_modifier -= 2
+      end
+    end
     identify = true
-    effective_roll = roll + role_modifier
+    effective_roll = roll + role_modifier + age_modifier + trait_modifier
     if effective_roll < 4
       HUD.output_message args, "You fail to decipher the scroll's magical script. It crumbles to dust."
       args.state.hero.carried_items.delete(self)

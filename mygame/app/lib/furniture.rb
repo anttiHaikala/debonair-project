@@ -100,6 +100,7 @@ class Furniture
   end
 
   def is_toggled_by(entity, args)
+    printf "Toggling furniture at %d,%d\n", @x, @y
     if @openness < 0.5
       SoundFX.play(:door_close, args)
       @openness = 1.0
@@ -113,5 +114,34 @@ class Furniture
     GUI.mark_tiles_stale
     HUD.mark_minimap_stale
     return true
+  end
+
+  def self.remove_unsupported_doors(level, args)
+    level.furniture.delete_if do |f|
+      if f.kind == :door
+        # check if the door is unsupported (no walls beside it at right angles)
+        supported = false
+        case f.rotation
+        when 0, 180
+          # east-west door, check north and south
+          if level.tile_at(f.x, f.y - 1) == :wall || level.tile_at(f.x, f.y + 1) == :wall
+            supported = true
+          end
+        when 90, 270
+          # north-south door, check east and west
+          if level.tile_at(f.x - 1, f.y) == :wall || level.tile_at(f.x + 1, f.y) == :wall
+            supported = true
+          end
+        end
+        unless supported
+          #level.add_effect(:debris, f.x, f.y, args)
+          true
+        else
+          false
+        end
+      else
+        false
+      end
+    end
   end
 end
