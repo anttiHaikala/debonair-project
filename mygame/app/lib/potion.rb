@@ -1,6 +1,6 @@
 class Potion < Item
 
-  def initialize(kind)
+  def initialize(kind)    
     super(kind, :potion)
   end
 
@@ -23,7 +23,15 @@ class Potion < Item
     ]
   end
 
-  def self.masks
+  def self.setup_masks(args)
+    self.mask_pool.shuffle
+  end
+
+  def self.masks(args)
+    args.state.run.potion_masks
+  end
+
+  def self.mask_pool
     [
       :pink,
       :blue,
@@ -41,8 +49,8 @@ class Potion < Item
   end
 
   def title(args)
-    mask_index = Potion.kinds.index(self.kind) % Potion.masks.length
-    mask = Potion.masks[mask_index]
+    mask_index = Potion.kinds.index(self.kind) % Potion.masks(args).length
+    mask = Potion.masks(args)[mask_index]
     if args.state.hero.known_potions.include?(self.kind)
       "#{self.attributes.join(' ')} #{mask} potion (#{self.kind.to_s.gsub('potion_of_','')})".trim
     else

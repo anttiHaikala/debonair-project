@@ -1,9 +1,12 @@
 # i am not sure if this class is required. but we might have some more
 # run-related data later on that doesn't really belong to hero or dungeon
+# edit: now we already have it - the item masks
 class Run
-  attr_accessor :dungeon, :hero  
+  attr_accessor :dungeon, :hero
+  attr_accessor :potion_masks
 
   def initialize(args)
+    @potion_masks = Potion.setup_masks(args)
   end
 
   def setup args

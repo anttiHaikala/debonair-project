@@ -274,6 +274,11 @@ class Entity
     end
   end
 
+  # hand index: 0 = right hand, 1 = left hand, if multiple sets of hands, start from the top
+  def wield_item(item, hand_index, args)
+    self.wielded_items[hand_index] = item
+  end
+
   def wield_info(item)
     self.wielded_items.each_with_index do |wielded_item, index|
       if wielded_item == item

@@ -14,9 +14,7 @@ NOTES ON GAME SYSTEM (the DEBONAIR!)
     - it's really hard to make the combat timescale match with exploration time scale then again the starvation and sleeping timescale
 
 TODO LIST
-- stuck doors (strength roll to open)
-- locked doors
-- crashing doors
+- keys
 - npc emojis (scared - angry - sad - happy - shock - )
 - banter!!! all npc's must have some kind of banter!!!
 - chests
@@ -46,6 +44,9 @@ TODO LIST
 - armor
 
 DONE LIST
+- stuck doors (strength roll to open)
+- locked doors
+- crashing doors
 - cursor shortcut (jumping between POIs)
 - doors
 - look mode: ability to move cursor freely

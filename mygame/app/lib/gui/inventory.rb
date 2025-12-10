@@ -64,6 +64,26 @@ class GUI
           end
           @@menu_cooldown = 5
         end
+      elsif args.inputs.controller_one.key_down.left || args.inputs.keyboard.key_down.left
+        # equip item to left hand
+        selected_index = args.state.selected_item_index
+        if selected_index >= 0 && selected_index < hero.carried_items.size
+          item = hero.carried_items[selected_index]
+          hero.wield_item(item, 1, args)
+          SoundFX.play_sound(:equip_item, args)
+          self.add_input_cooldown 10
+          return true
+        end
+      elsif args.inputs.controller_one.key_down.right || args.inputs.keyboard.key_down.right
+        # equip item to right hand
+        selected_index = args.state.selected_item_index
+        if selected_index >= 0 && selected_index < hero.carried_items.size
+          item = hero.carried_items[selected_index]
+          hero.wield_item(item, 0, args)
+          SoundFX.play_sound(:equip_item, args)
+          self.add_input_cooldown 10
+          return true
+        end
       elsif args.inputs.controller_one.key_down.a || args.inputs.keyboard.key_down.space
         # use selected item
         selected_index = args.state.selected_item_index
@@ -82,7 +102,7 @@ class GUI
           self.add_input_cooldown 10
           return true
         end
-      elsif args.inputs.controller_one.key_down.right || args.inputs.keyboard.key_down.right
+      elsif args.inputs.controller_one.key_down.b || args.inputs.keyboard.key_down.enter
         # drop selected item
         selected_index = args.state.selected_item_index
         hero.drop_item(hero.carried_items[selected_index], args)

@@ -37,7 +37,7 @@ class Scroll < Item
   end
 
   def title(args)
-    mask_index = Scroll.kinds.index(self.kind) % Potion.masks.length
+    mask_index = Scroll.kinds.index(self.kind) % Scroll.masks.length
     mask = Scroll.masks[mask_index]
     if args.state.hero.known_scrolls.include?(self.kind)
       "#{self.attributes.join(' ')} scroll labeled #{mask} (#{self.kind.to_s.gsub('scroll_of_','')})".gsub('_', ' ').trim
