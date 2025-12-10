@@ -303,22 +303,74 @@ class Level
     #
     # every room has 1 to 2 corridors to other rooms
     # every corridor leads to a random point in another room
+    distances_from_room_to_room = {}
+    # calculate distances between rooms
+    @rooms.each_with_index do |room_a, index_a|
+      distances_from_room_to_room[index_a] ||= {}
+      @rooms.each_with_index do |room_b, index_b|
+        next if index_a == index_b
+        distance = Math.sqrt((room_a.center_x - room_b.center_x)**2 + (room_a.center_y - room_b.center_y)**2)
+        distances_from_room_to_room[index_a][index_b] = distance
+      end
+    end
+
+    rooms_without_corridors = @rooms.dup
+    corridors = []
+
+    while rooms_without_corridors.size > 0 do
+      room = rooms_without_corridors.first
+      room_index = @rooms.index(room)
+      possible_targets = distances_from_room_to_room[room_index].sort_by { |index_b, distance| distance }
+      # create single corridor to nearest room
+      target_room_index = possible_targets.first[0]
+      target_room = @rooms[target_room_index]
+      x1 = room.center_x
+      y1 = room.center_y
+      x2 = target_room.center_x
+      y2 = target_room.center_y
+      dig_corridor(args, x1, y1, x2, y2)
+      corridors << [room, target_room]
+      rooms_without_corridors.delete(room)
+      rooms_without_corridors.delete(target_room) if rooms_without_corridors.include?(target_room)
+    end 
+
+    # now every room has a corridor to another room, but there is no way to be sure that all rooms are connected
+    # we need to enforce that there is a way from any room to any other room (checked from corridors array)
     @rooms.each do |room|
-      #printf "Creating corridors for room at (%d,%d) size (%d,%d)\n" % [room.x, room.y, room.w, room.h]
-      corridor_target = 1 || Numeric.rand(1..2)
-      corridors = 0
-      while corridors < corridor_target do
-        break if corridors > 5 # safety to avoid infinite loops
-        target_room = @rooms.sample
-        next if target_room == room
-        # random point in the target room
-        target_x = Numeric.rand((target_room.x+1)...(target_room.x + target_room.w - 1)).to_i
-        target_y = Numeric.rand((target_room.y+1)...(target_room.y + target_room.h - 1)).to_i
-        # create a corridor from center of room to target_x, target_y
-        current_x = room.x + (room.w / 2).to_i
-        current_y = room.y + (room.h / 2).to_i
-        dig_corridor(args, current_x, current_y, target_x, target_y)
-        corridors += 1
+      other_rooms = @rooms.dup
+      # find if there is a way to reach this 
+      reachable_rooms = [room]
+      safety = 0
+      while true do
+        safety += 1
+        if safety > 100
+          printf "  Corridor connectivity check aborted due to safety limit.\n"
+          break
+        end
+        newly_reached = []
+        reachable_rooms.each do |r_room|
+          corridors.each do |corridor|
+            if corridor[0] == r_room && !reachable_rooms.include?(corridor[1])
+              newly_reached << corridor[1]
+            elsif corridor[1] == r_room && !reachable_rooms.include?(corridor[0])
+              newly_reached << corridor[0]
+            end
+          end
+        end
+        break if newly_reached.size == 0
+        reachable_rooms += newly_reached
+      end
+      unreachable_rooms = other_rooms - reachable_rooms
+      if unreachable_rooms.size > 0
+        # need to connect to one of the unreachable rooms
+        target_room = unreachable_rooms.sample
+        x1 = room.center_x
+        y1 = room.center_y
+        x2 = target_room.center_x
+        y2 = target_room.center_y
+        dig_corridor(args, x1, y1, x2, y2)
+        corridors << [room, target_room]
+        printf "  Added extra corridor to connect unreachable room at (%d,%d)\n" % [target_room.x, target_room.y]
       end
     end
   end

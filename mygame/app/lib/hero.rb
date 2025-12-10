@@ -123,7 +123,10 @@ class Hero < Entity
   def walking_speed
     seconds_per_tile = 1.0
     if @age == :elder
-      seconds_per_tile += 0.5
+      seconds_per_tile += 0.4
+    end
+    if self.has_trait?(:zombie)
+      seconds_per_tile += 0.4
     end
     if @trait == :robot
       seconds_per_tile += 0.1

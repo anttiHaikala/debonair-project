@@ -191,9 +191,7 @@ class Combat
     # check for shock or death
     defender_shocked = Trauma.determine_shock(defender)
     if defender_shocked
-      Status.new(defender, :shocked, nil, args)
-      defender.drop_wielded_items(args)
-      HUD.output_message args, "#{dname} is in shock from trauma!"
+      defender.go_into_shock(args)
     end
     # todo: inflict "shaken" effects to make the target miss some time due to receiving trauma
     defender_dead = Trauma.determine_morbidity(defender)

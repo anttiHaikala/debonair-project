@@ -14,6 +14,7 @@ class Entity
   attr_accessor :facing # :south, :north, :east, :west
   attr_accessor :mode_of_movement
   attr_accessor :feels
+  attr_accessor :feel_cooldown
 
   def self.kinds
     [:generic, :item, :pc, :npc, :plant, :furniture]
@@ -40,7 +41,8 @@ class Entity
     @feels = []
     @hands = [:right, :left] # in order of preference
     @facing = :west
-    @mode_of_movement = :normal # :sneaking, :running, :walking
+    @mode_of_movement = :normal # :sneaking, :walking, :speeding
+    @feel_cooldown = 0
   end
 
   def is_hostile_to?(other_entity)
@@ -330,8 +332,11 @@ class Entity
     @depth = new_depth
   end
 
-  def feel(feeling)
-    @feels << feeling unless @feels.include?(feeling)
+  def feel(feeling, args)
+    #@feels << feeling unless @feels.include?(feeling)
+    @feels = [feeling]
+    @feel_cooldown = args.state.kronos.world_time + 10
+    printf "%s feels %s until %d\n" % [self.name.capitalize, feeling.to_s, @feel_cooldown] 
   end
 
 end

@@ -109,7 +109,7 @@ class GUI
   end
 
   def self.handle_changing_facing args
-    if !args.inputs.keyboard.key_held.command && !args.inputs.controller_one.key_held.l1
+    if !args.inputs.keyboard.key_held.command && !args.inputs.controller_one.key_held.l2
       return false
     end
     #printf "Changing facing direction based on input\n"
@@ -150,7 +150,7 @@ class GUI
       end
       return
     end
-    if args.inputs.keyboard.key_held.alt || args.inputs.controller_one.key_held.l2
+    if args.inputs.keyboard.key_held.alt || args.inputs.controller_one.key_held.l1
       @@strafing = true
     else
       @@strafing = false
@@ -402,7 +402,7 @@ class GUI
       if entity.has_status?(:shocked)
         height = (tile_size * 0.8).to_i
         angle = 15
-        y_adjustment += (tile_size * 0.4).to_i
+        y_adjustment -= (tile_size * 0.4).to_i
       end
       args.outputs.primitives << {
         x: x_offset + x * tile_size,
@@ -422,6 +422,9 @@ class GUI
       }
       if entity.feels
         entity.feels.each do |feel|
+          if entity.feel_cooldown < args.state.kronos.world_time
+            next
+          end
           args.outputs.primitives << {
             x: x_offset + x * tile_size,
             y: y_offset + y * tile_size + y_adjustment,

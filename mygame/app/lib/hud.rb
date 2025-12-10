@@ -408,7 +408,7 @@ class HUD
     statuses = hero.statuses
     return if statuses.empty?
     x = 960
-    y = 600
+    y = 320
     status_size = 20
     statuses.each_with_index do |status, index|
       args.outputs.labels << {

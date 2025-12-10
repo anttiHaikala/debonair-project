@@ -90,6 +90,7 @@ class Wand < Item
     end
     wand.charges -= 1
     wand.identify(args)
+    SoundFX.play(wand.kind.to_s.gsub('wand_of_',''), args)
     case wand.kind
     when :wand_of_magic_missile
       Wand.cast_magic_missile(user, target_x, target_y, target_entity, args)

@@ -125,7 +125,7 @@ class Behaviour
       return
     end
     # set emotions
-    npc.feel(:fear)
+    npc.feel(:afraid, args)
     # move away from closest enemy
     dx = npc.x - closest_enemy.x
     dy = npc.y - closest_enemy.y
@@ -180,7 +180,8 @@ class Behaviour
           # make angry emote towards hero if here is not yet enemy!
           if !args.state.hero.is_hostile_to?(npc)
             HUD.output_message args, "#{npc.name} stares angrily at you!"
-            args.state.hero.become_hostile_to(npc)
+            hero.become_hostile_to(npc)
+            npc.feel(:angry, args)
             args.state.kronos.spend_time(npc, npc.walking_speed*0.5, args)
           end
           # move towards hero, but check if the target is walkable first

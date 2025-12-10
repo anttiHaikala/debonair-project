@@ -90,6 +90,7 @@ class Trauma
     entity.traumas << trauma
     printf "Inflicted #{kind} trauma to #{entity.class} at #{body_part}. Has now #{entity.traumas.size} traumas.\n"
     self.apply_effects(entity, trauma, args)
+    SoundFX.play(:trauma, args)
     return trauma
   end
 
@@ -115,10 +116,7 @@ class Trauma
     end
     shocked = self.determine_shock(entity)
     if shocked
-      unless entity.has_status?(:shocked)
-        Status.new(entity, :shocked, nil, args)
-        HUD.output_message(args, "#{entity.name.capitalize} goes into shock!")
-      end
+      entity.go_into_shock(args)
     end
     dead = self.determine_morbidity(entity)
     if dead
@@ -211,5 +209,16 @@ class Trauma
       speed_modifier = 0.1
     end
     return speed_modifier
+  end
+end
+
+class Entity
+  def go_into_shock(args)
+    unless self.has_status?(:shocked)
+      Status.new(self, :shocked, nil, args)
+      self.drop_wielded_items(args) # add randomness later
+      self.feel(:afraid, args)
+      HUD.output_message(args, "#{self.name.capitalize} goes into shock!")
+    end
   end
 end
