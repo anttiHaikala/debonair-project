@@ -159,4 +159,39 @@ class Trap
       end
     end
   end
+
+  def self.disarm_trap_at(hero, x, y, level, args)
+    trap_to_disarm = nil
+    level.traps.each do |trap|
+      if trap.x == x && trap.y == y
+        trap_to_disarm = trap
+        break
+      end
+    end
+    if trap_to_disarm
+      die_roll = args.state.rng.d20
+      needed_to_disarm = 10
+      case hero.role
+      when :thief, :detective
+        needed_to_disarm -= 4
+      when :ninja, :rogue
+        needed_to_disarm -= 2
+      when :warrior, :tourist, :monk, :druid, :wizard, :cleric
+        needed_to_disarm += 2
+      end
+      if hero.age == :elder
+        needed_to_disarm += 1
+      end
+      if die_roll >= needed_to_disarm
+        level.traps.delete(trap_to_disarm)
+        HUD.output_message args, "#{hero.name} successfully disarmed the #{trap_to_disarm.title(args)}."
+        SoundFX.play_sound(:trap_disarmed, args)
+      else
+        HUD.output_message args, "#{hero.name} failed to disarm the #{trap_to_disarm.title(args)} and triggered it!"
+        trap_to_disarm.trigger(hero, args)
+      end
+    else
+      HUD.output_message args, "No trap found at that location to disarm."
+    end
+  end
 end

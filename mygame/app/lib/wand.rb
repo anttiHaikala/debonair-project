@@ -248,7 +248,7 @@ class Wand < Item
   end
 
   def self.cast_polymorph(user, target_x, target_y, target_entity, args)
-    HUD.output_message(args, "#{user.name} zaps a polymorph spell towards (#{target_entity.title(args)})!")
+    HUD.output_message(args, "#{user.name} zaps a polymorph spell!")
     if target_entity
       old_species = target_entity.species
       new_species = args.state.rng.choice(Species.npc_species)

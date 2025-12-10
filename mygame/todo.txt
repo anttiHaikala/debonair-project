@@ -6,7 +6,7 @@ NOTES ON TTRPG LEGACY
 
 NOTES ON HACK
 - shopkeepers
-- dragons
+- dragons (blue red green gray black white brown purple)
 
 NOTES ON GAME SYSTEM (the DEBONAIR!)
 - how long distance is one square?
@@ -14,10 +14,11 @@ NOTES ON GAME SYSTEM (the DEBONAIR!)
     - it's really hard to make the combat timescale match with exploration time scale then again the starvation and sleeping timescale
 
 TODO LIST
-- npc emojis (scared - angry - sad - happy - shock)
-- banter!!! all npc's must have some kind of banter!!!
-- stuck doors
+- stuck doors (strength roll to open)
 - locked doors
+- crashing doors
+- npc emojis (scared - angry - sad - happy - shock - )
+- banter!!! all npc's must have some kind of banter!!!
 - chests
 - mimics
 - plots and plot devices

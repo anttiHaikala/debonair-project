@@ -75,11 +75,12 @@ class Affordance
     # end
     
     # disarming traps - not implemented yet
-    # level.traps.each do |trap|
-    #   if trap.x == x && trap.y == y && trap.found
-    #     affordances << Affordance.new(level, x, y, :disarm_trap, nil, nil)
-    #   end
-    # end
+    level.traps.each do |trap|
+      if trap.x == x && trap.y == y && trap.found
+        affordances << Affordance.new(level, x, y, :disarm_trap, nil, nil)
+      end
+    end
+    
     affordances << Affordance.new(level, x, y, :do_nothing, nil, nil)
     return affordances
   end
@@ -108,8 +109,8 @@ class Affordance
     #   Hero.throw_item_at(@item, @target_entity, args)
     # when :zap
     #   Hero.zap_with(@item, args)
-    # when :disarm_trap
-    #   Hero.disarm_trap_at(@x, @y, args)
+    when :disarm_trap
+      Trap.disarm_trap_at(hero, @x, @y, @level, args)
     else
       printf "Unknown affordance executed.\n"
     end

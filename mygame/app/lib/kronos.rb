@@ -96,7 +96,6 @@ class Kronos
     Utils.level(args).entities.each do |entity|
       entity.recover_shock args
       Status.apply_statuses entity, args
-      entity.cooldown_feelings args
     end
     
     # worn rings

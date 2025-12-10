@@ -267,9 +267,14 @@ class Level
           new_tile = :floor
         end
         if create_door
-          door_angle = [:east, :west].include?(direction) ? 90 : 0
-          door = Furniture.new(:door, :wood, current_x, current_y, @depth, door_angle)
-          @furniture << door
+          if args.state.rng.d6 > 1
+            door_angle = [:east, :west].include?(direction) ? 90 : 0
+            door = Furniture.new(:door, :wood, current_x, current_y, @depth, door_angle)
+            if args.state.rng.d6 > 5
+              door.openness = 1.0
+            end
+            @furniture << door
+          end
         end
       end
       if current_tile == :water
