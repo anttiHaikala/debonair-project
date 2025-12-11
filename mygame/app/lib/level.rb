@@ -239,15 +239,25 @@ class Level
         # first make sure there is wall on both sides of this piece of wall
         if direction == :east || direction == :west
           if @tiles[current_y-1][current_x] == :wall && @tiles[current_y+1][current_x] == :wall
-            new_tile = :floor
+            new_tile = :floor 
             create_door = true
           else
-            new_tile = :wall
+            new_tile = :floor 
           end
           if direction == :east && @tiles[current_y][current_x+1] == :wall || direction == :west && @tiles[current_y][current_x-1] == :wall
-            printf "Running into double wall: sidestep!\n"
-            direction = :north
-            current_y += 1
+            printf "Running into double wall: step back and sidestep!\n"
+            if direction == :east
+              current_x -= 1
+            else
+              current_x += 1
+            end
+            if @tiles[current_y-1][current_x] == :wall
+              direction = :north
+              current_y += 1
+            else
+              direction = :south
+              current_y -= 1
+            end
             next
           end
         elsif direction == :north || direction == :south
@@ -255,12 +265,22 @@ class Level
             new_tile = :floor
             create_door = true
           else
-            new_tile = :wall
+            new_tile = :floor 
           end
           if direction == :north && @tiles[current_y-1][current_x] == :wall || direction == :south && @tiles[current_y+1][current_x] == :wall
-            printf "Running into double wall: sidestep!\n"
-            direction = :east
-            current_x += 1
+            printf "Running into double wall: step back and sidestep!\n"
+            if direction == :north
+              current_y -= 1
+            else
+              current_y += 1
+            end
+            if @tiles[current_y][current_x-1] == :wall
+              direction = :east
+              current_x += 1
+            else
+              direction = :west
+              current_x -= 1
+            end
             next
           end
         else

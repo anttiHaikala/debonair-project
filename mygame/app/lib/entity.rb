@@ -32,10 +32,10 @@ class Entity
     @needs = []
     @perished = false
     @reason_of_death = nil
-    @carried_items = []
+    @carried_items = [] # worn and wielded items are also included in this list
     @worn_items = []
-    @behaviours = []
     @wielded_items = []
+    @behaviours = []
     @statuses = []
     @traits = []
     @feels = []
@@ -43,6 +43,10 @@ class Entity
     @facing = :west
     @mode_of_movement = :normal # :sneaking, :walking, :speeding
     @feel_cooldown = 0
+  end
+
+  def all_items(args)
+    return @carried_items + @worn_items + @wielded_items
   end
 
   def is_hostile_to?(other_entity)

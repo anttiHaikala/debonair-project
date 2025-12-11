@@ -382,7 +382,7 @@ class GUI
       y = entity.visual_y
       alpha = 255
       if entity.invisible?
-        alpha = 28
+        alpha = 90
       end
       lighting = level.lighting[y][x] # 0.0 to 1.0
       hue = entity.hue

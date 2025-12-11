@@ -170,7 +170,7 @@ class GUI
         if @@selected_poi == nil
           @@selected_poi = @@pois[0]
         else
-          current_index = @@pois.index(@@selected_poi)
+          current_index = @@pois.index(@@selected_poi) || 0
           current_index -= 1
           if current_index < 0
             current_index = @@pois.size - 1

@@ -66,6 +66,7 @@ require 'app/lib/valuable'
 require 'app/lib/wand'
 require 'app/lib/furniture'
 require 'app/lib/cheats'
+require 'app/lib/armor'
 
 def boot args
   args.state = {}

@@ -114,6 +114,8 @@ class Species
   # - on top level we have the BIG SEVEN body parts of a humanoid
   # - every one of these body parts is further divided to more exact locations
   # - need some cool way to name these levels
+  # - also need to figure out the direction of a hit (front, back, left, right, up, down)
+  # - this will help in determining which body part is hit based on attack direction and angle
 
   def self.humanoid_hit_locations
     [

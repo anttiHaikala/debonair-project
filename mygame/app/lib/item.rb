@@ -10,8 +10,8 @@ class Item
     @x = nil
     @y = nil
     @attributes = []
-    @traits = []
-    set_weight
+    @traits = []    
+    yield(self) if block_given?
   end
 
   def self.categories
@@ -166,7 +166,7 @@ class Item
     total_weight = 0.0
     if entity.carried_items
       entity.carried_items.each do |item|
-        total_weight += item.weight
+        total_weight += item.weight || 0.0
       end
     end
     return total_weight
@@ -295,10 +295,34 @@ class Item
     when :knight
       hero.carried_items << Weapon.new(:sword)
       # plate armour
+      hero.worn_items << Armor.new(:plate_armor_shirt)
+      hero.worn_items << Armor.new(:plate_armor_pants)
+      hero.worn_items << Armor.new(:helmet)
+    when :samurai
+      Weapon.new(:katana) do |weapon|
+        hero.carried_items << weapon
+        hero.wielded_items << weapon
+      end
+      Armor.new(:lamellar_armor_shirt) do |armor|
+        hero.carried_items << armor
+        hero.worn_items << armor
+      end
+      Armor.new(:lamellar_armor_pants) do |armor|
+        hero.carried_items << armor
+        hero.worn_items << armor
+      end
+      Armor.new(:kabuto) do |armor|
+        hero.carried_items << armor
+        hero.worn_items << armor
+      end 
     when :warrior
-      hero.carried_items << Weapon.new(:axe)
+      weapon = Weapon.new(:axe)
+      hero.carried_items << weapon
+      hero.wielded_items << weapon
       # fur shorts
-      
+      shorts = Armor.new(:fur_shorts)
+      hero.worn_items << shorts 
+      hero.carried_items << shorts
     end
 
   end

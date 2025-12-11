@@ -20,7 +20,6 @@ class Hero < Entity
     @sleep_deprivation = 0.2 # 0.0 = well-rested, 1.0 = totally sleep-deprived
     @insanity = 0.0 # 0.0 = sane, 1.0 = totally insane
     @stress = 0.0 # 0.0 = calm, 1.0 = totally stressed
-    @carried_items = []
     @max_depth = 0
     @known_potions = []
     @known_scrolls = []

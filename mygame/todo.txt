@@ -14,8 +14,9 @@ NOTES ON GAME SYSTEM (the DEBONAIR!)
     - it's really hard to make the combat timescale match with exploration time scale then again the starvation and sleeping timescale
 
 TODO LIST
-- DEBUG CHEATS: cycle through roles, species, gain items: 1 species, 2 role, 3 age, 4 scroll, 5 wand, 6 potion
-- charcter select screen 
+- architect secret doors
+- charcter creation screen 
+- death is a bit confusing, make it more pronounced and slower
 - keys
 - npc emojis (scared - angry - sad - happy - shock - )
 - banter!!! all npc's must have some kind of banter!!!
@@ -25,13 +26,12 @@ TODO LIST
 - more monster emotes (textual ones) - when behaviour changes!
 - skeletons vs pierce damage!!!!
 - stealth/hearing mechanics
-- if we have field of view, how to communicate hearing to the player (and/or smell)
+- how to communicate hearing to the player (and/or smell)
 - drop weapon when hand is hit, skill modifiers, handedness, wield-hand
 - make the game slow down properly when there is danger/combat by adding input cooldown
     - new entity detected
     - sustaining damage
 - wands
-- architect secret doors
 - architect secret/hidden items
 - detective should detect secret doors automagically
 - status / emotion markers!!!
@@ -46,6 +46,7 @@ TODO LIST
 - armor
 
 DONE LIST
+- DEBUG CHEATS: cycle through roles, species, gain items: 1 species, 2 role, 3 age, 4 scroll, 5 wand, 6 potion
 - stuck doors (strength roll to open)
 - locked doors
 - crashing doors
