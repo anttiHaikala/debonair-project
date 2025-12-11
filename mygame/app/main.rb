@@ -65,6 +65,7 @@ require 'app/lib/affordance'
 require 'app/lib/valuable'
 require 'app/lib/wand'
 require 'app/lib/furniture'
+require 'app/lib/cheats'
 
 def boot args
   args.state = {}
@@ -179,6 +180,7 @@ def gameplay_tick args
   HUD.draw args
   HUD.draw_minimap args
   HUD.draw_hero_status args
+  Cheats.handle_input args 
 end
 
 def staircase_tick args

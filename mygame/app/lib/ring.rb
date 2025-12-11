@@ -57,6 +57,12 @@ class Ring < Item
     ]
   end
 
+  def self.randomize(depth, args)
+    kind = Ring.kinds[args.state.rng.rand(Ring.kinds.size)]
+    ring = Ring.new(kind)
+    return ring
+  end
+
   def name
     mask_index = Ring.kinds.index(self.kind) % Ring.masks.length
     mask = Ring.masks[mask_index]

@@ -137,8 +137,8 @@ class Scroll < Item
         if Math.sqrt((x - entity.x)**2 + (y - entity.y)**2) <= radius
           if level.tiles[y][x] == :wall || level.tiles[y][x] == :rock
             level.tiles[y][x] = :floor
-            level.add_effect(:dig, x, y, args)
           end
+         level.add_effect(:dig, x, y, args)
         end
       end
     end

@@ -2,8 +2,8 @@ class Hero < Entity
 
   include Needy
 
-  attr_reader :role, :species, :trait, :age, :name, :exhaustion, :sleep_deprivation, :insanity, :carried_items, :max_depth
-  attr_accessor :hunger, :hunger_level, :stress, :perished, :reason_of_death, :known_potions, :known_scrolls, :known_wands
+  attr_reader :trait, :name, :exhaustion, :sleep_deprivation, :insanity, :carried_items, :max_depth
+  attr_accessor :role, :species, :age, :hunger, :hunger_level, :stress, :perished, :reason_of_death, :known_potions, :known_scrolls, :known_wands
 
   def initialize(x, y)
     super(x, y)

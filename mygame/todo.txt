@@ -14,6 +14,8 @@ NOTES ON GAME SYSTEM (the DEBONAIR!)
     - it's really hard to make the combat timescale match with exploration time scale then again the starvation and sleeping timescale
 
 TODO LIST
+- DEBUG CHEATS: cycle through roles, species, gain items: 1 species, 2 role, 3 age, 4 scroll, 5 wand, 6 potion
+- charcter select screen 
 - keys
 - npc emojis (scared - angry - sad - happy - shock - )
 - banter!!! all npc's must have some kind of banter!!!

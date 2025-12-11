@@ -17,9 +17,9 @@ Double click the ./dragonruby executable to start up the game.
 |:----------------|:-------------------------------------------------------------------------------|
 |D-pad/Left Stick | move and attack enemies (no diagonal movement is permitted) |
 |A                | rest, pick up objects, use staircases |
-|Left Trigger     | hold to strafe (move without changing facing) |
+|Left Trigger     | hold to change facing without moving |
 |Right Trigger    | hold to enable cursor mode where pressing A shows further options |
-|Left Shoulder    | hold to change facing without moving |
+|Left Shoulder    | hold to strafe (move without changing facing) |
 |Right Shoulder   | hold to view inventory, up/down to select item, A to use item, B to drop item |
 
 
@@ -33,6 +33,21 @@ Double click the ./dragonruby executable to start up the game.
 |Shift    | hold to view inventory, A to use item, B to drop item, up/down to select |
 |Cmd        | hold to change facing without moving |
 |Option     | hold to strafe (move without changing facing) |
+
+### Debug commands and cheats
+
+|Input          | Function |
+|:----------------|:-------------------------------------------------------------------------------|
+|ESC  | toggle debug mode |
+|1             | change hero species |
+|2     | change hero role |
+|3    | change hero trait |
+|4    | equip random scroll |
+|5    | equip random want |
+|6    | equip random potion |
+|7    | equip random ring |
+|0    | equip random weapon |
+
 
 ## Source code
 

@@ -92,7 +92,7 @@ class GUI
             if args.state.rng.d6 < 4
               # randomize item
               selected_index = args.state.rng.rand(hero.carried_items.size)
-              HUD.output_message("In your confused state, you fumble and use a random item!", args)
+              HUD.output_message(args, "In your confused state, you fumble and use a random item!")
               SoundFX.play_sound(:fumble, args)
             end
           end
