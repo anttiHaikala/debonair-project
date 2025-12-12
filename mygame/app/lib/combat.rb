@@ -90,8 +90,8 @@ class Combat
     # hit!
     HUD.output_message args, "#{aname} shoots #{item.title(args)} at #{dname} and hits!"
     body_part = defender.random_body_part(args)
-    hit_severity = self.hit_severity(attacker, defender, attack_roll, args)
     hit_kind = item.hit_kind(args)
+    hit_severity = self.hit_severity(attacker, defender, hit_kind, body_part, attack_roll, args)
     Trauma.inflict(defender, body_part, hit_kind, hit_severity, args)
     SoundFX.play_sound(:hit, args)
     verb = "#{hit_kind}s"
@@ -175,8 +175,8 @@ class Combat
     end
     # hit!
     body_part = defender.random_body_part(args)
-    hit_severity = self.hit_severity(attacker, defender, attack_roll, args)
     hit_kind = attacker.hit_kind(args)
+    hit_severity = self.hit_severity(attacker, defender, hit_kind, body_part, attack_roll, args)
     Trauma.inflict(defender, body_part, hit_kind, hit_severity, args)
     SoundFX.play_sound(:hit, args)
     verb = "#{hit_kind}s"
@@ -223,7 +223,8 @@ class Combat
     end    
   end
 
-  def self.hit_severity(attacker, defender, attack_roll, args)
+  def self.hit_severity(attacker, defender, hit_kind, body_part, attack_roll, args)
+    printf "Calculating hit severity for attack roll %d to body part %s\n" % [attack_roll, body_part.to_s.gsub('_', ' ')]
     severity_modifier = 0
     weapon_modifier = 0
     if attacker.wielded_items
@@ -264,13 +265,17 @@ class Combat
     if defender.worn_items
       defender.worn_items.each do |item|
         if item.kind == :ring_of_protection
-          severity_modifier -= 5
+          severity_modifier -= 4
+        end
+        if item.category == :armor
+          severity_modifier += item.protection_value(body_part, hit_kind, args) || 0
         end
       end
     end
+
     # attacker strong status
     if attacker.has_status?(:strenghtened)
-      severity_modifier += 5
+      severity_modifier += 3
     end
     # roll for severity
     severity_roll = args.state.rng.d20 + severity_modifier

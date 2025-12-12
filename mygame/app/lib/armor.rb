@@ -60,4 +60,50 @@ class Armor < Item
       HUD.output_message(args,"You take off the #{self.title(args)}.")
     end
   end
+
+  def protection_value(body_part, hit_kind, args) 
+    case self.kind
+    when :leather_armor_shirt
+      if [:upper_torso, :left_arm, :right_arm].include? body_part
+        return 2
+      end
+    when :leather_armor_pants
+      if [:left_leg, :right_leg, :lower_torso].include? body_part
+        return 2
+      end
+    when :chain_mail_shirt
+      if [:upper_torso, :left_arm, :right_arm].include? body_part
+        return 4
+      end
+    when :chain_mail_tank_top
+      if body_part == :upper_torso
+        return 4
+      end
+    when :full_plate_mail
+      if [:lower_torso, :upper_torso, :left_arm, :right_arm, :left_leg, :right_leg].include? body_part
+        return 6
+      end
+    when :armet
+      if body_part == :head
+        return 5
+      end
+    when :bascinet
+      if body_part == :head
+        return 4
+      end
+    when :gorget
+      if body_part == :neck
+        return 4
+      end
+    when :kabuto
+      if body_part == :head
+        return 4
+      end
+    when :menpo
+      if body_part == :face
+        return 3
+      end
+    end
+    return 0 
+  end
 end
