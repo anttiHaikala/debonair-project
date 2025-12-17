@@ -8,25 +8,8 @@ class TitleScreen
       x: 640, y: 300, text: "Press A To Start", size_enum: 3, alignment_enum: 1, r: 255, g: 255, b: 255, font: "fonts/greek-freak.ttf"
     }
     if args.inputs.keyboard.key_down.space || args.inputs.controller_one.key_down.a
-      self.start_new_game args
+      args.state.scene = :create_hero
+      CreateHero.reset
     end
-  end
-
-  def self.start_new_game args
-      args.state.run = Run.new args
-      args.state.run.setup args
-      GUI.initialize_state args
-      Tile.reset_memory_and_visibility
-      printf "Game start complete.\n"
-      printf "Dungeon has %d levels.\n" % args.state.dungeon.levels.size
-      args.state.dungeon.levels.each_with_index do |level, index|
-        printf " %s level %d has %d rooms and %d entities and %d items.\n" % [level.vibe, index, level.rooms.size, level.entities.size, level.items.size]
-      end
-      args.state.scene = :gameplay
-      Lighting.mark_lighting_stale
-      Lighting.calculate_lighting(Utils.level(args), args)
-      SoundFX.play_sound(:staircase, args)
-      Tile.observe_tiles(args)
-      HUD.output_message args, "You enter the dungeon seeking the legendary Amulet of Skandor. Good luck!"
   end
 end

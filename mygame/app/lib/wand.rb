@@ -130,7 +130,7 @@ class Wand < Item
   end
 
   def self.cast_healing(user, target_x, target_y, target_entity, args)
-    HUD.output_message(args, "#{user.name} zaps a healing spell towards (#{target_entity.title(args)})!")
+    HUD.output_message(args, "#{user.name} zaps a healing spell!")
     if target_entity
       effect = 0
       Trauma.active_traumas(target_entity).each do |trauma|

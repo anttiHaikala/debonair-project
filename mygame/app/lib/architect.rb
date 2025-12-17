@@ -138,10 +138,6 @@ class Architect
   end
 
   def populate_entities(args)
-    hero = Hero.new(args.state.dungeon_entrance_x, args.state.dungeon_entrance_y)
-    hero.set_depth(0, args)
-    args.state.hero = hero
-    args.state.dungeon.levels[0].entities << hero
     NPC.populate_dungeon(args.state.dungeon, args)
   end
 

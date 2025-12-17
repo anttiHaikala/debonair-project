@@ -92,16 +92,34 @@ class Level
     entry_room = Room.new(entry_room_x, entry_room_y, room_width, room_height)
     @rooms << entry_room
     printf "Created entry room at (%d,%d) size %d x %d\n" % [entry_room.x, entry_room.y, entry_room.w, entry_room.h]
-    printf (entry_room.y...(entry_room.y + entry_room.h)).inspect
-    for i in (entry_room.y...(entry_room.y + entry_room.h))
-      for j in (entry_room.x...(entry_room.x + entry_room.w))
-        if i == entry_room.y || i == (entry_room.y + entry_room.h - 1) || j == entry_room.x || j == (entry_room.x + entry_room.w - 1)
-          @tiles[i][j] = :wall if @tiles[i][j] == :rock
-        else
-          @tiles[i][j] = :floor if @tiles[i][j] == :rock
+    if self.vibe == :rocky
+        # make rocky levels have bigger rooms that are round, not square
+        radius_x = (entry_room.w / 2).to_i
+        radius_y = (entry_room.h / 2).to_i
+        for i in entry_room.y...(entry_room.y + entry_room.h)
+          for j in entry_room.x...(entry_room.x + entry_room.w)
+            # check level boundaries
+            next if i < 1 || i >= @tiles.size - 1
+            next if j < 1 || j >= @tiles[0].size - 1
+            dx = j - entry_room.center_x
+            dy = i - entry_room.center_y
+            if ((dx * dx) * (radius_y * radius_y) + (dy * dy) * (radius_x * radius_x)) <= (radius_x * radius_x) * (radius_y * radius_y)
+              # inside ellipse, no walls
+              @tiles[i][j] = :floor if @tiles[i][j] == :rock
+            end
+          end
+        end
+      else
+        for i in entry_room.y...(entry_room.y + entry_room.h)
+          for j in entry_room.x...(entry_room.x + entry_room.w)
+            if i == entry_room.y || i == (entry_room.y + entry_room.h - 1) || j == entry_room.x || j == (entry_room.x + entry_room.w - 1)
+              @tiles[i][j] = :wall if @tiles[i][j] == :rock
+            else
+              @tiles[i][j] = :floor if @tiles[i][j] == :rock
+            end
+          end
         end
       end
-    end
   end
 
   def create_rooms(staircase_x, staircase_y, args)

@@ -5,14 +5,14 @@ class Hero < Entity
   attr_reader :trait, :name, :exhaustion, :sleep_deprivation, :insanity, :carried_items, :max_depth
   attr_accessor :role, :species, :age, :hunger, :hunger_level, :stress, :perished, :reason_of_death, :known_potions, :known_scrolls, :known_wands
 
-  def initialize(x, y)
-    super(x, y)
+  def initialize(age, trait, species, role)
+    super(1, 1) # just random values, will be set properly when placed in dungeon
     initialize_needs
     @kind = :pc
-    @role = Hero.roles.sample
-    @species = Hero.species.sample
-    @traits = [Hero.traits.sample]
-    @age = Hero.age.sample
+    @role = role
+    @species = species
+    @traits = [trait]
+    @age = age
     @name = random_name
     @exhaustion = 0.2 # 0.0 = totally rested, 1.0 = totally exhausted
     @hunger = 0.2 # 0.0 = satiated, 1.0 = starving
@@ -46,38 +46,38 @@ class Hero < Entity
     [
       :human,
       :elf,
-      :dwarf,
-      :orc,
-      :gnome,
-      :halfling,
       :dark_elf,
+      :duck, # glorantha style
+      :dwarf,
+      :gnome,
       :goblin,
+      :halfling,
+      :orc,
       :troll,
-      :duck # glorantha style
     ]
   end
 
   def self.age
     [
-      :teen,
       :adult,
-      :elder
+      :elder,
+      :teen
     ]
   end
 
   def self.traits
     [
-      :none,
-      :undead,
-      :mutant,
-      :cyborg,      
+      :normal,
       :alien,
+      :angel,
+      :cyborg,      
+      :demon,
+      :mutant,
+      :undead,
       :robot,
       :vampire,
       :werewolf,
-      :zombie,
-      :demon,
-      :angel
+      :zombie
     ]
   end
 

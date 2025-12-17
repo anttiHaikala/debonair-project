@@ -67,6 +67,7 @@ require 'app/lib/wand'
 require 'app/lib/furniture'
 require 'app/lib/cheats'
 require 'app/lib/armor'
+require 'app/lib/create_hero'
 
 def boot args
   args.state = {}
@@ -114,6 +115,8 @@ def tick args
     game_over_tick args
   when :high_score_list
     high_score_list args
+  when :create_hero
+    CreateHero.tick args
   end
 end
 
