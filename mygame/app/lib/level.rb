@@ -81,13 +81,38 @@ class Level
     return @tiles[y][x]
   end
 
-  def create_rooms(args)
-    # first put some walls in there
+  def create_entry_room(staircase_x, staircase_y, args)
+    room_width = 2 + args.state.rng.d6
+    room_height = 2 + args.state.rng.d6
+    args.state.dungeon_entrance_x
+    entry_room_x = staircase_x - (room_width / 2).to_i
+    entry_room_x = 1 if entry_room_x < 1
+    entry_room_y = staircase_y - (room_height / 2).to_i
+    entry_room_y = 1 if entry_room_y < 1
+    entry_room = Room.new(entry_room_x, entry_room_y, room_width, room_height)
+    @rooms << entry_room
+    printf "Created entry room at (%d,%d) size %d x %d\n" % [entry_room.x, entry_room.y, entry_room.w, entry_room.h]
+    printf (entry_room.y...(entry_room.y + entry_room.h)).inspect
+    for i in (entry_room.y...(entry_room.y + entry_room.h))
+      for j in (entry_room.x...(entry_room.x + entry_room.w))
+        if i == entry_room.y || i == (entry_room.y + entry_room.h - 1) || j == entry_room.x || j == (entry_room.x + entry_room.w - 1)
+          @tiles[i][j] = :wall if @tiles[i][j] == :rock
+        else
+          @tiles[i][j] = :floor if @tiles[i][j] == :rock
+        end
+      end
+    end
+  end
+
+  def create_rooms(staircase_x, staircase_y, args)
+    # first put some rock in there
     for y in 0...@tiles.size
       for x in 0...@tiles[y].size
         @tiles[y][x] = :rock unless @tiles[y][x] == :staircase_up
       end
     end
+    # create entry room
+    create_entry_room(staircase_x, staircase_y, args)
     # Code to create rooms in the level
     room_target = Numeric.rand(7..12)
     safety = 0  

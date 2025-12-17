@@ -14,8 +14,10 @@ NOTES ON GAME SYSTEM (the DEBONAIR!)
     - it's really hard to make the combat timescale match with exploration time scale then again the starvation and sleeping timescale
 
 TODO LIST
-- architect secret doors
+- fix the corridor algo
 - charcter creation screen 
+- architect secret doors
+- taming grid bugs / rats with food
 - death is a bit confusing, make it more pronounced and slower
 - keys
 - npc emojis (scared - angry - sad - happy - shock - )
@@ -31,21 +33,21 @@ TODO LIST
 - make the game slow down properly when there is danger/combat by adding input cooldown
     - new entity detected
     - sustaining damage
-- wands
 - architect secret/hidden items
 - detective should detect secret doors automagically
 - status / emotion markers!!!
 - do undead get shock or do they just crumble to dust?
-- magic missiles
 - grid bug coloring (can we get gradients or something??)
-- taming grid bugs with food
 - fix levels that do not have exit
 - tending to wounds
 - pickaxe cheat / mining bombs / hold down y to dig
 - body parts have a tree
-- armor
+- chain mail vs pierce damage? chain mail vs blunt damage?
 
 DONE LIST
+- magic missiles
+- wands
+- armor
 - DEBUG CHEATS: cycle through roles, species, gain items: 1 species, 2 role, 3 age, 4 scroll, 5 wand, 6 potion
 - stuck doors (strength roll to open)
 - locked doors

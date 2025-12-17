@@ -89,7 +89,7 @@ class Architect
       should_be_same = args.state.dungeon.levels[depth].tiles[staircase_y][staircase_x]
 
       # add rooms and corridors
-      level.create_rooms(args)
+      level.create_rooms(staircase_x, staircase_y, args)
       level.create_corridors(args)
       level.add_waters(args)
 
@@ -97,9 +97,7 @@ class Architect
       printf level.rooms.size.to_s + " rooms created at depth %d with vibe %s\n" % [depth, vibe.to_s]
       # find the closest room among level.rooms
       entry_room = level.rooms.min_by { |room| Math.sqrt((room.center_x - staircase_x)**2 + (room.center_y - staircase_y)**2) }
-      
-      level.dig_corridor(args, staircase_x, staircase_y, entry_room.center_x, entry_room.center_y)
-
+    
       # finally place staircase down in a room
       if depth < (@settings[:levels] - 1)
         exit_room = level.rooms.sample

@@ -46,7 +46,7 @@ Double click the ./dragonruby executable to start up the game.
 |5    | equip random want |
 |6    | equip random potion |
 |7    | equip random ring |
-|0    | equip random weapon |
+§|0    | equip random weapon |
 
 
 ## Source code
