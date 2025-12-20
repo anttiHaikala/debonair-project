@@ -119,6 +119,7 @@ class Tile
     SoundFX.play(:mapping, args)
   end
 
+  # this method is called every now and then to update visible and memorized tiles
   def self.observe_tiles args
     dungeon = args.state.dungeon
     level = dungeon.levels[args.state.current_depth]
@@ -156,6 +157,43 @@ class Tile
         end
       end
     end
+    # expand tile visibility so that adjacent tiles are also visible if the main tile is visible and it is open space (floor or water)
+    expanded_tiles = []
+    for y in (y_start..y_end)
+      for x in (x_start..x_end)
+        # vision range
+        if Utils::distance(hero_x, hero_y, x, y) > vision_range
+          next
+        end
+        # check fov
+        if Utils.in_hero_fov?(x, y, args) == false
+          next
+        end
+        # expand visibility
+        if tile_visibility[y][x] == true
+          tile = level.tiles[y][x]
+          if tile == :floor || tile == :water || tile == :ice
+            # make adjacent tiles visible
+            [[-1, 1],[-1, -1],[-1, 0],[1, 1],[1, 0],[1, -1],[0, -1],[0, 1]].each do |dx, dy|
+              nx = x + dx
+              ny = y + dy
+              if nx >= x_start && nx <= x_end && ny >= y_start && ny <= y_end
+                expanded_tiles[ny] ||= []
+                expanded_tiles[ny][nx] = true
+              end
+            end
+          end
+        end
+      end
+    end
+    for y in (y_start..y_end)
+      for x in (x_start..x_end)
+        if expanded_tiles[y] && expanded_tiles[y][x]
+          tile_visibility[y][x] = true
+        end
+      end
+    end
+  
     @@tile_visibility_per_level[args.state.current_depth] = tile_visibility
 
     # update memory with currently visible tiles

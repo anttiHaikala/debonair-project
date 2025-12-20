@@ -29,17 +29,18 @@ class CreateHero
       args.state.hero = Hero.new(selected_age, selected_trait, selected_species, selected_role)
       printf "Created new hero: %s\n" % args.state.hero.name
       Run.start_new_game args, args.state.hero
+      args.state.scene = :gameplay
     end
     # cursor movement
-    if args.inputs.keyboard.key_down.right || args.inputs.controller_one.right
+    if args.inputs.keyboard.key_down.right || args.inputs.controller_one.key_down.right
       @@cursor_index += 1
       @@cursor_index = 0 if @@cursor_index > 3
     end
-    if args.inputs.keyboard.key_down.left || args.inputs.controller_one.left
+    if args.inputs.keyboard.key_down.left || args.inputs.controller_one.key_down.left
       @@cursor_index -= 1
       @@cursor_index = 3 if @@cursor_index < 0
     end
-    if args.inputs.keyboard.key_down.up || args.inputs.controller_one.up
+    if args.inputs.keyboard.key_down.up || args.inputs.controller_one.key_down.up
       case @@cursor_index
       when 0
         @@age_index -= 1
@@ -55,7 +56,7 @@ class CreateHero
         @@role_index = Hero.roles.size - 1 if @@role_index < 0
       end
     end
-    if args.inputs.keyboard.key_down.down || args.inputs.controller_one.down
+    if args.inputs.keyboard.key_down.down || args.inputs.controller_one.key_down.down
       case @@cursor_index
       when 0
         @@age_index += 1

@@ -142,6 +142,9 @@ class Entity
         end
       end
     end
+    if self.has_status?(:invisible)
+      invisibility = true
+    end
     return invisibility
   end
 
@@ -205,15 +208,19 @@ class Entity
       end
     end
     if level.is_walkable?(x,y)
-      self.x = x
-      self.y = y
-      self.visual_x = x
-      self.visual_y = y
+      self.set_location(x, y)
       SoundFX.play_sound(:teleport, args)
       GUI.mark_tiles_stale
       Lighting.mark_lighting_stale
       HUD.mark_minimap_stale
     end
+  end
+
+  def set_location(x, y)
+    self.x = x
+    self.y = y
+    self.visual_x = x
+    self.visual_y = y
   end
 
   def slowed_in_water?

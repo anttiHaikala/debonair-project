@@ -166,12 +166,12 @@ class Furniture
         # check if the door is unsupported (no walls beside it at right angles)
         supported = false
         case f.rotation
-        when 0, 180
+        when 90, 270
           # east-west door, check north and south
           if level.tile_at(f.x, f.y - 1) == :wall || level.tile_at(f.x, f.y + 1) == :wall
             supported = true
           end
-        when 90, 270
+        when 0, 180
           # north-south door, check east and west
           if level.tile_at(f.x - 1, f.y) == :wall || level.tile_at(f.x + 1, f.y) == :wall
             supported = true

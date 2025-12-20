@@ -142,9 +142,9 @@ module Utils
   end
 
   def self.line_of_sight?(x0, y0, x1, y1, level)
-    line_points = get_line(x0, x1, y0, y1)
-    line_points.shift
-    line_points.pop
+    line_points = get_line(x0, x1, y0, y1) # Bresenham line algorithm
+    line_points.shift # the first point is the source tile, skip it (cannot block los)
+    line_points.pop  # the last point is the target tile, skip it (cannot block los)
     line_points.each do |point|
       tile = level.tiles[point[:y]][point[:x]]
       if Tile.blocks_line_of_sight?(tile)

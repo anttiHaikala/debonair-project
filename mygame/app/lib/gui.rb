@@ -1,21 +1,35 @@
 class GUI
 
   def self.initialize_state args
+
+    # general
+    @@input_cooldown = 0
+    @@menu_cooldown = 0
+
+    # special fx
+    @@color_flash = nil
+
+    # hero movement
+    @@moving_frames = 0
+    @@strafing = false
     @@auto_move = nil
     @@hero_locked = false
     @@just_used_staircase = true
-    @@input_cooldown = 0
-    @@moving_frames = 0
     @@standing_still_frames = 0
-    @@tiles_observed = false
-    @@color_flash = nil
-    @@menu_cooldown = 0
+
+    # look mode
     @@look_mode_index = nil
     @@look_mode_cooldown = 0
     @@look_mode_frames = nil
     @@look_mode_x = nil
     @@look_mode_y = nil
-    @@strafing = false
+
+    # behaviours that include caching
+    @@tiles_observed = false
+  end
+
+  def self.mark_tiles_stale
+    @@tiles_observed = false
   end
 
   def self.standing_still_frames
@@ -342,12 +356,12 @@ class GUI
     Foliage.draw(args, level)
   end
 
-
   def self.draw_entities args
     level = Utils.level(args)
     return unless level
     level.entities.each do |entity|
       telepathic_connection = false
+      next unless entity.x && entity.y && entity.visual_x && entity.visual_y
       unless entity == args.state.hero
         # then check tile visibility
         visible = Tile.is_tile_visible?(entity.x, entity.y, args) && !entity.invisible?
@@ -556,6 +570,7 @@ class GUI
     level = args.state.dungeon.levels[args.state.current_depth]
     return unless level
     level.entities.each do |entity|
+      next unless entity.x && entity.y && entity.visual_x && entity.visual_y
       if entity.visual_x < entity.x
         entity.visual_x += animation_speed
         if entity.visual_x > entity.x
@@ -605,21 +620,13 @@ class GUI
     end    
   end
 
-  def self.mark_tiles_stale
-    @@tiles_observed = false
-  end
-
   def self.unlock_hero(args)
     @@hero_locked = false
     @@tiles_observed = false
-    # check if we stepped on something?
     x = args.state.hero.x
     y = args.state.hero.y
     @@look_mode_x = x
     @@look_mode_y = y
-    level = args.state.hero.depth
-    dungeon = args.state.dungeon
-    tile = dungeon.levels[level].tiles[y][x]
     Lighting.mark_lighting_stale
     HUD.mark_minimap_stale
   end

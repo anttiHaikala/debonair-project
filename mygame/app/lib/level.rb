@@ -31,6 +31,10 @@ class Level
     @los_cache = {}
   end
 
+  def reset_los_cache
+    @los_cache = {}
+  end
+
   def width
     return @tiles[0].size if @tiles.size > 0
   end
@@ -93,33 +97,35 @@ class Level
     @rooms << entry_room
     printf "Created entry room at (%d,%d) size %d x %d\n" % [entry_room.x, entry_room.y, entry_room.w, entry_room.h]
     if self.vibe == :rocky
-        # make rocky levels have bigger rooms that are round, not square
-        radius_x = (entry_room.w / 2).to_i
-        radius_y = (entry_room.h / 2).to_i
-        for i in entry_room.y...(entry_room.y + entry_room.h)
-          for j in entry_room.x...(entry_room.x + entry_room.w)
-            # check level boundaries
-            next if i < 1 || i >= @tiles.size - 1
-            next if j < 1 || j >= @tiles[0].size - 1
-            dx = j - entry_room.center_x
-            dy = i - entry_room.center_y
-            if ((dx * dx) * (radius_y * radius_y) + (dy * dy) * (radius_x * radius_x)) <= (radius_x * radius_x) * (radius_y * radius_y)
-              # inside ellipse, no walls
-              @tiles[i][j] = :floor if @tiles[i][j] == :rock
-            end
-          end
-        end
-      else
-        for i in entry_room.y...(entry_room.y + entry_room.h)
-          for j in entry_room.x...(entry_room.x + entry_room.w)
-            if i == entry_room.y || i == (entry_room.y + entry_room.h - 1) || j == entry_room.x || j == (entry_room.x + entry_room.w - 1)
-              @tiles[i][j] = :wall if @tiles[i][j] == :rock
-            else
-              @tiles[i][j] = :floor if @tiles[i][j] == :rock
-            end
+      # make rocky levels have bigger rooms that are round, not square
+      radius_x = (entry_room.w / 2).to_i
+      radius_y = (entry_room.h / 2).to_i
+      for i in entry_room.y...(entry_room.y + entry_room.h)
+        @tiles[i] ||= []
+        for j in entry_room.x...(entry_room.x + entry_room.w)
+          # check level boundaries
+          next if i < 1 || i >= @tiles.size - 1
+          next if j < 1 || j >= @tiles[0].size - 1
+          dx = j - entry_room.center_x
+          dy = i - entry_room.center_y
+          if ((dx * dx) * (radius_y * radius_y) + (dy * dy) * (radius_x * radius_x)) <= (radius_x * radius_x) * (radius_y * radius_y)
+            # inside ellipse, no walls
+            @tiles[i][j] = :floor if @tiles[i][j] == :rock
           end
         end
       end
+    else
+      for i in entry_room.y...(entry_room.y + entry_room.h)
+        @tiles[i] ||= []
+        for j in entry_room.x...(entry_room.x + entry_room.w)
+          if i == entry_room.y || i == (entry_room.y + entry_room.h - 1) || j == entry_room.x || j == (entry_room.x + entry_room.w - 1)
+            @tiles[i][j] = :wall if @tiles[i][j] == :rock
+          else
+            @tiles[i][j] = :floor if @tiles[i][j] == :rock
+          end
+        end
+      end
+    end
   end
 
   def create_rooms(staircase_x, staircase_y, args)
@@ -281,9 +287,19 @@ class Level
       if current_tile == :wall
         # first make sure there is wall on both sides of this piece of wall
         if direction == :east || direction == :west
+          # check if there is door either north or south - doors are not tiles???
+          if @tiles[current_y-1][current_x] == :door || @tiles[current_y+1][current_x] == :door
+            if direction == :east
+              current_x += 1
+            else
+              current_x -= 1
+            end
+            next # let's just skip to next square. hope the door fixed it
+          end
           if @tiles[current_y-1][current_x] == :wall && @tiles[current_y+1][current_x] == :wall
             new_tile = :floor 
             create_door = true
+            printf "We should create door at (%d,%d)\n" % [current_x, current_y]
           else
             new_tile = :floor 
           end
@@ -304,6 +320,14 @@ class Level
             next
           end
         elsif direction == :north || direction == :south
+          if @tiles[current_y][current_x-1] == :door || @tiles[current_y][current_x+1] == :door
+            if direction == :north
+              current_y += 1
+            else
+              current_y -= 1
+            end
+            next # let's just skip to next square. hope the door fixed it
+          end
           if @tiles[current_y][current_x-1] == :wall && @tiles[current_y][current_x+1] == :wall
             new_tile = :floor
             create_door = true
@@ -330,6 +354,7 @@ class Level
           new_tile = :floor
         end
         if create_door
+          printf "Creating door at (%d,%d)\n" % [current_x, current_y]
           if args.state.rng.d6 > 1
             door_angle = [:east, :west].include?(direction) ? 90 : 0
             door = Furniture.new(:door, :wood, current_x, current_y, @depth, door_angle)
@@ -344,6 +369,18 @@ class Level
               door.stuck = args.state.rng.d12 + 8 # door is stuck, needs strength test to open
             end
             @furniture << door
+            @tiles[current_y][current_x] = :floor if current_tile == :rock || current_tile == :wall
+            case direction
+            when :east
+              current_x += 1
+            when :west
+              current_x -= 1
+            when :north
+              current_y += 1
+            when :south
+              current_y -= 1  
+            end
+            next
           end
         end
       end

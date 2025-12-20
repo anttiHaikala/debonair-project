@@ -131,6 +131,7 @@ class Architect
       end
 
       level.add_foliage(args)
+      Furniture.remove_unsupported_doors(level, args)
       Trap.populate_for_level(level, args)
 
     end

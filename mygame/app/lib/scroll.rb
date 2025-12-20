@@ -142,6 +142,7 @@ class Scroll < Item
         end
       end
     end
+    level.reset_los_cache
     Furniture.remove_unsupported_doors(level, args)
     GUI.mark_tiles_stale
     HUD.mark_minimap_stale

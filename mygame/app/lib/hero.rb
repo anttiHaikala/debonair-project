@@ -6,7 +6,7 @@ class Hero < Entity
   attr_accessor :role, :species, :age, :hunger, :hunger_level, :stress, :perished, :reason_of_death, :known_potions, :known_scrolls, :known_wands
 
   def initialize(age, trait, species, role)
-    super(1, 1) # just random values, will be set properly when placed in dungeon
+    super(nil, nil) # we don't know the location yet 
     initialize_needs
     @kind = :pc
     @role = role

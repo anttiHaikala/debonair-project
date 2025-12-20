@@ -21,14 +21,11 @@ class Run
     printf "Dungeon seed: %s\n" % args.state.seed
     args.state.architect.architect_dungeon(args)
     @dungeon = args.state.dungeon # TODO: should we only access these things below the :run attribute?
-
     # hero settings
-    hero.x = args.state.dungeon_entrance_x
-    hero.y = args.state.dungeon_entrance_y
+    hero.set_location(args.state.dungeon_entrance_x, args.state.dungeon_entrance_y)
     hero.set_depth(0, args)
     args.state.hero = hero
     args.state.dungeon.levels[0].entities << hero
-
     @hero = hero
     args.state.current_depth = 0
     args.state.kronos = Kronos.new
@@ -46,7 +43,6 @@ class Run
     args.state.dungeon.levels.each_with_index do |level, index|
       printf " %s level %d has %d rooms and %d entities and %d items.\n" % [level.vibe, index, level.rooms.size, level.entities.size, level.items.size]
     end
-    args.state.scene = :gameplay
     Lighting.mark_lighting_stale
     Lighting.calculate_lighting(Utils.level(args), args)
     SoundFX.play_sound(:staircase, args)
