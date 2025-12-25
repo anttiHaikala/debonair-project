@@ -14,11 +14,41 @@ class Item
     yield(self) if block_given?
   end
 
+  #footwear and helmet should be included in armor
   def self.categories
     return [:food, :weapon, :potion, :armor, :scroll, :wand, :ring, :scroll, :amulet, :gloves, :footwear, :helmet, :portable_light, :corpse]
   end
 
-  def set_weight # grams
+  def set_weight # kilograms
+    case @category
+    when :food
+      @weight = 0.4 
+    when :weapon
+      @weight = 1.0
+    when :potion
+      @weight = 0.2
+    when :armor
+      @weight = 4.0
+    when :scroll
+      @weight = 0.2
+    when :wand
+      @weight = 0.1
+    when :ring
+      @weight = 0.02
+    when :amulet
+      @weight = 0.2
+    when :gloves
+      @weight = 0.4
+    when :footwear
+      @weight = 0.4
+    when :helmet
+      @weight = 0.3
+    else
+      @weight = 0.4
+    end
+  end
+
+  def set_weight_in_kilograms  # kilograms
     case @category
     when :food
       @weight = 0.4 
@@ -157,6 +187,13 @@ class Item
           item.x = room.center_x
           item.y = room.center_y
           level.items << item      
+        when 9
+            puts 'attempting to place armor'
+            item = Armor.randomize(level.depth, args)
+            item.depth = level.depth
+            item.x = room.center_x
+            item.y = room.center_y
+            level.items << item
       end
     end
   end
