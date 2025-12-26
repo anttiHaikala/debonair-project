@@ -268,7 +268,7 @@ class Combat
           severity_modifier -= 4
         end
         if item.category == :armor
-          severity_modifier += item.protection_value(body_part, hit_kind, args) || 0
+          severity_modifier -= item.protection_value(body_part, hit_kind, args) || 0
         end
       end
     end
@@ -279,6 +279,7 @@ class Combat
     end
     # roll for severity
     severity_roll = args.state.rng.d20 + severity_modifier
+    printf "Severity roll: %d (modifier %d)\n" % [severity_roll, severity_modifier]
     case severity_roll
     when 1..10
       return :minor
