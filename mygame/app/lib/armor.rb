@@ -171,7 +171,7 @@ class Armor < Item
 
   attr_accessor :coverage, :meta
 
-  def initialize(kind, &block)
+  def initialize(kind, args=nil, &block)
     blueprint = ARMOR_DATA[kind] || { coverage: {}, meta: {} }
     @coverage = blueprint[:coverage].dup
     @meta     = blueprint[:meta].dup
