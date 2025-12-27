@@ -1,4 +1,5 @@
-# these are actions that can be performed on tiles or objects
+# these are actions that can be performed on tiles or objects 
+# usually these actions are accessed via the "look mode"
 class Affordance
   attr_reader :level, :x, :y, :kind, :target_entity, :item
 
@@ -43,6 +44,7 @@ class Affordance
     # affordances given by throwing potions
     target_entity = level.entity_at(x, y)
     hero.wielded_items.each do |item|
+      next unless item
       if item.category == :wand
         affordances << Affordance.new(level, x, y, :zap, target_entity, item)
       end

@@ -162,18 +162,12 @@ def gameplay_tick args
   GUI.handle_input args
   args.state.kronos.advance_time args
   GUI.update_entity_animations args
-  start_profile(:lighting_calculation, args)
   Lighting.calculate_lighting(args.state.dungeon.levels[args.state.current_depth], args) if $dynamic_light_system
-  end_profile(:lighting_calculation, args)
   GUI.draw_background args
   GUI.draw_tiles args
-  start_profile(:foliage_drawing, args)
   GUI.draw_foliage args
   Trap.draw_traps args
-  end_profile(:foliage_drawing, args)
-  start_profile(:light_drawing, args)
   Light.draw_lights args
-  end_profile(:light_drawing, args)
   GUI.draw_furniture args
   GUI.draw_items args
   GUI.draw_entities args
