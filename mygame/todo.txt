@@ -14,6 +14,7 @@ NOTES ON GAME SYSTEM (the DEBONAIR!)
     - it's really hard to make the combat timescale match with exploration time scale then again the starvation and sleeping timescale
 
 TODO LIST
+- IMPORTANT: wielded items somehow gets nils now, must fix soon
 - fix the corridor algo
 - charcter creation screen 
 - architect secret doors

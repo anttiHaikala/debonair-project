@@ -48,6 +48,7 @@ class Run
     SoundFX.play_sound(:staircase, args)
     Tile.observe_tiles(args)
     HUD.output_message args, "You enter the dungeon seeking the legendary Amulet of Skandor. Good luck!"
-end
-
+    GUI.mark_tiles_stale
+    Lighting.mark_lighting_stale
+  end
 end
