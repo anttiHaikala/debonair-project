@@ -226,11 +226,14 @@ class Level
     return nil
   end
 
-  def is_walkable?(x, y)
+  def is_walkable?(x, y, args)
     tile = tile_at(x, y)
+    furniture = Furniture.furniture_at(x, y, self, args)
+    return false if furniture && furniture.blocks_movement?(args)
     return false if tile.nil?
-    walkable_tiles = [:floor, :closed_door, :open_door, :staircase_up, :staircase_down]
-    return walkable_tiles.include?(tile)
+    return true if Tile.is_walkable?(tile, args)
+    return true if tile == :wall && furniture && furniture.kind == :secret_door && furniture.openness > 0.0
+    return false
   end
 
   def add_foliage(args)
@@ -353,11 +356,22 @@ class Level
         else
           new_tile = :floor
         end
+        # check if door already exists here
+        if Furniture.furniture_at(current_x, current_y, self, args)
+          create_door = false
+        end
         if create_door
-          printf "Creating door at (%d,%d)\n" % [current_x, current_y]
+          printf "Creating door at (%d,%d) (current tile: %s)\n" % [current_x, current_y, @tiles[current_y][current_x].to_s]
           if args.state.rng.d6 > 1
             door_angle = [:east, :west].include?(direction) ? 90 : 0
-            door = Furniture.new(:door, :wood, current_x, current_y, @depth, door_angle)
+            secret_roll = args.state.rng.d20
+            if secret_roll > 7
+              kind = :secret_door
+              new_tile = :wall # keep wall tile for secret door
+            else
+              kind = :door
+            end
+            door = Furniture.new(kind, :wood, current_x, current_y, @depth, door_angle)
             if args.state.rng.d6 > 5
               door.openness = 1.0
             end
@@ -369,7 +383,7 @@ class Level
               door.stuck = args.state.rng.d12 + 8 # door is stuck, needs strength test to open
             end
             @furniture << door
-            @tiles[current_y][current_x] = :floor if current_tile == :rock || current_tile == :wall
+            @tiles[current_y][current_x] = new_tile if current_tile == :rock || current_tile == :wall
             case direction
             when :east
               current_x += 1

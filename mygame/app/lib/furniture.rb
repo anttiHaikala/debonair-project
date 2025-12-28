@@ -42,7 +42,9 @@ class Furniture
     :door,
     :bed,
     :chair,
-    :table
+    :table,
+    :secret_door,
+    :chest
   ]
   end
 
@@ -63,8 +65,15 @@ class Furniture
     return [40, 30, 40]
   end
 
+  def hidden?
+    if @kind == :secret_door && @seen_by_hero == false
+      return true
+    end
+    return false
+  end
+
   def title(args)
-    t = "#{@material.to_s} #{@kind.to_s}"
+    t = "#{@material.to_s} #{@kind.to_s}".gsub('_',' ') 
     if @kind == :door
       if @openness == 0
         return t + " (closed)"
@@ -84,27 +93,29 @@ class Furniture
     return nil
   end
 
-  def self.blocks_movement?(x, y, level, args)
-    furniture = Furniture.furniture_at(x, y, level, args)
-    return false unless furniture
-    case furniture.kind
-    when :door
-      if furniture.openness >= 0.5
+  def blocks_movement? args
+    case self.kind
+    when :door, :secret_door
+      if self.openness > 0.0
         return false
       end
     end
     return true
   end
+
+  def self.blocks_movement?(x, y, level, args)
+    furniture = Furniture.furniture_at(x, y, level, args)
+    if furniture && furniture.blocks_movement?(args) 
+      return true
+    end
+  end
+
   def self.blocks_line_of_sight?(x, y, level, args)
     furniture = Furniture.furniture_at(x, y, level, args)
-    return false unless furniture
-    case furniture.kind
-    when :door
-      if furniture.openness >= 0.5
-        return false
-      end
+    if furniture && furniture.blocks_movement?(args) 
+      return true
     end
-    return true
+    return false
   end
 
   def is_toggled_by(entity, args)

@@ -113,7 +113,9 @@ class GUI
     # describe furniture
     level.furniture.each do |furniture|
       if furniture.x == x && furniture.y == y
-        description << furniture.title(args)
+        unless furniture.hidden?
+          description << furniture.title(args)
+        end
       end
     end
     # describe entities

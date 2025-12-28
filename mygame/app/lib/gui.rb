@@ -149,6 +149,8 @@ class GUI
       args.state.kronos.spend_time(hero, hero.walking_speed * 0.20, args)
       GUI.mark_tiles_stale
       Lighting.mark_lighting_stale
+      hero.detect_traps args if hero == args.state.hero
+      hero.detect_secret_doors args if hero == args.state.hero
       self.add_input_cooldown 20
       return true
     else
@@ -461,6 +463,7 @@ class GUI
   # return false if move not possible
   def self.move_player dx, dy, args
     hero = args.state.hero
+    level = args.state.dungeon.levels[hero.depth]
     if hero.has_status?(:shocked)
       HUD.output_message args, "You attempt to move but cannot due to shock!"
       args.state.kronos.spend_time(hero, hero.walking_speed * 4, args)
@@ -499,8 +502,7 @@ class GUI
       @@auto_move = nil
       return false
     end
-    target_tile = args.state.dungeon.levels[hero.depth].tiles[hero.y + dy][hero.x + dx]
-    unless Tile.is_walkable?(target_tile, args)
+    unless level.is_walkable?(hero.x + dx, hero.y + dy, args)
       @@auto_move = nil
       # add input cooldown
       self.add_input_cooldown 20
@@ -712,9 +714,10 @@ class GUI
       # check visibility and memory
       visible = Tile.is_tile_visible?(furniture.x, furniture.y, args)
       remembered = furniture.seen_by_hero
-      if visible && !remembered
+      if visible && !remembered && furniture.kind != :secret_door
         furniture.seen_by_hero = true
       end
+      next if furniture.kind == :secret_door && !remembered
       next unless visible || remembered
       saturation_modifier = visible ? 1.0 : 0.7
       lighting = level.lighting[furniture.y][furniture.x] # 0.0 to 1.0
@@ -730,7 +733,7 @@ class GUI
       x_offset_adjustment = 0
       y_offset_adjustment = 0
       angle = furniture.rotation
-      if furniture.kind == :door && furniture.openness > 0
+      if (furniture.kind == :door || furniture.kind == :secret_door) && furniture.openness > 0
         # rotate door to open it
         angle = furniture.rotation + 90
         if furniture.rotation == 0
@@ -748,7 +751,7 @@ class GUI
         y: y_offset + y_offset_adjustment.to_i + furniture.y * tile_size,
         w: tile_size,
         h: tile_size,
-        path: "sprites/furniture/#{furniture.kind}.png",
+        path: "sprites/furniture/#{furniture.kind.gsub('secret_','')}.png",
         angle: angle,
         r: color[:r],
         g: color[:g],

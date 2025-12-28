@@ -185,6 +185,7 @@ class Hero < Entity
     args.state.kronos.spend_time(self, 1.0, args)
     apply_exhaustion(-0.05, args)
     self.detect_traps(args)
+    self.detect_secret_doors(args)
   end
 
   def stealth_range
@@ -329,6 +330,55 @@ class Hero < Entity
     end
   end
 
+  # how good the character is at detecting traps, secret doors and hidden furnitureb
+  def detection_modifier
+    modifier = 0
+    case self.role
+    when :detective
+      modifier += 0.4
+    when :archeologist
+      modifier += 0.3
+    when :thief, :ninja
+      modifier += 0.2
+    when :warrior, :tourist
+      modifier -= 0.2
+    end
+    case self.species
+    when :elf, :dark_elf, :halfling, :gnome
+      modifier += 0.1
+    end
+    return modifier
+  end
+  
+  def detect_secret_doors args
+    level = Utils.level(args)
+    detection_range = 2
+    level.furniture.each do |furniture|
+      next unless furniture.kind == :secret_door
+      distance = Utils.distance_between_entities(self, furniture)
+      if distance <= detection_range && Tile.is_tile_visible?(furniture.x, furniture.y, args)
+        if !furniture.seen_by_hero
+          printf "Checking for secret door detection at furniture location (%d,%d)\n" % [furniture.x, furniture.y]
+          # odds to detect secret door depend on role, species, lighting, etc.
+          lighting_modifier = Lighting.light_level_at(furniture.x, furniture.y, level, args) 
+          printf "Secret door detection lighting modifier: %.2f\n" % lighting_modifier
+          base_detection_chance = 0.2 
+          base_detection_chance += self.detection_modifier
+          base_detection_chance *= lighting_modifier
+          final_detection_chance = base_detection_chance * 0.1
+          printf "Final secret door detection chance: %.2f\n" % final_detection_chance
+          detection_roll = args.state.rng.nxt_float
+          if detection_roll < final_detection_chance
+            HUD.output_message(args, "You notice something unusual about a section of the wall...")
+            furniture.seen_by_hero = true
+            SoundFX.play_sound(:clue, args)
+            GUI.add_input_cooldown(30)
+          end
+        end
+      end
+    end
+  end
+
   def detect_traps args
     level = Utils.level(args)
     detection_range = 2
@@ -341,15 +391,7 @@ class Hero < Entity
           lighting_modifier = Lighting.light_level_at(trap.x, trap.y, level, args) 
           printf "Trap detection lighting modifier: %.2f\n" % lighting_modifier
           base_detection_chance = 0.3 
-          if @role == :detective || @role == :archeologist
-            base_detection_chance += 0.4
-          end
-          if @role == :ninja || @role == :thief
-            base_detection_chance += 0.2
-          end
-          if @species == :elf || @species == :dark_elf || @species == :halfling
-            base_detection_chance += 0.1
-          end
+          base_detection_chance += self.detection_modifier
           base_detection_chance *= lighting_modifier
           final_detection_chance = base_detection_chance * 0.1
           printf "Final trap detection chance: %.2f\n" % final_detection_chance

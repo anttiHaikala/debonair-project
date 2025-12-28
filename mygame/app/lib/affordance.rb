@@ -70,6 +70,13 @@ class Affordance
         affordances << Affordance.new(level, x, y, :break_door, nil, nil)
       end
     end
+    if furniture && furniture.kind == :secret_door && furniture.seen_by_hero
+      if furniture.openness == 0
+        affordances << Affordance.new(level, x, y, :open_door, nil, nil)
+      else
+        affordances << Affordance.new(level, x, y, :close_door, nil, nil)
+      end
+    end 
 
     # throwing potions - not impelemented yet
     # hero.carried_items.each do |item|
@@ -97,12 +104,12 @@ class Affordance
       return
     when :open_door
       furniture = Furniture.furniture_at(@x, @y, @level, args)
-      if furniture && furniture.kind == :door
+      if furniture && (furniture.kind == :door || furniture.kind == :secret_door)
         furniture.is_toggled_by(hero, args )
       end
     when :close_door
       furniture = Furniture.furniture_at(@x, @y, @level, args)
-      if furniture && furniture.kind == :door
+      if furniture && (furniture.kind == :door || furniture.kind == :secret_door)
         furniture.is_toggled_by(hero, args )
       end
     when :break_door

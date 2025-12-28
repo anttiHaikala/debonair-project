@@ -81,6 +81,7 @@ class Tile
     GUI.mark_tiles_stale
     HUD.mark_minimap_stale
     entity.detect_traps args if entity == args.state.hero
+    entity.detect_secret_doors args if entity == args.state.hero
     entity.walking_sound(tile, args)
   end
 

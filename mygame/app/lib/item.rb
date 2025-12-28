@@ -123,7 +123,7 @@ class Item
     when :potion
       return [1,2]
     when :armor
-      return [2,0]
+      return [11,5]
     when :scroll
       return [15,3]
     when :wand
