@@ -365,7 +365,7 @@ class Level
           if args.state.rng.d6 > 1
             door_angle = [:east, :west].include?(direction) ? 90 : 0
             secret_roll = args.state.rng.d20
-            if secret_roll > 7
+            if secret_roll > 17
               kind = :secret_door
               new_tile = :wall # keep wall tile for secret door
             else
