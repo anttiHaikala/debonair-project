@@ -238,14 +238,7 @@ class Entity
   def drop_wielded_items(args)
     if self.wielded_items
       self.wielded_items.each do |item|
-        HUD.output_message(args, "#{self.name} drops #{item.title(args)}.")
-        self.wielded_items.delete(item)
-        self.carried_items.delete(item)
-        level = args.state.dungeon.levels[self.depth]
-        item.x = self.x
-        item.y = self.y
-        item.depth = self.depth
-        level.items << item
+        self.drop_item(item, args)
       end
     end 
   end

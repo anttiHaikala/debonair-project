@@ -146,6 +146,7 @@ class Light
         x = Utils.offset_x(args) + (light.x+0.25) * Utils.tile_size(args)
         y = Utils.offset_y(args) + (light.y+0.25) * Utils.tile_size(args)
         tile_size = 16
+        output_tile_size = Utils.tile_size(args) / 2
         tile_selection = case light.kind
         when :torch
           [7,2]
@@ -156,8 +157,8 @@ class Light
         args.outputs.primitives << {
           x: x,
           y: y,
-          w: tile_size,
-          h: tile_size,
+          w: output_tile_size,
+          h: output_tile_size,
           path: "sprites/sm16px.png",
           tile_x: tile_selection[0] * tile_size,
           tile_y: tile_selection[1] * tile_size,

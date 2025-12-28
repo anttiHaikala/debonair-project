@@ -14,14 +14,17 @@ NOTES ON GAME SYSTEM (the DEBONAIR!)
     - it's really hard to make the combat timescale match with exploration time scale then again the starvation and sleeping timescale
 
 TODO LIST
+- Leprechauns steal gold
+- Rats shadow player
 - IMPORTANT: wielded items somehow gets nils now, must fix soon
+- wielded items shown double in hand!!
+- tending to wounds
+- scale the lighting items as well (they do not change size now)
 - fix the corridor algo
-- charcter creation screen 
 - architect secret doors
 - taming grid bugs / rats with food
 - death is a bit confusing, make it more pronounced and slower
 - keys
-- npc emojis (scared - angry - sad - happy - shock - )
 - banter!!! all npc's must have some kind of banter!!!
 - chests
 - mimics
@@ -40,12 +43,13 @@ TODO LIST
 - do undead get shock or do they just crumble to dust?
 - grid bug coloring (can we get gradients or something??)
 - fix levels that do not have exit
-- tending to wounds
 - pickaxe cheat / mining bombs / hold down y to dig
 - body parts have a tree
 - chain mail vs pierce damage? chain mail vs blunt damage?
 
 DONE LIST
+- npc emojis (scared - angry - sad - happy - shock - )
+- charcter creation screen 
 - magic missiles
 - wands
 - armor

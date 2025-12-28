@@ -84,6 +84,8 @@ class GUI
       args.state.scene = :gameplay
       @@staircase_animation_frame = 0
       HUD.output_message args, "You enter level #{args.state.current_depth + 1} of the dungeon."
+      GUI.mark_tiles_stale
+      Lighting.mark_lighting_stale
     end
   end
 

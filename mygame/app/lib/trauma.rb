@@ -99,17 +99,15 @@ class Trauma
     if trauma.severity != :minor
       if [:right_hand, :right_fingers, :right_arm].include? trauma.body_part
         if entity.wielded_items.any?
-          dropped_item = entity.wielded_items.sample
-          entity.wielded_items.delete(dropped_item)
-          entity.carried_items << dropped_item
+          dropped_item = entity.wielded_items.first
+          entity.drop_item(dropped_item, args)          
           printf "Entity dropped wielded item due to hand trauma.\n"
         end
       end
       if trauma.body_part == :left_arm
         if entity.wielded_items.size > 1
           dropped_item = entity.wielded_items[1]
-          entity.wielded_items.delete(dropped_item)
-          entity.carried_items << dropped_item
+          entity.drop_item(dropped_item, args)
           printf "Entity dropped wielded item due to hand trauma.\n"
         end
       end 
