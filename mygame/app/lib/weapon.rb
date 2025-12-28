@@ -1,6 +1,6 @@
 class Weapon < Item
   
-  def initialize(kind)
+  def initialize(kind, args=nil)
     super(kind, :weapon)
   end
 
@@ -24,15 +24,18 @@ class Weapon < Item
       :bow,
       :crossbow,
       :sling,
-      :shuriken
+      :shuriken,
+      :selfie_stick,
+      :razor_blade,
+      :revolver
     ]
   end
 
   def hit_kind(args)
     case @kind
-    when :dagger, :sword, :katana, :axe
+    when :dagger, :sword, :katana, :axe, :razor_blade
       return :cut
-    when :mace, :club
+    when :mace, :club, :selfie_stick
       return :blunt
     when :spear, :bow, :crossbow, :shuriken, :revolver
       return :pierce
@@ -72,6 +75,10 @@ class Weapon < Item
       @weight = 1.3
     when :club
       @weight = 2.2
+    when :selfie_stick
+      @weight = 0.3
+    when :razor_blade
+      @weight = 0.1
     else
       @weight = 0.6
     end 

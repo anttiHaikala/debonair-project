@@ -1,5 +1,5 @@
 class Scroll < Item
-  def initialize(kind)
+  def initialize(kind, args=nil)
     super(kind, :scroll)
   end
 
