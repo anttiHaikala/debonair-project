@@ -178,4 +178,7 @@ class PortableLight < Item
   def initialize(kind)
     super(kind, :portable_light)
   end
+  def self.kinds
+    [:torch, :lamp, :candle, :flashlight]
+  end
 end

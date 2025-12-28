@@ -2,7 +2,7 @@ class Wand < Item
   attr_accessor :charges
   attr_accessor :known_to_be_empty
 
-  def initialize(kind, args)
+  def initialize(kind, args=nil)
     super(kind, :wand)
     @charges = 3 + args.state.rng.rand(5) # 3 to 7 charges
     @known_to_be_empty = false

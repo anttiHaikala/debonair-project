@@ -14,11 +14,61 @@ class Item
     yield(self) if block_given?
   end
 
+  # Smart Finder: Automatically creates the correct subclass instance based on the kind.
+  # This simplified logic assumes all subclasses (Armor, Weapon, etc.) now accept (kind, args) in their initialize.
+  def self.create_instance(kind, args)
+    # Priority registry of subclasses to check for ownership of the 'kind'
+    # does not have Light or Valuable yet because they have different initialize signatures
+    item_classes = [Armor, Tool, Weapon, Food, Potion, Scroll, Wand, Ring, Corpse]
+
+    target_class = item_classes.find { |klass| klass.respond_to?(:kinds) && klass.kinds.include?(kind) }
+
+    if target_class
+      # Uniform Interface: All subclasses now take the same arguments.
+      return target_class.new(kind, args)
+    else
+      # Fallback for generic items without a specialized class.
+      return Item.new(kind,  :misc)
+      puts "Warning: Unknown item kind '#{kind}', created as generic Item."
+    end
+  end
+
+  # AH: 27.12.2025 notes:
+  # footwear and helmet, gloves etc should be included in armor? Or is it for sprite sheet purposes only?
   def self.categories
     return [:food, :weapon, :potion, :armor, :scroll, :wand, :ring, :scroll, :amulet, :gloves, :footwear, :helmet, :portable_light, :corpse]
   end
 
-  def set_weight # grams
+  def set_weight # kilograms
+    case @category
+    when :food
+      @weight = 0.4 
+    when :weapon
+      @weight = 1.0
+    when :potion
+      @weight = 0.2
+    when :armor
+      @weight = 4.0
+    when :scroll
+      @weight = 0.2
+    when :wand
+      @weight = 0.1
+    when :ring
+      @weight = 0.02
+    when :amulet
+      @weight = 0.2
+    when :gloves
+      @weight = 0.4
+    when :footwear
+      @weight = 0.4
+    when :helmet
+      @weight = 0.3
+    else
+      @weight = 0.4
+    end
+  end
+
+  def set_weight_in_kilograms  # kilograms
     case @category
     when :food
       @weight = 0.4 
@@ -94,6 +144,7 @@ class Item
       return [10,2]
     when :portable_light
       return [13,10]
+    # tools and accessories need to be added here  
     else
       return [1,0] # unknown
     end
@@ -157,6 +208,18 @@ class Item
           item.x = room.center_x
           item.y = room.center_y
           level.items << item      
+        when 9
+            item = Armor.randomize(level.depth, args)
+            item.depth = level.depth
+            item.x = room.center_x
+            item.y = room.center_y
+            level.items << item
+        when 10
+            item = Tool.randomize(level.depth, args)
+            item.depth = level.depth
+            item.x = room.center_x
+            item.y = room.center_y
+            level.items << item
       end
     end
   end
@@ -208,7 +271,7 @@ class Item
       return 6.0 # heavy encumbrance
     elsif total_weight <= carrying_capacity * 4.0
       return 8.0 # heavy encumbrance
-    elsif total_weight <= Item.maximum_carrying_capacity(entity)  
+    else total_weight <= Item.maximum_carrying_capacity(entity)  
       # heavy encumbrance
       return 12.0
     end
@@ -237,95 +300,133 @@ class Item
     return false
   end
 
-  def self.setup_items_for_new_hero(hero, args)
-    # give starting items
-    starting_items = [
-      :food_ration,
-      :potion_of_healing,
-      :bow,
-      :torch
-    ]
-    starting_items.each do |kind|
-      item = nil
-      case kind
-      when :food_ration
-        item = Food.new(:food_ration, args)
-      when :potion_of_healing
-        item = Potion.new(:potion_of_healing)
-      when :scroll_of_mapping
-        item = Scroll.new(:scroll_of_mapping)
-      when :dagger
-        item = Weapon.new(:dagger)
-      when :bow
-        item = Weapon.new(:bow)
-      when :torch
-        item = PortableLight.new(:torch)
-        hero.wielded_items << item
-      end
-      if item
-        hero.carried_items << item
-      end
-    end
-    case hero.role
-    when :wizard
-      hero.carried_items << Scroll.new(:scroll_of_digging)
-      hero.carried_items << Wand.new(Wand.kinds.sample, args)
-      hero.carried_items << Wand.new(Wand.kinds.sample, args)
-    when :archaeologist
-      hero.carried_items << Weapon.new(:whip)
-      hero.carried_items << Scroll.new(:scroll_of_mapping)
-    when :tourist
-      hero.carried_items << Weapon.new(:camera)
-      hero.carried_items << Scroll.new(:scroll_of_mapping)
-    when :detective
-      hero.carried_items << Weapon.new(:revolver)
-    when :cleric
-      hero.carried_items << Weapon.new(:mace)
-      hero.carried_items << Potion.new(:potion_of_extra_healing)
-      hero.carried_items << Potion.new(:potion_of_holy_water)
-    when :druid
-      hero.carried_items << Weapon.new(:staff)
-      hero.carried_items << Wand.new(Wand.kinds.sample, args)
-      hero.carried_items << Potion.new(Potion.kinds.sample)
-      hero.carried_items << Potion.new(Potion.kinds.sample)
-    when :monk
-      hero.carried_items << Weapon.new(:staff)
-      hero.carried_items << Potion.new(:potion_of_extra_healing)
-      hero.carried_items << Potion.new(:potion_of_holy_water)
-    when :knight
-      hero.carried_items << Weapon.new(:sword)
-      # plate armour
-      hero.worn_items << Armor.new(:plate_armor_shirt)
-      hero.worn_items << Armor.new(:plate_armor_pants)
-      hero.worn_items << Armor.new(:helmet)
-    when :samurai
-      Weapon.new(:katana) do |weapon|
-        hero.carried_items << weapon
-        hero.wielded_items << weapon
-      end
-      Armor.new(:lamellar_armor_shirt) do |armor|
-        hero.carried_items << armor
-        hero.worn_items << armor
-      end
-      Armor.new(:lamellar_armor_pants) do |armor|
-        hero.carried_items << armor
-        hero.worn_items << armor
-      end
-      Armor.new(:kabuto) do |armor|
-        hero.carried_items << armor
-        hero.worn_items << armor
-      end 
-    when :warrior
-      weapon = Weapon.new(:axe)
-      hero.carried_items << weapon
-      hero.wielded_items << weapon
-      # fur shorts
-      shorts = Armor.new(:fur_shorts)
-      hero.worn_items << shorts 
-      hero.carried_items << shorts
-    end
 
+  # Master list for role-based starting loadouts
+  def self.setup_items_for_new_hero(hero, args)
+     # 1. Common Starting Items: Every hero starts with a torch (wielded) and a food ration.
+     # how to get torch in right hand?
+    item = Food.new(:food_ration, args)
+    hero.carried_items << item
+    item = Potion.new(:potion_of_healing)
+    hero.carried_items << item
+    item = PortableLight.new(:torch)
+    hero.carried_items << item
+    hero.wielded_items << item
+ 
+    # 2. Role-Specific Loadouts
+    role_gear = {
+      archeologist: [
+        { kind: :hat, state: :worn },
+        { kind: :whip, state: :wielded },
+        { kind: :leather_boots, state: :worn },
+        { kind: :scroll_of_mapping },
+        { count: args.state.rng.nxt_int(1, 3), pool: Food.kinds }
+      ],
+      cleric: [
+        { kind: :corinthian_helmet, state: :worn },
+        { kind: :mace, state: :wielded },
+        { kind: :potion_of_extra_healing },
+        { kind: :potion_of_holy_water },
+        { kind: :chain_mail_shirt, state: :worn }
+      ],
+      detective: [
+        { kind: :hat, state: :worn },
+        { kind: :magnifying_glass },
+        { kind: :razor_blade, state: :wielded },
+        { kind: :revolver },
+        { kind: :notebook },
+        { kind: :medkit }
+      ],
+      druid: [
+        { kind: :staff, state: :wielded },
+        { count: 1, pool: Potion.kinds },
+        { count: 1, pool: Scroll.kinds },
+        { count: 1, pool: Wand.kinds },
+        { kind: :ring_of_regeneration, state: :worn }
+      ],
+      knight: [
+        { kind: :sword, state: :wielded },
+        { kind: :armet, state: :worn },
+        { kind: :plate_armor_shirt, state: :worn },
+        { kind: :plate_mail_pants, state: :worn },
+        { kind: :plate_shoes, state: :worn }
+      ],
+      monk: [
+        { kind: :staff, state: :wielded },
+        { count: args.state.rng.nxt_int(1, 2), kind: :potion_of_healing },
+        { count: args.state.rng.nxt_int(1, 2), kind: :potion_of_holy_water },
+        { count: args.state.rng.nxt_int(2, 3), kind: :food_ration },
+        { count: 3, pool: Scroll.kinds }
+      ],
+      ninja: [
+        { kind: :dagger, state: :wielded },
+        { kind: :shuriken },
+        { kind: :ninja_suit, state: :worn },
+        { kind: :bow },
+        { kind: :potion_of_teleportation },
+      ],
+      rogue: [
+        { kind: :sword, state: :wielded },
+        { kind: :bow },
+        { kind: :leather_hood, state: :worn },
+        { kind: :leather_armor_shirt, state: :worn },
+        { count: 1, pool: Potion.kinds }
+      ],
+      samurai: [
+        { kind: :katana, state: :wielded },
+        { kind: :bow },
+        { kind: :basic_helmet, state: :worn },
+        { kind: :lamellar_armor_shirt, state: :worn },
+        { kind: :greaves, state: :worn }
+      ],
+      thief: [
+        { kind: :dagger, state: :wielded },
+        { kind: :lockpick },
+        { kind: :bow },
+        { kind: :rope },
+        { count: args.state.rng.nxt_int(1, 2), kind: :food_ration }
+      ],
+      tourist: [
+        { kind: :hat, state: :worn },
+        { kind: :sunglasses, state: :worn },
+        { kind: :camera },
+        { kind: :selfie_stick, state: :wielded },
+        { count: args.state.rng.nxt_int(3, 5), pool: Food.kinds }
+      ],
+      warrior: [
+        { kind: :sword, state: :wielded },
+        { kind: :fur_shorts, state: :worn },
+        { kind: :breastplate, state: :worn },
+        { kind: :viking_helmet, state: :worn },
+        { kind: :spear }
+      ],
+      wizard: [
+        { kind: :staff, state: :wielded },
+        { count: 3, pool: Wand.kinds },
+        { count: 3, pool: Scroll.kinds },
+        { count: 1, pool: Ring.kinds },
+        { count: 1, pool: Potion.kinds }
+      ]
+    }
+
+    # Apply the Loadout
+    loadout = role_gear[hero.role] || []
+    loadout.each do |entry|
+      # Handle count for multi-item drops or random counts
+      repeat = entry[:count] || 1
+      repeat.times do
+        # If kind isn't specified, pick a random one from the provided pool
+        # Ensure we use the seeded RNG for sampling if pool is provided
+        kind = entry[:kind] || args.state.rng.sample(entry[:pool])
+        item = self.create_instance(kind, args)
+        
+        hero.carried_items << item
+        hero.worn_items << item if entry[:state] == :worn
+        hero.wielded_items << item if entry[:state] == :wielded
+      end
+    end
   end
+
 
   def teleport(args, x=nil, y=nil)
     level = args.state.dungeon.levels[self.depth]

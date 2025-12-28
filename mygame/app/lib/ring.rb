@@ -3,7 +3,7 @@ class Ring < Item
   @@mask_index_seed = nil
   attr_accessor :usage, :max_usage, :cursed
 
-  def initialize(kind)
+  def initialize(kind,args=nil)
     super(kind, :ring)
     @usage = 0
     if Numeric.rand(1..6) == 1
