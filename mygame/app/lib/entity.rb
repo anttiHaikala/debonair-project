@@ -201,13 +201,13 @@ class Entity
         y = args.state.rng.nxt_int(0, level.height-1)
         attempts += 1
         printf "Teleport attempt %d to (%d, %d)\n" % [attempts, x, y]
-      end while !level.is_walkable?(x,y) && attempts < max_attempts
+      end while !level.is_walkable?(x,y, level) && attempts < max_attempts
       if attempts >= max_attempts
         HUD.output_message(args, "#{self.name} tries to teleport but fails!")
         return
       end
     end
-    if level.is_walkable?(x,y)
+    if level.is_walkable?(x,y, args)
       self.set_location(x, y)
       SoundFX.play_sound(:teleport, args)
       GUI.mark_tiles_stale

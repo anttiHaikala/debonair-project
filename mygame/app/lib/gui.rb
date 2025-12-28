@@ -502,22 +502,24 @@ class GUI
       @@auto_move = nil
       return false
     end
-    unless level.is_walkable?(hero.x + dx, hero.y + dy, args)
-      @@auto_move = nil
-      # add input cooldown
-      self.add_input_cooldown 20
-      return false
-    end
     if Furniture.blocks_movement?(hero.x + dx, hero.y + dy, Utils.level(args), args)
       @@auto_move = nil
       # check if there is an openable door
       furniture = Furniture.furniture_at(hero.x + dx, hero.y + dy, Utils.level(args), args)
-      if furniture && furniture.kind == :door && furniture.openness == 0
-        affordance = Affordance.new(Utils.level(args), hero.x + dx, hero.y + dy, :open_door, nil, nil)
-        affordance.execute(hero, args)
-        self.add_input_cooldown 20
-        return true
+      if furniture && (furniture.kind == :door || furniture.kind == :secret_door) && furniture.openness == 0
+        unless furniture.hidden?
+          affordance = Affordance.new(Utils.level(args), hero.x + dx, hero.y + dy, :open_door, nil, nil)
+          affordance.execute(hero, args)
+          self.add_input_cooldown 20
+          return true
+        end
       end
+      return false
+    end
+    unless level.is_walkable?(hero.x + dx, hero.y + dy, args)
+      @@auto_move = nil
+      # add input cooldown
+      self.add_input_cooldown 20
       return false
     end
     if Tile.occupied?(hero.x + dx, hero.y + dy, args)
