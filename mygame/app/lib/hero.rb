@@ -347,6 +347,11 @@ class Hero < Entity
     when :elf, :dark_elf, :halfling, :gnome
       modifier += 0.1
     end
+    [:undead, :zombie, :robot].each do |trait|
+      if self.traits.include?(trait)
+        modifier -= 0.2
+      end
+    end
     return modifier
   end
   
@@ -362,10 +367,10 @@ class Hero < Entity
           # odds to detect secret door depend on role, species, lighting, etc.
           lighting_modifier = Lighting.light_level_at(furniture.x, furniture.y, level, args) 
           printf "Secret door detection lighting modifier: %.2f\n" % lighting_modifier
-          base_detection_chance = 0.2 
+          base_detection_chance = 0.33333 
           base_detection_chance += self.detection_modifier
           base_detection_chance *= lighting_modifier
-          final_detection_chance = base_detection_chance * 0.04 # player has infinite attempts, so lower the odds
+          final_detection_chance = base_detection_chance * 0.03 # player has infinite attempts, so lower the odds
           printf "Final secret door detection chance: %.2f\n" % final_detection_chance
           detection_roll = args.state.rng.nxt_float
           if detection_roll < final_detection_chance
@@ -390,7 +395,7 @@ class Hero < Entity
           # odds to detect trap depend on role, species, lighting, etc.
           lighting_modifier = Lighting.light_level_at(trap.x, trap.y, level, args) 
           printf "Trap detection lighting modifier: %.2f\n" % lighting_modifier
-          base_detection_chance = 0.3 
+          base_detection_chance = 0.33333
           base_detection_chance += self.detection_modifier
           base_detection_chance *= lighting_modifier
           final_detection_chance = base_detection_chance * 0.1

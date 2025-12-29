@@ -18,11 +18,12 @@ class HUD
 
   def self.draw_health args
     hero = args.state.hero
+    y_base = 580
     traumas = Trauma.active_traumas(hero)
     if !traumas.empty?
       args.outputs.labels << {
       x: 960,
-      y: 641,
+      y: y_base,
       text: "Health",
       size_enum: 1,
       r: 255,
@@ -34,7 +35,7 @@ class HUD
     traumas.each_with_index do |trauma, index|
       args.outputs.labels << {
         x: 960,
-        y: 620 - index * 16,
+        y: y_base - 20 - index * 16,
         text: "#{trauma.severity} #{trauma.kind.to_s.gsub('_',' ')} trauma on #{trauma.body_part.to_s.gsub('_',' ')}",
         size_enum: 0,
         r: 255,
@@ -407,22 +408,32 @@ class HUD
     hero = args.state.hero
     statuses = hero.statuses
     return if statuses.empty?
+    y_base = 630
     x = 960
-    y = 320
-    status_size = 20
-    statuses.each_with_index do |status, index|
-      args.outputs.labels << {
-        x: x,
-        y: y - index * status_size,
-        text: status.title,
-        size_enum: 0,
-        r: 255,
-        g: 255,
-        b: 255,
-        a: 255,
-        font: "fonts/olivetti.ttf"
-      }
-    end
+    args.outputs.labels << {
+      x: 960,
+      y: y_base,
+      text: "Status",
+      size_enum: 1,
+      r: 255,
+      g: 255,
+      b: 255,
+      a: 255,
+      font: "fonts/olivetti.ttf"
+    }
+    status_text = statuses.map { |s| s.title }.join(", ")
+    y = y_base - 25
+    args.outputs.labels << {
+      x: x,
+      y: y,
+      text: status_text,
+      size_enum: -2,
+      r: 255,
+      g: 255,
+      b: 255,
+      a: 255,
+      font: "fonts/olivetti.ttf"
+    }
   end
 
 end
