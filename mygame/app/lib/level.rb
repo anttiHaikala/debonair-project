@@ -264,8 +264,43 @@ class Level
     end
   end
 
+  def print_minimap_around(x, y, range=1)
+    for j in (y - range)..(y + range)
+      row = "  "
+      for i in (x - range)..(x + range)
+          furniture = Furniture.furniture_at(i, j, self, nil)
+          if furniture && furniture.kind == :door
+            row += "+"
+            next
+          end
+          if furniture && furniture.kind == :secret_door
+            row += "="
+            next
+          end
+          tile = tile_at(i, j)
+          case tile
+          when :floor
+            row += "."
+          when :rock
+            row += "*"
+          when :wall
+            row += "#"
+          when :water
+            row += "~"
+          when :staircase_up
+            row += "<"
+          when :staircase_down
+            row += ">"
+          else
+            row += "?"
+          end
+      end
+      printf "%s\n" % row
+    end
+  end
+
   def dig_corridor(args, x1, y1, x2, y2)
-    printf "Digging corridor from (%d,%d) to (%d,%d)\n" % [x1, y1, x2, y2]
+    printf "Digging corridor from (%d,%d) to (%d,%d) at depth %d \n" % [x1, y1, x2, y2, @depth]
     return if x1 == x2 && y1 == y2 # no need to dig
     current_x = x1
     current_y = y1
@@ -274,16 +309,28 @@ class Level
     while current_x != x2 || current_y != y2 do
       safety += 1
       if safety > 500
-        printf "  Corridor digging aborted due to safety limit.\n"
+        printf "  corridor digging aborted due to safety limit.\n"
         break
       end
+      case direction
+      when :east
+        current_x += 1
+      when :west
+        current_x -= 1
+      when :north
+        current_y += 1
+      when :south
+        current_y -= 1
+      end
       if current_y < 0 || current_y >= @tiles.size || current_x < 0 || current_x >= @tiles[0].size
-        printf "  Digging out of bounds at (%d,%d), aborting corridor.\n" % [current_x, current_y]
+        printf "  digging out of bounds at (%d,%d), aborting corridor.\n" % [current_x, current_y]
         break
       end
       new_tile = nil
       create_door = false
       current_tile = @tiles[current_y][current_x]
+      printf "  digging %s at (%d,%d) %s\n" % [direction, current_x, current_y, current_tile]
+      self.print_minimap_around(current_x, current_y, 2)
       if current_tile == :rock
         new_tile = :floor
       end
@@ -292,22 +339,17 @@ class Level
         if direction == :east || direction == :west
           # check if there is door either north or south - doors are not tiles???
           if @tiles[current_y-1][current_x] == :door || @tiles[current_y+1][current_x] == :door
-            if direction == :east
-              current_x += 1
-            else
-              current_x -= 1
-            end
             next # let's just skip to next square. hope the door fixed it
           end
           if @tiles[current_y-1][current_x] == :wall && @tiles[current_y+1][current_x] == :wall
             new_tile = :floor 
             create_door = true
-            printf "We should create door at (%d,%d)\n" % [current_x, current_y]
+            printf "  .. should create door at (%d,%d)\n" % [current_x, current_y]
           else
             new_tile = :floor 
           end
           if direction == :east && @tiles[current_y][current_x+1] == :wall || direction == :west && @tiles[current_y][current_x-1] == :wall
-            printf "Running into double wall: step back and sidestep!\n"
+            printf "  .. running into double wall: step back and sidestep!\n"
             if direction == :east
               current_x -= 1
             else
@@ -315,20 +357,13 @@ class Level
             end
             if @tiles[current_y-1][current_x] == :wall
               direction = :north
-              current_y += 1
             else
               direction = :south
-              current_y -= 1
             end
             next
           end
         elsif direction == :north || direction == :south
           if @tiles[current_y][current_x-1] == :door || @tiles[current_y][current_x+1] == :door
-            if direction == :north
-              current_y += 1
-            else
-              current_y -= 1
-            end
             next # let's just skip to next square. hope the door fixed it
           end
           if @tiles[current_y][current_x-1] == :wall && @tiles[current_y][current_x+1] == :wall
@@ -338,7 +373,7 @@ class Level
             new_tile = :floor 
           end
           if direction == :north && @tiles[current_y-1][current_x] == :wall || direction == :south && @tiles[current_y+1][current_x] == :wall
-            printf "Running into double wall: step back and sidestep!\n"
+            printf "  .. running into double wall: step back and sidestep!\n"
             if direction == :north
               current_y -= 1
             else
@@ -346,10 +381,8 @@ class Level
             end
             if @tiles[current_y][current_x-1] == :wall
               direction = :east
-              current_x += 1
             else
               direction = :west
-              current_x -= 1
             end
             next
           end
@@ -361,7 +394,7 @@ class Level
           create_door = false
         end
         if create_door
-          printf "Creating door at (%d,%d) (current tile: %s)\n" % [current_x, current_y, @tiles[current_y][current_x].to_s]
+          printf "  .. creating door at (%d,%d) (current tile: %s direction: %s)\n" % [current_x, current_y, @tiles[current_y][current_x].to_s, direction]
           if args.state.rng.d6 > 1
             door_angle = [:east, :west].include?(direction) ? 90 : 0
             secret_roll = args.state.rng.d20
@@ -384,16 +417,6 @@ class Level
             end
             @furniture << door
             @tiles[current_y][current_x] = new_tile if current_tile == :rock || current_tile == :wall
-            case direction
-            when :east
-              current_x += 1
-            when :west
-              current_x -= 1
-            when :north
-              current_y += 1
-            when :south
-              current_y -= 1  
-            end
             next
           end
         end
@@ -404,21 +427,62 @@ class Level
       if current_tile == :staircase_up || current_tile == :staircase_down
         new_tile = current_tile # keep the staircase tile
       end
+      # terraform the tile - importat part!!!
       @tiles[current_y][current_x] = new_tile if new_tile
-      if current_x < x2 # priority one: move horizontally east
-        direction = :east
-        current_x += 1
-      elsif current_x > x2 # priority two: move horizontally west
-        direction = :west
-        current_x -= 1
-      elsif current_y < y2 # priority three: move vertically north
-        direction = :north
-        current_y += 1
-      elsif current_y > y2 # priority four: move vertically south
-        direction = :south
-        current_y -= 1
+      # decide direction to next tile
+      # if we have a direction, keep going that way with some chance
+      if direction
+        if args.state.rng.d20 < 4
+          # keep going same direction
+          next
+        end
+      end
+      # otherwise or if no direction yet,
+      # see which direction gets us closer to target
+      y_diff = (y2 - current_y).abs
+      x_diff = (x2 - current_x).abs
+      if x_diff > y_diff
+        if current_x < x2
+          direction = :east
+        elsif current_x > x2
+          direction = :west
+        else
+          if current_y < y2
+            direction = :north
+          elsif current_y > y2
+            direction = :south
+          end
+        end
+      elsif y_diff > x_diff
+        if current_y < y2
+          direction = :north
+        elsif current_y > y2
+          direction = :south
+        else
+          if current_x < x2
+            direction = :east
+          elsif current_x > x2
+            direction = :west
+          end
+        end
+      else
+        # equal distance, pick horizontal first 
+        if current_x != x2
+          if current_x < x2
+            direction = :east
+          elsif current_x > x2
+            direction = :west
+          end
+        elsif current_y != y2
+          if current_y < y2
+            direction = :north
+          elsif current_y > y2
+            direction = :south
+          end
+        end
       end
     end
+    printf "  finished digging corridor.\n"
   end
 
   def create_corridors(args)
@@ -496,7 +560,7 @@ class Level
         y2 = target_room.center_y
         dig_corridor(args, x1, y1, x2, y2)
         corridors << [room, target_room]
-        printf "  Added extra corridor to connect unreachable room at (%d,%d)\n" % [target_room.x, target_room.y]
+        printf "  added extra corridor to connect unreachable room at (%d,%d)\n" % [target_room.x, target_room.y]
       end
     end
   end

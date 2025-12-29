@@ -77,7 +77,6 @@ class Architect
     args.state.dungeon = dungeon
 
     for depth in 0..(@settings[:levels] - 1)
-
       vibe = randomize_vibe_for_depth(depth)
       level = create_level(args, depth, vibe)
 
