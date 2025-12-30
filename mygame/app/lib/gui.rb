@@ -836,7 +836,7 @@ class GUI
         r: color[:r],
         g: color[:g],
         b: color[:b],
-        a: 100
+        a: 30
       }
     end
   end

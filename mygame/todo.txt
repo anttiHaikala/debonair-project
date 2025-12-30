@@ -49,6 +49,7 @@ TODO LIST
 - chain mail vs pierce damage? chain mail vs blunt damage?
 
 DONE LIST
+- level gen debugger (show rooms and corridors)
 - npc emojis (scared - angry - sad - happy - shock - )
 - charcter creation screen 
 - magic missiles
