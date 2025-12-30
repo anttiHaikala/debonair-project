@@ -437,7 +437,7 @@ class Level
       # decide direction to next tile
       # if we have a direction, keep going that way with some chance
       if direction
-        if args.state.rng.d20 < 4
+        if args.state.rng.d20 < 12
           # keep going same direction
           next
         end

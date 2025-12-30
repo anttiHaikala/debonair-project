@@ -771,6 +771,7 @@ class GUI
     y_offset = Utils.offset_y(args)
     level.corridors.each do |corridor|
       color = corridor.color
+      # then draw the steps
       corridor.steps.each do |step|
         args.outputs.primitives << {
           x: x_offset + step[:x] * tile_size,
@@ -784,7 +785,37 @@ class GUI
           a: 80
         }
       end
+      # mark corridor start
+      args.outputs.primitives << {
+        x: x_offset + corridor.x1 * tile_size,
+        y: y_offset + corridor.y1 * tile_size,
+        w: tile_size,
+        h: tile_size, 
+        path: :text,
+        text: "start",
+        size_enum: 1,
+        r: color[:r],
+        g: color[:g],
+        b: color[:b],
+        a: 200
+      }
+      # mark corridor end
+      args.outputs.primitives << {
+        x: x_offset + corridor.x2 * tile_size,
+        y: y_offset + corridor.y2 * tile_size,
+        w: tile_size,
+        h: tile_size, 
+        path: :text,
+        text: "end",
+        size_enum: 1,
+        r: color[:r],
+        g: color[:g],
+        b: color[:b],
+        a: 200
+      }
+
     end
+    
   end
 
   def self.draw_room_debug args
