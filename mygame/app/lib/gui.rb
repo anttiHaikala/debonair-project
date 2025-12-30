@@ -277,19 +277,9 @@ class GUI
                   
                   printf "Hero is using staircase on tile #{tile} x,y: #{hero.x},#{hero.y}\n"
                   if tile == :staircase_down
-                    args.state.staircase = :down
-                    args.state.scene = :staircase
-                    @@just_used_staircase = true
-                    @@staircase_animation_frame = 0
+                    GUI.take_staircase_down(args)
                   elsif tile == :staircase_up
-                    if hero.depth > 0
-                      args.state.staircase = :up
-                      args.state.scene = :staircase
-                      @@just_used_staircase = true
-                      @@staircase_animation_frame = 0
-                    else
-                      args.state.scene = :game_over
-                    end
+                    GUI.take_staircase_up(args)
                   end
                 end
               end
@@ -906,4 +896,24 @@ class GUI
       end
     end
   end
+
+  def self.take_staircase_down args
+    args.state.staircase = :down
+    args.state.scene = :staircase
+    @@just_used_staircase = true
+    @@staircase_animation_frame = 0    
+  end
+
+  def self.take_staircase_up args
+    hero = args.state.hero
+    if hero.depth > 0
+      args.state.staircase = :up
+      args.state.scene = :staircase
+      @@just_used_staircase = true
+      @@staircase_animation_frame = 0
+    else
+      args.state.scene = :game_over
+    end
+  end
+
 end

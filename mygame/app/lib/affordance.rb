@@ -30,6 +30,10 @@ class Affordance
       return "Close door"
     when :break_door
       return "Break door"
+    when :climb_up
+      return "Climb up staircase"
+    when :climb_down
+      return "Climb down staircase"
     else
       return "Unknown affordance"
     end
@@ -78,6 +82,18 @@ class Affordance
       end
     end 
 
+    # tile specific affordances
+    tile = level.tiles[y][x]
+    if hero.x == x && hero.y == y
+      case tile
+      when :staircase_up
+        affordances << Affordance.new(level, x, y, :climb_up, nil, nil)
+      when :staircase_down
+        affordances << Affordance.new(level, x, y, :climb_down, nil, nil)
+      end
+    end
+
+    
     # throwing potions - not impelemented yet
     # hero.carried_items.each do |item|
     #   if item.category == :potion && item.kind
@@ -102,6 +118,10 @@ class Affordance
     case @kind
     when :do_nothing
       return
+    when :climb_up
+      GUI.take_staircase_up args
+    when :climb_down
+      GUI.take_staircase_down args
     when :open_door
       furniture = Furniture.furniture_at(@x, @y, @level, args)
       if furniture && (furniture.kind == :door || furniture.kind == :secret_door)
