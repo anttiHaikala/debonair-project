@@ -30,7 +30,7 @@ Double click the ./dragonruby executable to start up the game.
 |WASD/arrow keys  | move and attack enemies (no diagonal movement is permitted) |
 |Space             | rest, pick up objects, use staircases |
 |Tab     | hold to enable look mode where you can use up/down controls to look at stuff |
-|Shift    | hold to view inventory, A to use item, B to drop item, up/down to select |
+|Shift    | hold to view inventory, SPACE to use item, ENTER to drop item, up/down to select |
 |Cmd        | hold to change facing without moving |
 |Option     | hold to strafe (move without changing facing) |
 

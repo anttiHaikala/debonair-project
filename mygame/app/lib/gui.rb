@@ -761,4 +761,52 @@ class GUI
       }
     end
   end
+
+  def self.draw_corridor_debug args
+    return unless $debug
+    level = Utils.level(args)
+    return unless level
+    tile_size = Utils.tile_size(args)
+    x_offset = Utils.offset_x(args)
+    y_offset = Utils.offset_y(args)
+    level.corridors.each do |corridor|
+      color = corridor.color
+      corridor.steps.each do |step|
+        args.outputs.primitives << {
+          x: x_offset + step[:x] * tile_size,
+          y: y_offset + step[:y] * tile_size,
+          w: tile_size,
+          h: tile_size,
+          path: :solid,
+          r: color[:r],
+          g: color[:g],
+          b: color[:b],
+          a: 80
+        }
+      end
+    end
+  end
+
+  def self.draw_room_debug args
+    return unless $debug
+    level = Utils.level(args)
+    return unless level
+    tile_size = Utils.tile_size(args)
+    x_offset = Utils.offset_x(args)
+    y_offset = Utils.offset_y(args)
+    level.rooms.each do |room|
+      color = room.color
+      args.outputs.primitives << {
+        x: x_offset + room.x * tile_size,
+        y: y_offset + room.y * tile_size,
+        w: room.w * tile_size,
+        h: room.h * tile_size, 
+        path: :solid,
+        r: color[:r],
+        g: color[:g],
+        b: color[:b],
+        a: 100
+      }
+    end
+  end
 end

@@ -3,7 +3,6 @@ class Level
   attr_accessor :depth, :tiles, :items, :lights
   attr_accessor :floor_hsl # this determines the color scheme of the level
   attr_accessor :vibe # :hack, :lush, :swamp, :fiery, :ice, :rocky, :water
-  attr_accessor :rooms
   attr_accessor :entities
   attr_accessor :lighting
   attr_accessor :los_cache
@@ -12,6 +11,8 @@ class Level
   attr_accessor :fire
   attr_accessor :traps
   attr_accessor :furniture
+
+  attr_accessor :rooms, :corridors # properties of these objects do not always match the actual tiles on the level
 
   def initialize(depth, vibe = :hack)
     @depth = depth
@@ -22,6 +23,7 @@ class Level
     @vibe = vibe  
     self.set_colors
     @rooms = []
+    @corridors = []
     @entities = []
     @items = []
     @traps = []
@@ -306,6 +308,8 @@ class Level
     current_y = y1
     direction = nil
     safety = 0
+    corridor = Corridor.new(x1, y1, x2, y2)
+    @corridors << corridor
     while current_x != x2 || current_y != y2 do
       safety += 1
       if safety > 500
@@ -326,11 +330,12 @@ class Level
         printf "  digging out of bounds at (%d,%d), aborting corridor.\n" % [current_x, current_y]
         break
       end
+      corridor.steps << {x: current_x, y: current_y}
       new_tile = nil
       create_door = false
       current_tile = @tiles[current_y][current_x]
       printf "  digging %s at (%d,%d) %s\n" % [direction, current_x, current_y, current_tile]
-      self.print_minimap_around(current_x, current_y, 2)
+      #self.print_minimap_around(current_x, current_y, 2)
       if current_tile == :rock
         new_tile = :floor
       end
