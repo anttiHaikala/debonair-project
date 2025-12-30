@@ -1,6 +1,25 @@
 PHILOSOPHY
 - make a game that 14 year old me would love
 
+IDEAS
+- pits & boulders
+- sokoban level https://nethackwiki.com/wiki/Sokoban
+- teleport bans: https://nethackwiki.com/wiki/Non-teleport_level
+- teleport disease: https://nethackwiki.com/wiki/Teleportitis
+- tengu: https://nethackwiki.com/wiki/Tengu
+- Jabberwock: https://nethackwiki.com/wiki/Jabberwock
+- Rodney the FinalBoss: https://nethackwiki.com/wiki/Wizard_of_Yendor
+- Violet fungi (D&D): https://nethackwiki.com/wiki/Violet_fungus
+- Trolls (Glorantha style please!): https://nethackwiki.com/wiki/Troll
+- Quasit (maybe!): https://nethackwiki.com/wiki/Quasit
+- kobold: https://nethackwiki.com/wiki/Kobold
+- gelatinious cube: https://nethackwiki.com/wiki/Gelatinous_cube
+- giant ant!
+- vaults: https://nethackwiki.com/wiki/Vault
+- wetting items and heroes: https://nethackwiki.com/wiki/Wet
+- crypts: https://nethackwiki.com/wiki/Graveyard
+- acid blobs: https://nethackwiki.com/wiki/Acid_blob
+
 NOTES ON TTRPG LEGACY (inspo material to check out)
 - Tomb Of Horros (original D&D book)
 
