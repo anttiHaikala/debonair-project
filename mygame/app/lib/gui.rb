@@ -346,7 +346,7 @@ class GUI
 
   def self.draw_tiles args
     start_profile(:observe_tiles, args)
-    Tile.observe_tiles args unless @@tiles_observed
+    Tile.observe_tiles args #unless @@tiles_observed
     end_profile(:observe_tiles, args)
     @@tiles_observed = true
     start_profile(:tile_drawing, args)
@@ -792,7 +792,7 @@ class GUI
         w: tile_size,
         h: tile_size, 
         path: :text,
-        text: "start",
+        text: "#{corridor.name} start",
         size_enum: 1,
         r: color[:r],
         g: color[:g],
@@ -806,7 +806,7 @@ class GUI
         w: tile_size,
         h: tile_size, 
         path: :text,
-        text: "end",
+        text: "#{corridor.name} end",
         size_enum: 1,
         r: color[:r],
         g: color[:g],

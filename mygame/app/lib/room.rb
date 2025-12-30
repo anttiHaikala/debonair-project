@@ -32,13 +32,22 @@ class Room
 end
 
 class Corridor
-  attr_accessor :x1, :y1, :x2, :y2, :steps
+  attr_accessor :x1, :y1, :x2, :y2, :steps, :name
   def initialize(x1, y1, x2, y2)
     @x1 = x1
     @y1 = y1
     @x2 = x2
     @y2 = y2
+    @name = random_name
     @steps = []
+  end
+
+  def random_name
+    prefixes = ["Shadow", "Whispering", "Silent", "Dark", "Hidden", "Misty", "Ancient", "Forgotten", "Creeping", "Twisted"]
+    suffixes = ["Passage", "Way", "Path", "Tunnel", "Route", "Hall", "Gallery", "Avenue", "Lane", "Drive"]
+    prefix = prefixes.sample
+    suffix = suffixes.sample
+    return "#{prefix} #{suffix}"
   end
 
   def color
