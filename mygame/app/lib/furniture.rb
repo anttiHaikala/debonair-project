@@ -37,7 +37,7 @@ class Furniture
     @breakable = 10
   end
 
-  def  self.kinds
+  def self.kinds
     [
     :door,
     :bed,
@@ -110,9 +110,13 @@ class Furniture
     end
   end
 
+  def blocks_line_of_sight?(args)
+    self.blocks_movement?(args)
+  end
+
   def self.blocks_line_of_sight?(x, y, level, args)
     furniture = Furniture.furniture_at(x, y, level, args)
-    if furniture && furniture.blocks_movement?(args) 
+    if furniture && furniture.blocks_line_of_sight?(args) 
       return true
     end
     return false

@@ -20,6 +20,11 @@ class Tile
     return @@tile_visibility_per_level[depth] || []
   end 
 
+  def self.visibility_at(x, y, depth, args)
+    tile_visibility = @@tile_visibility_per_level[depth] || []
+    return tile_visibility[y] && tile_visibility[y][x]
+  end
+
   def self.tile_types
     [:floor, :rock, :wall, :water, :staircase_up, :staircase_down, :chasm, :ice, :open_door, :closed_door, :secret_door]
   end
@@ -174,6 +179,11 @@ class Tile
         if tile_visibility[y][x] == true
           tile = level.tiles[y][x]
           if tile == :floor || tile == :water || tile == :ice
+            # check furniture 
+            furniture = Furniture.furniture_at(x, y, level, args)
+            if furniture && furniture.blocks_line_of_sight?(args) 
+              next
+            end
             # make adjacent tiles visible
             [[-1, 1],[-1, -1],[-1, 0],[1, 1],[1, 0],[1, -1],[0, -1],[0, 1]].each do |dx, dy|
               nx = x + dx
@@ -207,6 +217,8 @@ class Tile
         end
       end
     end
+
+    Lighting.mark_lighting_stale
   end
 
   def self.draw_tiles args

@@ -771,13 +771,15 @@ class GUI
     y_offset = Utils.offset_y(args)
     level.corridors.each do |corridor|
       color = corridor.color
+      offset_seed = (corridor.x1 + corridor.y1 + corridor.x2 + corridor.y2) % 10
+      c_offset = offset_seed * 0.1
       # then draw the steps
       corridor.steps.each do |step|
         args.outputs.primitives << {
-          x: x_offset + step[:x] * tile_size,
-          y: y_offset + step[:y] * tile_size,
-          w: tile_size,
-          h: tile_size,
+          x: x_offset + (step[:x] + 0.1) * tile_size,
+          y: y_offset + (step[:y] + 0.1) * tile_size,
+          w: tile_size*0.8,
+          h: tile_size*0.8,
           path: :solid,
           r: color[:r],
           g: color[:g],
@@ -787,8 +789,8 @@ class GUI
       end
       # mark corridor start
       args.outputs.primitives << {
-        x: x_offset + corridor.x1 * tile_size,
-        y: y_offset + corridor.y1 * tile_size,
+        x: x_offset + (corridor.x1 + c_offset) * tile_size,
+        y: y_offset + (corridor.y1 + c_offset) * tile_size,
         w: tile_size,
         h: tile_size, 
         path: :text,
@@ -801,8 +803,8 @@ class GUI
       }
       # mark corridor end
       args.outputs.primitives << {
-        x: x_offset + corridor.x2 * tile_size,
-        y: y_offset + corridor.y2 * tile_size,
+        x: x_offset + (corridor.x2 + c_offset) * tile_size,
+        y: y_offset + (corridor.y2 + c_offset) * tile_size,
         w: tile_size,
         h: tile_size, 
         path: :text,
@@ -838,6 +840,70 @@ class GUI
         b: color[:b],
         a: 30
       }
+    end
+  end
+
+  def self.draw_los_debug args
+    return unless $debug
+    level = Utils.level(args)
+    return unless level
+    tile_size = Utils.tile_size(args)
+    x_offset = Utils.offset_x(args)
+    y_offset = Utils.offset_y(args)
+    tile_viewport = Utils.tile_viewport args
+    x_start = tile_viewport[0]
+    y_start = tile_viewport[1]
+    x_end = tile_viewport[2]
+    y_end = tile_viewport[3]
+    depth = level.depth
+    for x in (x_start..x_end)
+      for y in (y_start..y_end)
+        printf "Checking LOS for tile #{x},#{y}\n"
+        visibility = Tile.visibility_at(x, y, depth, args)
+        if visibility == true
+          args.outputs.primitives << {
+            x: x_offset + (x+0.5) * tile_size,
+            y: y_offset + (y+0.7) * tile_size,
+            w: tile_size,
+            h: tile_size,
+            text: "V",
+            size_enum: 1,
+            r: 0,
+            g: 255,
+            b: 0,
+            a: 100
+          }
+        else
+          args.outputs.primitives << {
+            x: x_offset + (x+0.5) * tile_size,
+            y: y_offset + (y+0.7) * tile_size,
+            w: tile_size,
+            h: tile_size,
+            text: "X",
+            size_enum: 1,
+            r: 255,
+            g: 0,
+            b: 0,
+            a: 100
+          }
+        end
+        # also print lighting level
+        lighting = level.lighting[y][x]
+        lighting_value = (lighting * 100).to_i
+        args.outputs.primitives << {
+          x: x_offset + (x+0.6) * tile_size,
+          y: y_offset + (y+0.3) * tile_size,
+          w: tile_size,
+          h: tile_size,
+          text: "#{lighting_value}",
+          size_enum: 0,
+          alignment_enum: 1,
+          r: 255,
+          g: 255,
+          b: 0,
+          a: 100
+        }
+      end
     end
   end
 end

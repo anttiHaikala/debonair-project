@@ -1,5 +1,9 @@
 module Utils
 
+  def self.depth(args)
+    return args.state.current_depth
+  end
+
   def self.level(args)
     return args.state.dungeon.levels[args.state.current_depth]
   end

@@ -88,6 +88,7 @@ class Lighting
 
   def self.calculate_lighting(level, args)
     if @@lighting_stale
+      printf("calculating lighting...\n")
       unless level.lighting
         level.lighting = Array.new(level.height) { Array.new(level.width, 0.0) }
       end
@@ -99,7 +100,7 @@ class Lighting
       for y in y_start..y_end
         for x in x_start..x_end
           # only if within line of sight
-          if level.los_cache["#{args.state.hero.x},#{args.state.hero.y}->#{x},#{y}"]
+          if Tile.visibility_at(x, y, level.depth, args)
             level.lighting[y][x] = self.calculate_light_level_at(level, x, y)
           end
           unless level.lighting[y][x]

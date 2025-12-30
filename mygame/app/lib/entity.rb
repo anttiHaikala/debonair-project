@@ -213,6 +213,7 @@ class Entity
       GUI.mark_tiles_stale
       Lighting.mark_lighting_stale
       HUD.mark_minimap_stale
+      Lighting.calculate_lighting(level, args)
     end
   end
 

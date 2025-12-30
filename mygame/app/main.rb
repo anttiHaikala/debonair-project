@@ -178,6 +178,7 @@ def gameplay_tick args
   GUI.draw_look_mode args
   GUI.draw_room_debug args
   GUI.draw_corridor_debug args
+  GUI.draw_los_debug args
   HUD.draw args
   HUD.draw_minimap args
   HUD.draw_hero_status args
