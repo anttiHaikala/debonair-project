@@ -16,6 +16,8 @@ $gui_width = 1280
 $gui_height = 720
 $auto_pan_margin = 0.444 # percentage of screen size
 $auto_pan_speed = 0.026
+$display_room_generation = true
+$display_los_debug = false
 
 # vendor libraries
 require 'app/vendor/perlin_noise'
@@ -176,9 +178,9 @@ def gameplay_tick args
   GUI.pan_to_player args
   GUI.update_screen_flash args
   GUI.draw_look_mode args
-  GUI.draw_room_debug args
-  GUI.draw_corridor_debug args
-  GUI.draw_los_debug args
+  GUI.draw_room_debug args if $display_room_generation
+  GUI.draw_corridor_debug args if $display_room_generation
+  GUI.draw_los_debug args if $display_los_debug
   HUD.draw args
   HUD.draw_minimap args
   HUD.draw_hero_status args

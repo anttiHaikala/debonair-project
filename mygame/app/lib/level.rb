@@ -233,7 +233,7 @@ class Level
     furniture = Furniture.furniture_at(x, y, self, args)
     return false if furniture && furniture.blocks_movement?(args)
     return false if tile.nil?
-    return true if Tile.is_walkable?(tile, args)
+    return true if Tile.is_walkable_type?(tile, args)
     return true if tile == :wall && furniture && furniture.kind == :secret_door && furniture.openness > 0.0
     return false
   end
@@ -309,6 +309,7 @@ class Level
     direction = nil
     safety = 0
     corridor = Corridor.new(x1, y1, x2, y2)
+    printf "  starting digging corridor named %s.\n" % [corridor.name]
     @corridors << corridor
     while current_x != x2 || current_y != y2 do
       safety += 1

@@ -140,7 +140,7 @@ class Behaviour
     target_y = npc.y + step_y
     level = args.state.dungeon.levels[npc.depth]
     target_tile = level.tiles[target_y][target_x]
-    if Tile.is_walkable?(target_tile, args) && !Tile.occupied?(target_x, target_y, args)
+    if Tile.is_walkable_type?(target_tile, args) && !Tile.occupied?(target_x, target_y, args)
       Tile.enter(npc, target_x, target_y, args)
       return
     else
@@ -197,7 +197,7 @@ class Behaviour
           #printf "Target x,y: #{target_x}, #{target_y}, hero x,y #{hero.x}, #{hero.y}, npc x,y #{npc.x}, #{npc.y}\n"
           level = args.state.dungeon.levels[depth]
           target_tile = level.tiles[target_y][target_x]
-          if !Tile.is_walkable?(target_tile, args) && Tile.occupied?(target_x, target_y, args)
+          if !Tile.is_walkable_type?(target_tile, args) && Tile.occupied?(target_x, target_y, args)
             # cannot move towards the hero, try the other direction
             if step_x != 0
               target_x = npc.x
@@ -207,7 +207,7 @@ class Behaviour
               target_y = npc.y 
             end
           end
-          if Tile.is_walkable?(target_tile, args) && !Furniture.blocks_movement?(target_x, target_y, level, args)
+          if Tile.is_walkable_type?(target_tile, args) && !Furniture.blocks_movement?(target_x, target_y, level, args)
             if Tile.occupied?(target_x, target_y, args)
               if hero.x == target_x && hero.y == target_y
                 # occupied, attack!
@@ -283,7 +283,7 @@ class Behaviour
         return
       end
       target_tile = level.tiles[target_coordinates[1]][target_coordinates[0]]
-      if Tile.is_walkable?(target_tile, args) && !Tile.occupied?(target_coordinates[0], target_coordinates[1], args)
+      if Tile.is_walkable_type?(target_tile, args) && !Tile.occupied?(target_coordinates[0], target_coordinates[1], args)
         Tile.enter(npc, target_coordinates[0], target_coordinates[1], args)
         SoundFX.play_walking_sound(npc, args)
         return # important to not spend time twice!

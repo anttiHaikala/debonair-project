@@ -39,6 +39,8 @@ Double click the ./dragonruby executable to start up the game.
 |Input          | Function |
 |:----------------|:-------------------------------------------------------------------------------|
 |ESC  | toggle debug mode |
+|F   | toggle field of vision and lighting layer|
+|R   | toggle map generation layer|
 |1             | change hero species |
 |2     | change hero role |
 |3    | change hero trait |
@@ -46,7 +48,7 @@ Double click the ./dragonruby executable to start up the game.
 |5    | equip random want |
 |6    | equip random potion |
 |7    | equip random ring |
-§|0    | equip random weapon |
+|0    | equip random weapon |
 
 
 ## Source code

@@ -208,6 +208,12 @@ class GUI
         Debug.press_l(args)
         return
       end
+      if args.inputs.keyboard.key_down.r
+        $display_room_generation = !$display_room_generation
+      end
+      if args.inputs.keyboard.key_down.f
+        $display_los_debug = !$display_los_debug
+      end
     end
     # inventory management can happen in parallel
     self.handle_inventory_input args
@@ -760,11 +766,14 @@ class GUI
     x_offset = Utils.offset_x(args)
     y_offset = Utils.offset_y(args)
     level.corridors.each do |corridor|
+      corridor_length = corridor.steps.size
       color = corridor.color
       offset_seed = (corridor.x1 + corridor.y1 + corridor.x2 + corridor.y2) % 10
       c_offset = offset_seed * 0.1
       # then draw the steps
+      step_count = 0
       corridor.steps.each do |step|
+        step_count += 1
         args.outputs.primitives << {
           x: x_offset + (step[:x] + 0.1) * tile_size,
           y: y_offset + (step[:y] + 0.1) * tile_size,
@@ -776,6 +785,34 @@ class GUI
           b: color[:b],
           a: 80
         }
+        # mark step number 
+        args.outputs.primitives << {  
+          x: x_offset + (step[:x] + 0.4) * tile_size,
+          y: y_offset + (step[:y] + 0.9) * tile_size,
+          w: tile_size,
+          h: tile_size, 
+          text: "#{step_count}",
+          size_enum: 0,
+          r: color[:r],
+          g: color[:g],
+          b: color[:b],
+          a: 200
+        }
+        if step_count == (corridor_length / 2).floor
+          # mark midpoint
+          args.outputs.primitives << {  
+            x: x_offset + (step[:x] + 0.2) * tile_size,
+            y: y_offset + (step[:y] + 0.2) * tile_size,
+            w: tile_size,
+            h: tile_size, 
+            text: "#{corridor.name} midpoint",
+            size_enum: 0,
+            r: color[:r],
+            g: color[:g],
+            b: color[:b],
+            a: 200
+          }
+        end
       end
       # mark corridor start
       args.outputs.primitives << {
@@ -786,6 +823,7 @@ class GUI
         path: :text,
         text: "#{corridor.name} start",
         size_enum: 1,
+        alignment_enum: 2,
         r: color[:r],
         g: color[:g],
         b: color[:b],
@@ -799,6 +837,7 @@ class GUI
         h: tile_size, 
         path: :text,
         text: "#{corridor.name} end",
+        alignment_enum: 0,
         size_enum: 1,
         r: color[:r],
         g: color[:g],

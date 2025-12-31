@@ -447,7 +447,7 @@ class Item
         return
       end
     end
-    if level.is_walkable?(x,y)
+    if level.is_walkable?(x, y, args)
       self.x = x
       self.y = y
       self.visual_x = x

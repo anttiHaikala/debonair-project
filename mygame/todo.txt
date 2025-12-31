@@ -20,8 +20,8 @@ IDEAS
 - crypts: https://nethackwiki.com/wiki/Graveyard
 - acid blobs: https://nethackwiki.com/wiki/Acid_blob
 
-NOTES ON TTRPG LEGACY (inspo material to check out)
-- Tomb Of Horros (original D&D book)
+TTRPG LEGACY INSPO
+- Tomb Of Horrors (original D&D book)
 
 NOTES ON HACK
 - shopkeepers

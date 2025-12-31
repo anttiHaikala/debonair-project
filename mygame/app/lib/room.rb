@@ -43,8 +43,8 @@ class Corridor
   end
 
   def random_name
-    prefixes = ["Shadow", "Whispering", "Silent", "Dark", "Hidden", "Misty", "Ancient", "Forgotten", "Creeping", "Twisted"]
-    suffixes = ["Passage", "Way", "Path", "Tunnel", "Route", "Hall", "Gallery", "Avenue", "Lane", "Drive"]
+    prefixes = ["Shadow", "Whispering", "Silent", "Dark", "Hidden", "Misty", "Ancient", "Forgotten", "Creeping", "Twisted", 'Glowing', "Minstrel's", 'Dwarven', 'Orcish', 'Elven', 'Goblin', 'Haunted', 'Crystal', 'Golden', 'Silver', 'Bronze', 'Iron', 'Copper', 'Rainbow', 'Silent', 'Noisy']
+    suffixes = ["Passage", "Way", "Path", "Tunnel", "Route", "Hall", "Gallery", "Avenue", "Lane", "Drive", 'Hallway', 'Walk', 'Run', 'Ring', 'Trail', 'Haunt', 'Block', 'Boulevard', 'Laneway', 'Loop', 'Promenade', 'Track', 'Sneak', 'Subway', 'Sprint', 'Alley', 'Marathon', 'Broadway', 'Shortcut', 'Byway']
     prefix = prefixes.sample
     suffix = suffixes.sample
     return "#{prefix} #{suffix}"

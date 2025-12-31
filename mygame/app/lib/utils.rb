@@ -235,7 +235,7 @@ module Utils
         {:x => current[:x], :y => current[:y] - 1}
       ]
       neighbors.each do |neighbor|
-        next unless level.is_walkable?(neighbor[:x], neighbor[:y])
+        next unless level.is_walkable?(neighbor[:x], neighbor[:y], args)
         alt = distances["#{current[:x]},#{current[:y]}"] + 1
         if alt < distances["#{neighbor[:x]},#{neighbor[:y]}"]
           distances["#{neighbor[:x]},#{neighbor[:y]}"] = alt

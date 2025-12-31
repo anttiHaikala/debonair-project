@@ -37,7 +37,7 @@ class Tile
     return [:wall, :rock].include?(tile_type)
   end
 
-  def self.is_walkable?(tile_type, args)
+  def self.is_walkable_type?(tile_type, args)
     return [:floor, :staircase_up, :staircase_down, :water, :ice, :open_door].include?(tile_type)
   end
 
