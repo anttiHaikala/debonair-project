@@ -164,7 +164,7 @@ class NPC < Entity
       end
     end
     special_monster_roll = args.state.rng.d20
-    if special_monster_roll # > 17 && level.depth > 0
+    if special_monster_roll > 17 && level.depth > 0
       room = level.rooms.sample
       x = room.center_x + Numeric.rand(-1..1)
       y = room.center_y + Numeric.rand(-1..1)
