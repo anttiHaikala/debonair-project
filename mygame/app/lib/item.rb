@@ -306,9 +306,8 @@ class Item
   # Master list for role-based starting loadouts
   def self.setup_items_for_new_hero(hero, args)
      # 1. Common Starting Items: Every hero starts with a torch (wielded) and a food ration.
-     # how to get torch in right hand?
-    item = Food.new(:food_ration, args)
-    hero.carried_items << item
+    #item = Food.new(:food_ration, args) #you want to pass args here to get spoilage tracking working
+    #hero.carried_items << item
     item = Potion.new(:potion_of_healing)
     hero.carried_items << item
     item = PortableLight.new(:torch)
@@ -322,14 +321,16 @@ class Item
         { kind: :whip, state: :wielded },
         { kind: :leather_boots, state: :worn },
         { kind: :scroll_of_mapping },
-        { count: args.state.rng.nxt_int(1, 3), pool: Food.kinds }
+        { kind: :food_ration },
+        *Array.new(args.state.rng.nxt_int(1, 3)) { { kind: args.state.rng.sample(Food.kinds) } }
       ],
       cleric: [
         { kind: :corinthian_helmet, state: :worn },
         { kind: :mace, state: :wielded },
         { kind: :potion_of_extra_healing },
         { kind: :potion_of_holy_water },
-        { kind: :chain_mail_shirt, state: :worn }
+        { kind: :chain_mail_shirt, state: :worn },
+        { kind: :food_ration }
       ],
       detective: [
         { kind: :hat, state: :worn },
@@ -337,14 +338,16 @@ class Item
         { kind: :razor_blade, state: :wielded },
         { kind: :revolver },
         { kind: :notebook },
-        { kind: :medkit }
+        { kind: :medkit },
+        { kind: :food_ration }
       ],
       druid: [
         { kind: :staff, state: :wielded },
-        { count: 1, pool: Potion.kinds },
-        { count: 1, pool: Scroll.kinds },
-        { count: 1, pool: Wand.kinds },
-        { kind: :ring_of_regeneration, state: :worn }
+        *Array.new(args.state.rng.nxt_int(1, 3)) { { kind: args.state.rng.sample(Potion.kinds) } },
+        *Array.new(args.state.rng.nxt_int(1, 3)) { { kind: args.state.rng.sample(Scroll.kinds) } },
+        { kind: args.state.rng.sample(Wand.kinds) },
+        { kind: :ring_of_regeneration, state: :worn },
+        { kind: :food_ration }
       ],
       knight: [
         { kind: :sword, state: :wielded },
@@ -355,10 +358,10 @@ class Item
       ],
       monk: [
         { kind: :staff, state: :wielded },
-        { count: args.state.rng.nxt_int(1, 2), kind: :potion_of_healing },
-        { count: args.state.rng.nxt_int(1, 2), kind: :potion_of_holy_water },
-        { count: args.state.rng.nxt_int(2, 3), kind: :food_ration },
-        { count: 3, pool: Scroll.kinds }
+        *Array.new(args.state.rng.nxt_int(1, 2)) { { kind: :potion_of_healing } },
+        *Array.new(args.state.rng.nxt_int(1, 2)) { { kind: :potion_of_holy_water } },
+        *Array.new(args.state.rng.nxt_int(2, 3)) { { kind: args.state.rng.sample(Scroll.kinds) } },
+        *Array.new(args.state.rng.nxt_int(2, 3)) { { kind: :food_ration } }
       ],
       ninja: [
         { kind: :dagger, state: :wielded },
@@ -366,62 +369,285 @@ class Item
         { kind: :ninja_suit, state: :worn },
         { kind: :bow },
         { kind: :potion_of_teleportation },
+        { kind: :food_ration }
       ],
       rogue: [
         { kind: :sword, state: :wielded },
         { kind: :bow },
         { kind: :leather_hood, state: :worn },
         { kind: :leather_armor_shirt, state: :worn },
-        { count: 1, pool: Potion.kinds }
+        { kind: args.state.rng.sample(Potion.kinds) },
+        { kind: :food_ration }
       ],
       samurai: [
         { kind: :katana, state: :wielded },
         { kind: :bow },
         { kind: :basic_helmet, state: :worn },
         { kind: :lamellar_armor_shirt, state: :worn },
-        { kind: :greaves, state: :worn }
+        { kind: :greaves, state: :worn },
+        { kind: :food_ration }
       ],
       thief: [
         { kind: :dagger, state: :wielded },
         { kind: :lockpick },
         { kind: :bow },
         { kind: :rope },
-        { count: args.state.rng.nxt_int(1, 2), kind: :food_ration }
+        *Array.new(args.state.rng.nxt_int(1, 3)) { { kind: :food_ration } }
       ],
       tourist: [
         { kind: :hat, state: :worn },
         { kind: :sunglasses, state: :worn },
         { kind: :camera },
         { kind: :selfie_stick, state: :wielded },
-        { count: args.state.rng.nxt_int(3, 5), pool: Food.kinds }
+        *Array.new(args.state.rng.nxt_int(4, 7)) { { kind: args.state.rng.sample(Food.kinds) } }
       ],
       warrior: [
         { kind: :sword, state: :wielded },
         { kind: :fur_shorts, state: :worn },
         { kind: :breastplate, state: :worn },
         { kind: :viking_helmet, state: :worn },
-        { kind: :spear }
+        { kind: :spear },
+        { kind: :food_ration }
       ],
       wizard: [
         { kind: :staff, state: :wielded },
-        { count: 3, pool: Wand.kinds },
-        { count: 3, pool: Scroll.kinds },
-        { count: 1, pool: Ring.kinds },
-        { count: 1, pool: Potion.kinds }
+        *Array.new(args.state.rng.nxt_int(2, 3)) { { kind: args.state.rng.sample(Wand.kinds) } },
+        *Array.new(args.state.rng.nxt_int(1, 2)) { { kind: args.state.rng.sample(Scroll.kinds) } },
+        *Array.new(args.state.rng.nxt_int(1, 2)) { { kind: args.state.rng.sample(Ring.kinds) } },
+        { kind: args.state.rng.sample(Potion.kinds) },
+        { kind: :food_ration }
       ]
     }
+    loadout = role_gear[hero.role] || []
+    # 3. Add hero.species specific items if needed
+    case hero.species
+    when :human
+      # no modifications
+    when :elf
+      loadout.each do |entry|
+        if entry[:kind] == :sword || entry[:kind] == :mace
+          entry[:kind] = :bow
+        end
+        if entry[:kind] == :food_ration
+          entry[:kind] = :lembas
+        end
+      end 
+      loadout.delete(loadout.sample)         
+    when :dark_elf
+      loadout.each do |entry|
+        if entry[:kind] == :sword || entry[:kind] == :mace
+          entry[:kind] = :bow
+        end
+        if Armor.kinds.include?(entry[:kind])
+          loadout.delete(entry)
+        end
+      end
+      loadout.delete(loadout.sample)
+      loadout.sample << {attribute: :cursed}
+      2.times do
+        loadout << {kind: Weapon.kinds.sample}
+      end
+    when :dwarf
+      2.times do 
+        loadout.delete(loadout.sample)
+      end
+      loadout << {kind: :pickaxe}
+    when :orc
+      loadout.each do |entry|
+        if Armor.kinds.include?(entry[:kind])
+          entry << {attribute: :made_in_Mordor}
+        end
+      end
+    when :goblin
+      loadout << {kind: Armor.kinds.sample}
+      loadout.sample << {attribute: :cursed}
+    when :troll
+      loadout.each do |entry|
+        if Armor.kinds.include?(entry[:kind])
+          loadout.delete(entry)
+        end
+      end
+    when :halfling
+      loadout.each do |entry|
+        if entry[:kind] == :food_ration
+          entry[:kind] = :lembas
+        end
+      end
+      loadout << {kind: Ring.kinds.sample}
+    when :gnome
+      loadout.each do |entry|
+        if Armor.kinds.include?(entry[:kind])
+          randRange = args.state.rng.nxt_int(1, 8)
+          case randRange
+          when 1   
+            loadout.delete(entry)
+          when 2
+            entry << {attribute: :cursed}
+          else
+            entry << {attribute: :masterwork}
+          end  
+        end
+      end
+      loadout.sample << {attribute: :cursed}
+
+    when :duck
+      loadout.each do |entry|
+        if entry[:kind] == :food_ration
+          entry[:kind] = :bird_food
+        end
+      end
+      loadout.sample << {attribute: :enchanted}
+    end
+
+    # 4. Trait specific item modifications
+    hero.traits.each do |heroTrait|
+      case heroTrait
+      when :normal
+        # no effect
+      when :alien
+        4.times do
+          loadout.delete(loadout.sample)
+        end
+        loadout << {kind: :raygun, state: :wielded}
+      when :angel
+        loadout = []
+        loadout << {kind: :wings}
+        loadout << {kind: Weapon.kinds.sample, attribute: :holy}
+      when :cyborg
+        loadout.each do |entry|
+          if Armor.kinds.include?(entry[:kind])
+            loadout.delete(entry)
+          end
+        end 
+        cyborgParts = []
+        Armor.kinds.each do |armorKind|
+          if armorKind.to_s.include?("cyborg")
+            cyborgParts << armorKind
+          end
+        end
+        loadout << {kind: cyborgParts.sample, state: :worn}
+      when :demon
+        loadout = []
+        loadout << {kind: :wings}
+        loadout << {kind: :trident}
+      when :mutant
+        armorFound = false
+        loadout.each do |entry|
+          if Armor.kinds.include?(entry[:kind])
+            loadout.delete(entry)
+            armorFound = true
+          end
+        end
+        if armorFound
+          loadout << {kind: :silly_stocking_suit, state: :worn}
+        else
+          loadout << {kind: :silly_stocking_suit, state: :worn, attribute: :cursed}
+        end
+      when :undead
+        loadout.each do |entry|
+          if Food.kinds.include?(entry[:kind])
+            loadout.delete(entry)
+          end
+        end
+        3.times do
+          loadout.sample << {attribute: :cursed}
+        end
+        if hero.role == :archeologist && hero.species == :dark_elf
+          loadout << {kind: :bone_whip_of_death, state: :wielded}
+        end
+      when :robot
+        loadout = []
+        loadout << {kind: :battery_pack}
+      when :vampire
+        puts Food.kinds
+        puts loadout
+        loadout.each do |entry|
+          puts entry[:kind]
+          if Food.kinds.include?(entry[:kind])
+            entry[:kind] = :blood_pack
+          end
+        end
+      when :werewolf
+        # no specific items?
+      when :zombie
+          loadout.each do |entry|
+          if Food.kinds.include?(entry[:kind])
+            entry[:kind] = :brain
+          end
+        end
+        3.times do
+          # make these later rotten etc - need changes in add_attribute
+          loadout.sample << {attribute: :broken}
+        end      
+      end
+    end
+
+  # 5. Age specific item modifications
+    case hero.age
+    when :teen
+      loadout.each do |entry|
+        if entry[:kind] == :food_ration
+          entry[:kind] = :hamburger
+        end
+        if Scroll.kinds.include?(entry[:kind])
+          entry[:kind] = :potion_of_speed
+        end
+      end
+    when :adult
+      # no effect
+    when :elder
+      noWeapon = true
+      loadout.each do |entry|
+        if Weapon.kinds.include?(entry[:kind])
+          noWeapon = false
+        end
+        entry << {indentified: true}
+      end
+      2.times do
+        loadout.delete(loadout.sample)
+        loadout << {kind: Scroll.kinds.sample, indentified: true}
+      end
+      if noWeapon
+        loadout << {kind: :staff, state: :wielded}
+      end
+    end
+
+    # 6. Apply random luck modifications
+    luckRoll = args.state.rng.nxt_int(1, 100)
+    allItems = Weapon.kinds + Armor.kinds + Potion.kinds + Scroll.kinds + Ring.kinds + Wand.kinds + Food.kinds
+    if luckRoll <= 5
+      loadout.delete(loadout.sample)
+      HUD.output_message(args, "You might have forgotten something...")
+    elsif luckRoll >= 90
+      loadout << {kind: allItems.sample}
+      HUD.output_message(args, "This might be a good day after all...")
+    elsif luckRoll == 100
+      3.times do
+        loadout << {kind: allItems.sample, attribute: :enchanted}
+        HUD.output_message(args, "You feel lucky today!")
+      end
+    end
 
     # Apply the Loadout
-    loadout = role_gear[hero.role] || []
     loadout.each do |entry|
       # Handle count for multi-item drops or random counts
+      # Count not used in item generation atm
       repeat = entry[:count] || 1
       repeat.times do
         # If kind isn't specified, pick a random one from the provided pool
         # Ensure we use the seeded RNG for sampling if pool is provided
-        kind = entry[:kind] || args.state.rng.sample(entry[:pool])
+        kind = entry[:kind]
+        indentified = entry[:identified] || false
         item = self.create_instance(kind, args)
-        
+        if entry[:attribute]
+          if item.respond_to?(:add_attribute_modfiers)
+            item.add_attribute_modfiers(entry[:attribute], args)
+          end
+          item.add_attribute(entry[:attribute])
+        end
+        if indentified
+          item.identifify
+        end
         hero.carried_items << item
         hero.worn_items << item if entry[:state] == :worn
         hero.wielded_items << item if entry[:state] == :wielded
@@ -429,7 +655,9 @@ class Item
     end
   end
 
-
+  def return_pool_item(pool)
+    args.state.rng.sample(pool)
+  end
   def teleport(args, x=nil, y=nil)
     level = args.state.dungeon.levels[self.depth]
     if x.nil? || y.nil?
