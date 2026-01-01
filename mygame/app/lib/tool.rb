@@ -18,8 +18,17 @@ class Tool < Item
     medkit: {
       meta: { ui_name: "trauma medkit", weight: 1.2, price: 300, rarity: 20, durability: 1, action: :heal }
     },
-    shovel: {
-      meta: { ui_name: "iron shovel", weight: 3.0, price: 30, rarity: 90, durability: nil, action: :dig }
+    wings: {
+      meta: { ui_name: "wings", weight: 3.0, price: 500, rarity: 100, durability: nil, action: :fly }
+    },
+    battery: {
+      meta: { ui_name: "battery pack", weight: 3.0, price: 500, rarity: 100, durability: nil, action: :recharge}
+    },
+    notebook: {
+      meta: { ui_name: "notebook", weight: 3.0, price: 10, rarity: 100, durability: 10, action: :copy_scroll }
+    },
+    camera: {
+      meta: { ui_name: "camera", weight: 0.5, price: 400, rarity: 100, durability: 30, action: :take_photo }
     }
   }
 

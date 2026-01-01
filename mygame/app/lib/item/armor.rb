@@ -186,7 +186,7 @@ class Armor < Item
   end
 
   def self.rare_attributes
-    [:masterwork, :enchanted, :alien_made, :mythical, :made_by_Ilmarinen]
+    [:masterwork, :enchanted, :alien_made, :mythical, :made_by_Ilmarinen, :holy]
   end
 
   def apply_attribute_modifiers(args, attribute)
@@ -208,7 +208,7 @@ class Armor < Item
       @meta[:price] = ((@meta[:price] || 10) * 1.5).floor
     when :made_in_Mordor
       @coverage.each { |part, val| @coverage[part] = [0, val - args.state.rng.nxt_int(-2, 1)].max }
-    when :masterwork, :enchanted, :alien_made, :mythical, :made_by_Ilmarinen
+    when :masterwork, :enchanted, :alien_made, :mythical, :made_by_Ilmarinen, :holy
       @coverage.each { |part, val| @coverage[part] = val + args.state.rng.nxt_int(1, 2) }
     end
   end

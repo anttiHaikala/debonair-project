@@ -27,7 +27,9 @@ class Weapon < Item
       :shuriken,
       :selfie_stick,
       :razor_blade,
-      :revolver
+      :revolver,
+      :raygun,
+      :trident
     ]
   end
 
@@ -37,7 +39,7 @@ class Weapon < Item
       return :cut
     when :mace, :club, :selfie_stick
       return :blunt
-    when :spear, :bow, :crossbow, :shuriken, :revolver
+    when :spear, :bow, :crossbow, :shuriken, :revolver, :trident
       return :pierce
     else
       return :blunt
@@ -55,7 +57,8 @@ class Weapon < Item
 
   def self.rare_attributes
     [
-      :masterwork
+      :masterwork,
+      :holy #has no effect in combat yet
     ]
   end
 
@@ -79,6 +82,8 @@ class Weapon < Item
       @weight = 0.3
     when :razor_blade
       @weight = 0.1
+    when :raygun
+      @weight = 1.5
     else
       @weight = 0.6
     end 
@@ -163,3 +168,11 @@ class Weapon < Item
     end
   end
 end
+
+class UniqueWeapon < Weapon
+  def initialize(kind, args=nil)
+    super(kind, args)
+    @category = :melee_weapon
+  end
+end
+
