@@ -26,44 +26,12 @@ class NPC < Entity
     else
       return "#{@traits.join(' ')} #{@species.to_s.gsub('_',' ')}".capitalize.strip
     end
-  end
-
-  def hue # deprecate!!!
-    case @species
-    when :newt
-      return 80
-    when :goblin, :orc
-      return 120  
-    when :grid_bug
-      return 300
-    when :rat
-      return 40
-    else
-      return 0
-    end
-  end
+  end  
 
   # these are HSl values (hue, saturation, level)
   # hue cheat sheet: 0=red, 40=orange, 80=yellow, 120=green, 200=blue, 300=purple
   def color
-    case @species
-    when :goblin, :orc
-      return [20, 80, 70]
-    when :newt
-      return [90, 100, 100]
-    when :grid_bug
-      return [130, 100, 100]
-    when :rat
-      return [80, 80, 20]
-    when :wraith
-      return [200, 200, 255]
-    when :skeleton
-      return [0, 0, 100]
-    when :minotaur
-      return [150, 75, 80]
-    else
-      return [255, 255, 255]
-    end
+    return Species.color_for_species(@species)
   end
 
   def setup_traits
@@ -77,6 +45,8 @@ class NPC < Entity
     when :wraith
     when :skeleton
     when :minotaur
+    when :leprechaun
+      @traits << [:cheerful, :grumpy, :mischievous, :sleepy].sample
     end
   end
 
@@ -100,6 +70,8 @@ class NPC < Entity
       return [3,5]
     when :minotaur
       return [13,4]
+    when :leprechaun
+      return [12,6]
     else
       return [16,14]
     end
@@ -113,6 +85,8 @@ class NPC < Entity
       return "makes weird noise"
     when :rat
       return "growls hungrily"
+    when :leprechaun
+      return "chuckles"
     else
       return "looks around"
     end
@@ -189,25 +163,34 @@ class NPC < Entity
         end
       end
     end
+    special_monster_roll = args.state.rng.d20
+    if special_monster_roll # > 17 && level.depth > 0
+      room = level.rooms.sample
+      x = room.center_x + Numeric.rand(-1..1)
+      y = room.center_y + Numeric.rand(-1..1)
+      special = NPC.new(:leprechaun, x, y, level.depth)
+      level.entities << special
+    end
   end
 
   def walking_speed # separate to attack speed later
     species_speed = 1.0
     case @species
     when :goblin
-      species_speed = 1.4 # seconds per tile
+      species_speed = 1.2 # seconds per tile
     when :grid_bug
       species_speed = 0.2
     when :rat, :newt, :minotaur
       species_speed = 0.8
     when :gelatinous_cube # these guys keep the dungeon clean??
       species_speed = 5.0
+    when :leprechaun
+      species_speed = 0.85
     end
     traumatized_speed = species_speed / Trauma.walking_speed_modifier(self)
+    status_modifier = 1.0
     if self.has_status?(:speedy)
-      status_modifier = 0.5
-    else
-      status_modifier = 1.0
+      status_modifier *= 0.5
     end
     if self.has_status?(:slowed)
       status_modifier *= 2.0
@@ -217,8 +200,8 @@ class NPC < Entity
   end
 
   def take_action args
-    #printf "NPC #{@species} at (#{@x}, #{@y}) taking action at time #{args.state.kronos.world_time}\n"
     behaviour = Behaviour.select_for_npc(self, args)
+    printf "NPC #{@species} at (#{@x}, #{@y}) taking action #{behaviour.kind} at time #{args.state.kronos.world_time.round(2)}\n"
     behaviour.execute(args) if behaviour
   end
 

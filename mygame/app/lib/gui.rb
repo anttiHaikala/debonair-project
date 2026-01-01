@@ -209,7 +209,7 @@ class GUI
         return
       end
       if args.inputs.keyboard.key_down.r
-        $display_room_generation = !$display_room_generation
+        $display_room_debug = !$display_room_debug
       end
       if args.inputs.keyboard.key_down.f
         $display_los_debug = !$display_los_debug
@@ -399,7 +399,7 @@ class GUI
         alpha = 90
       end
       lighting = level.lighting[y][x] # 0.0 to 1.0
-      hue = entity.hue
+      hue = entity.color[0]
       saturation = entity.color[1]
       level = entity.color[2]
       level *= lighting unless telepathic_connection
@@ -529,7 +529,7 @@ class GUI
         # check that the direction button was pressed, not just held
         if args.inputs.keyboard.key_down.up || args.inputs.keyboard.key_down.down || args.inputs.keyboard.key_down.left || args.inputs.keyboard.key_down.right || args.inputs.controller_one.key_down.dpad_up || args.inputs.controller_one.key_down.dpad_down || args.inputs.controller_one.key_down.dpad_left || args.inputs.controller_one.key_down.dpad_right
           Combat.resolve_attack(hero, npc, args)
-          hero.apply_new_facing(dx, dy)
+          hero.apply_new_facing(Utils.direction_from_delta(dx, dy))
           self.add_input_cooldown 20
           args.state.kronos.spend_time(hero, hero.walking_speed, args) # todo fix speed depending on action
           # mark lighting stale
@@ -561,7 +561,7 @@ class GUI
     GUI.lock_hero
     Tile.enter(hero, hero.x + dx, hero.y + dy, args)
     unless @@strafing
-      hero.apply_new_facing(dx, dy)
+      hero.apply_new_facing(Utils.direction_from_delta(dx, dy))
     end
     hero.apply_walking_exhaustion(args)
     return true
@@ -867,7 +867,20 @@ class GUI
         r: color[:r],
         g: color[:g],
         b: color[:b],
-        a: 30
+        a: 80
+      }
+      # output room details
+      args.outputs.primitives << {
+        x: x_offset + (room.x + 0.2) * tile_size,
+        y: y_offset + (room.y + room.h - 0.3) * tile_size,
+        w: tile_size,
+        h: tile_size, 
+        text: "#{room.name} (#{room.w}x#{room.h})",
+        size_enum: 0,
+        r: color[:r],
+        g: color[:g],
+        b: color[:b],
+        a: 200
       }
     end
   end
@@ -935,6 +948,30 @@ class GUI
       end
     end
   end
+
+  def self.draw_npc_debug args
+    return unless $debug
+    level = Utils.level(args)
+    return unless level
+    tile_size = Utils.tile_size(args)
+    x_offset = Utils.offset_x(args)
+    y_offset = Utils.offset_y(args)
+    level.entities.each do |entity|
+      next unless entity.x && entity.y
+      args.outputs.primitives << {
+        x: x_offset + (entity.x + 0.1) * tile_size,
+        y: y_offset + (entity.y + 0.7) * tile_size,
+        w: tile_size,
+        h: tile_size,
+        text: "#{entity.last_behaviour} #{entity.facing}",
+        size_enum: 0,
+        r: 255,
+        g: 200,
+        b: 0,
+        a: 200
+      }
+    end
+  end 
 
   def self.take_staircase_down args
     args.state.staircase = :down

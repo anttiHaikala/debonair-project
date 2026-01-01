@@ -1,4 +1,11 @@
 module Utils
+  # returns true if other_entity is in one of the four adjacent tiles
+  def self.adjacent?(x1, y1, x2, y2)
+    dx = (x1 - x2)
+    dy = (y1 - y2)
+    # and now... prepare for a neat math trick on the next line!
+    return (dx.abs + dy.abs) == 1
+  end
 
   def self.depth(args)
     return args.state.current_depth
@@ -14,6 +21,24 @@ module Utils
 
   def self.xy_of_thing(thing)
     return [thing.x, thing.y]
+  end
+
+  def self.direction_from_to(x0, y0, x1, y1)
+    dx = x1 - x0
+    dy = y1 - y0
+    if dx.abs > dy.abs
+      return dx > 0 ? :east : :west
+    else
+      return dy > 0 ? :south : :north
+    end
+  end
+
+  def self.direction_from_delta(dx, dy)
+    if dx.abs > dy.abs
+      return dx > 0 ? :east : :west
+    else
+      return dy > 0 ? :south : :north
+    end
   end
 
   def self.tile_size(args)

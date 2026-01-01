@@ -30,6 +30,9 @@ class Kronos
   end
 
   def spend_time entity, seconds, args
+    if seconds < 0
+      raise "Cannot spend negative time!"
+    end
     entity.busy_until = @world_time + seconds
   end
 
@@ -60,7 +63,9 @@ class Kronos
         idle_entity = entity
       end
     end
+    # THE MIGHTY PASSAGE OF TIME
     @world_time = min_busy_until unless min_busy_until < @world_time # time cannot go backwards
+    # /THE MIGHTY PASSAGE OF TIME
     if self.should_continous_effects_be_applied?
       self.apply_continuous_effects args
     end

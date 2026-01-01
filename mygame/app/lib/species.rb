@@ -8,7 +8,12 @@ class Species
       :wraith,
       :skeleton,
       :minotaur,
-      :orc
+      :orc,
+      :leprechaun,
+      :newt,
+      :troll,
+      :raccoon,
+      :gelatinous_cube
     ]
   end
   def self.hero_species
@@ -164,5 +169,34 @@ class Species
       # :right_cheek,
       # :back_of_skull
     ]
+  end
+
+  def self.color_for_species(species)
+    case species
+    when :goblin, :orc
+      return [120, 80, 70]
+    when :newt
+      return [90, 100, 100]
+    when :grid_bug
+      return [330, 100, 100]
+    when :rat
+      return [80, 80, 20]
+    when :wraith
+      return [240, 0, 50]
+    when :skeleton
+      return [60, 0, 90]
+    when :minotaur
+      return [20, 80, 50]
+    when :leprechaun
+      return [120, 205, 120]
+    when :troll
+      return [100, 80, 40]
+    when :raccoon
+      return [30, 80, 60]
+    when :gelatinous_cube
+      return [180, 50, 90]
+    else
+      return [255, 255, 255]
+    end
   end
 end

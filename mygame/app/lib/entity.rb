@@ -15,6 +15,7 @@ class Entity
   attr_accessor :mode_of_movement
   attr_accessor :feels
   attr_accessor :feel_cooldown
+  attr_accessor :last_behaviour
 
   def self.kinds
     [:generic, :item, :pc, :npc, :plant, :furniture]
@@ -59,6 +60,11 @@ class Entity
     
   def is_allied_to?(other_entity)
     return @allies.include?(other_entity)
+  end
+
+  # returns true if other_entity is in one of the four adjacent tiles
+  def adjacent_to?(other_entity)
+    return Utils.adjacent?(self.x, self.y, other_entity.x, other_entity.y)
   end
 
   def add_status(status)
@@ -149,16 +155,15 @@ class Entity
   end
 
   def sees?(other_entity, args)
-    dx = other_entity.x - self.x
-    dy = other_entity.y - self.y
-    distance = Math.sqrt(dx * dx + dy * dy)
-    if distance > 15
-      return false
-    end
+    able_to_see = true
     if other_entity.invisible?
-      return false
+      able_to_see = false
     end
-    return Utils.line_of_sight?(self.x, self.y, other_entity.x, other_entity.y, args.state.dungeon.levels[self.depth])
+    if !Utils.line_of_sight?(self.x, self.y, other_entity.x, other_entity.y, args.state.dungeon.levels[self.depth])
+      able_to_see = false
+    end
+    
+    return able_to_see
   end
 
   def use_item(item, args)
@@ -211,6 +216,7 @@ class Entity
       self.set_location(x, y)
       SoundFX.play_sound(:teleport, args)
       GUI.mark_tiles_stale
+      Tile.observe_tiles args
       Lighting.mark_lighting_stale
       HUD.mark_minimap_stale
       Lighting.calculate_lighting(level, args)
@@ -326,16 +332,8 @@ class Entity
     return hit_kind
   end
 
-  def apply_new_facing(dx, dy)
-    if dx > 0
-      @facing = :east
-    elsif dx < 0
-      @facing = :west
-    elsif dy > 0
-      @facing = :north
-    elsif dy < 0
-      @facing = :south
-    end   
+  def apply_new_facing(facing)
+    @facing = facing
   end
 
   def set_depth(new_depth, args)
@@ -347,6 +345,14 @@ class Entity
     @feels = [feeling]
     @feel_cooldown = args.state.kronos.world_time + 10
     printf "%s feels %s until %d\n" % [self.name.capitalize, feeling.to_s, @feel_cooldown] 
+  end
+
+  def is_wearing?(item)
+    return self.worn_items.include?(item)
+  end
+
+  def is_wielding?(item)
+    return self.wielded_items.include?(item)
   end
 
 end

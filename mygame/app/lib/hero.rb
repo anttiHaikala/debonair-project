@@ -25,6 +25,40 @@ class Hero < Entity
     @known_scrolls = []
   end
 
+  # modifies a d20 roll to resist theft attempts
+  def anti_steal_ability
+    modifier = 0
+    case self.role
+    when :thief
+      modifier += 5
+    when :ninja
+      modifier += 3
+    when :detective
+      modifier += 2
+    when :rogue
+      modifier += 1
+    when :warrior, :samurai
+      modifier -= 2
+    when :tourist
+      modifier -= 5
+    end
+    case self.trait
+    when :undead
+      modifier -= 3
+    when :zombie
+      modifier -= 4
+    end
+    case self.species
+    when :elf, :dark_elf, :gnome
+      modifier += 1
+    when :orc
+      modifier -= 1
+    when :troll
+      modifier -= 2
+    end
+    return modifier
+  end
+
   def self.roles
     [
       :archeologist, # maps and artifacts

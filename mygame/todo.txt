@@ -34,6 +34,8 @@ NOTES ON GAME SYSTEM (the DEBONAIR!)
 
 TODO LIST
 - Leprechauns steal gold
+- Raccoon steals drinks
+- Rats steal food
 - onsens & geysirs. water temperature!
 - Rats shadow player
 - IMPORTANT: wielded items somehow gets nils now, must fix soon

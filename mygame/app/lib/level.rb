@@ -88,8 +88,8 @@ class Level
   end
 
   def create_entry_room(staircase_x, staircase_y, args)
-    room_width = 2 + args.state.rng.d6
-    room_height = 2 + args.state.rng.d6
+    room_width = 3 + args.state.rng.d6
+    room_height = 3 + args.state.rng.d6
     args.state.dungeon_entrance_x
     entry_room_x = staircase_x - (room_width / 2).to_i
     entry_room_x = 1 if entry_room_x < 1
@@ -154,7 +154,7 @@ class Level
       x = rand(@tiles[0].size - width - buffer*2) + buffer
       y = rand(@tiles.size - height - buffer*2) + buffer
       new_room = Room.new(x, y, width, height)
-      if self.vibe != :rocky
+      if self.vibe != :rocky && self.vibe != :ice
         if rooms.none? { |room| room.intersects?(new_room) }
           rooms << new_room
         end
@@ -163,7 +163,7 @@ class Level
       end
     end
     @rooms.each do |room|
-      if self.vibe == :rocky
+      if self.vibe == :rocky || self.vibe == :ice
         # make rocky levels have bigger rooms that are round, not square
         room.w += 4
         room.h += 4
@@ -436,17 +436,18 @@ class Level
       # terraform the tile - importat part!!!
       @tiles[current_y][current_x] = new_tile if new_tile
       # decide direction to next tile
-      # if we have a direction, keep going that way with some chance
+      y_diff = (y2 - current_y).abs
+      x_diff = (x2 - current_x).abs      # if we have a direction, keep going that way with some chance
+
       if direction
-        if args.state.rng.d20 < 12
+        if args.state.rng.d20 < 12 && x_diff > 0 && y_diff > 0
           # keep going same direction
           next
         end
       end
       # otherwise or if no direction yet,
       # see which direction gets us closer to target
-      y_diff = (y2 - current_y).abs
-      x_diff = (x2 - current_x).abs
+
       if x_diff > y_diff
         if current_x < x2
           direction = :east

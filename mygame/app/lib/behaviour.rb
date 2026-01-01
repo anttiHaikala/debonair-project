@@ -19,6 +19,7 @@
 # curiosity behaviour
 # exploration behaviour
 # hiding behaviour
+# stay away from hero 
 
 class Behaviour
 
@@ -26,9 +27,9 @@ class Behaviour
 
   def initialize(kind, npc)
     @kind = kind
-    @npc = npc
-    @destination = nil
-    @target = nil
+    @npc = npc              # subject of the behaviour
+    @destination = nil      # destionation of activity as x, y, depth coordinates
+    @target = nil           # object of the behaviour
   end
 
   def self.setup_for_npc(npc)
@@ -46,6 +47,13 @@ class Behaviour
       npc.behaviours << Behaviour.new(:wander, npc)
       # npc.behaviours << Behaviour.new(:forage, npc)
       # npc.behaviours << Behaviour.new(:pack, npc)
+    when :leprechaun
+      npc.behaviours << Behaviour.new(:steal, npc)
+      npc.behaviours << Behaviour.new(:flee, npc)
+      npc.behaviours << Behaviour.new(:teleport, npc)
+      npc.behaviours << Behaviour.new(:wander, npc)
+    else 
+      npc.behaviours << Behaviour.new(:wander, npc)
     end
   end
 
@@ -69,8 +77,16 @@ class Behaviour
   end
 
   def self.select_for_npc(npc, args)
-    # priority one - flee
-    npc.behaviours.each do |behaviour|
+    hero = args.state.hero
+    # priority one - flee in various ways
+    npc.behaviours.shuffle.each do |behaviour|
+      if behaviour.kind == :teleport && Trauma.trauma_score(npc, args) > 0 && args.state.rng.d6 > 3
+        # if npc is close to hero, try teleporting away
+        # check distance to hero
+        if Utils.distance_between_entities(npc, hero) < 5 #&& npc.sees?(hero, args)    
+          return behaviour
+        end
+      end
       if behaviour.kind == :flee && Trauma.trauma_score(npc, args) >= self.trauma_threshold_for_fleeing(npc, args)
         return behaviour
       end
@@ -78,6 +94,20 @@ class Behaviour
     # priority two - fight or threaten
     npc.behaviours.each do |behaviour|
       if behaviour.kind == :fight 
+        return behaviour
+      end
+    end
+    # priority three - steal
+    npc.behaviours.each do |behaviour|
+      if behaviour.kind == :steal 
+        if Utils.distance_between_entities(npc, hero) < 10 #&& npc.sees?(hero, args)    
+          return behaviour
+        end
+      end
+    end
+    # priority four - wander
+    npc.behaviours.each do |behaviour|
+      if behaviour.kind == :wander 
         return behaviour
       end
     end
@@ -89,6 +119,7 @@ class Behaviour
     if args.state.hero.sees?(@npc, args)
       #printf "Executing behaviour #{@kind} for NPC #{@npc.species} at (#{@npc.x}, #{@npc.y}) - level #{@npc.depth} - time #{args.state.kronos.world_time.round(2)}\n"  
     end
+    @npc.last_behaviour = @kind
     method_name = @kind.to_s
     if self.respond_to?(method_name)
       self.send(method_name, args)
@@ -261,11 +292,21 @@ class Behaviour
       #print "NPC #{@npc.species} at (#{npc.x}, #{npc.y}) moving towards #{@destination}\n"
       delta = @destination.last > npc.y ? 1 : -1
       target_coordinates = [npc.x, npc.y + delta]
+      if delta > 0 && npc.facing != :north
+        npc.apply_new_facing(:north)
+      elsif delta < 0 && npc.facing != :south
+        npc.apply_new_facing(:south)
+      end
     when 2
       # move eastwest
       #print "NPC #{@npc.species} at (#{npc.x}, #{npc.y}) moving towards #{@destination}\n"
       delta = @destination.first > npc.x ? 1 : -1
       target_coordinates = [npc.x + delta, npc.y]
+      if delta > 0 && npc.facing != :east
+        npc.apply_new_facing(:east)
+      elsif delta < 0 && npc.facing != :west
+        npc.apply_new_facing(:west)
+      end
     else
       #printf "NPC #{@npc.species} at (#{npc.x}, #{npc.y}) idling.\n"
       # do nothing
@@ -292,5 +333,90 @@ class Behaviour
     args.state.kronos.spend_time(npc, npc.walking_speed, args) # todo fix speed depending on action
   end
 
+  def steal args
+    npc = @npc
+    target = args.state.hero
+    if npc.sees?(target, args)    
+      # if we are next to hero, make a stealing roll
+      unless npc.adjacent_to?(target)
+        approach(target.x, target.y, args)
+        return
+      end
+      # face hero
+      npc.apply_new_facing(Utils.direction_from_to(npc.x, npc.y, target.x, target.y))
+      # attempt to steal an item from hero
+      steal_roll = args.state.rng.d20 
+      steal_roll -= target.anti_steal_ability
+      if steal_roll < 5
+        # failed & caught stealing!
+        target.become_hostile_to(npc)
+        npc.become_hostile_to(target)
+        HUD.output_message args, "#{npc.name} tries to steal from you but fails!"
+        args.state.kronos.spend_time(npc, npc.walking_speed, args)
+        return
+      end
+      if steal_roll < 10
+        # failed & almost caught!
+        args.state.kronos.spend_time(npc, npc.walking_speed, args)
+        return
+      end
+      # any roll 10+ equals success in stealing
+      potential_targets = target.carried_items
+      potential_targets = potential_targets.select { |item| !target.is_wearing?(item) }
+      potential_targets = potential_targets.select { |item| !target.is_wielding?(item) }  
+      unless potential_targets.empty?
+        stolen_item = potential_targets.sample
+        target.carried_items.delete(stolen_item)
+        npc.carried_items << stolen_item
+      end
+      if steal_roll < 15
+        # success but caught!
+        target.become_hostile_to(npc)
+        npc.become_hostile_to(target)
+        if potential_targets.empty?
+          HUD.output_message args, "#{npc.name} tries to steal from you but you have nothing!"
+        else
+          HUD.output_message args, "#{npc.name} steals your #{stolen_item.title(args)}!"
+        end
+      end
+      # steal roll 15+ equals full success, not caught
+      args.state.kronos.spend_time(npc, npc.walking_speed, args)
+      return
+    end
+  end
+
+  # action that simply tries to move the NPC closer to given coordinates
+  def approach(x, y, args)
+    npc = @npc
+    dx = x - npc.x
+    dy = y - npc.y
+    if dy.abs < dx.abs || y == npc.y # north-south movement   
+      step_x = dx > 0 ? 1 : -1
+      step_y = 0
+    else
+      step_y = dy > 0 ? 1 : -1
+      step_x = 0  
+    end
+    target_x = npc.x + step_x
+    target_y = npc.y + step_y
+    level = args.state.dungeon.levels[npc.depth]
+    target_tile = level.tiles[target_y][target_x]
+    if Tile.is_walkable_type?(target_tile, args) && !Tile.occupied?(target_x, target_y, args)
+      Tile.enter(npc, target_x, target_y, args)
+      return true
+    else
+      return false
+    end
+  end
+
+  def teleport args
+    hero = args.state.hero
+    npc = @npc
+    npc.teleport args
+    if args.state.hero.sees?(npc, args)
+      HUD.output_message args, "#{npc.name} teleports away!"
+    end
+    args.state.kronos.spend_time(npc, npc.walking_speed, args)
+  end
  
 end

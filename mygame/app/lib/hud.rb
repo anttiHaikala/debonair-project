@@ -150,7 +150,7 @@ class HUD
     args.outputs.labels << {
       x: 960,
       y: 670,
-      text: "#{hero.age.to_s.gsub('adult','')} #{hero.trait.to_s.gsub('none','')} #{hero.species} #{hero.role}".gsub('  ',' ').gsub('_','').trim,
+      text: "#{hero.age.to_s.gsub('adult','')} #{hero.trait.to_s.gsub('normal','')} #{hero.species} #{hero.role}".gsub('  ',' ').gsub('_','').trim,
       size_enum: -2,
       r: 255,
       g: 255,
@@ -213,7 +213,7 @@ class HUD
     args.outputs.labels << {
       x: 10,
       y: 40,
-      text: "depth: #{args.state.hero.depth+1} time: #{args.state.kronos.world_time.to_i} seed: #{seed} ",
+      text: "depth: #{args.state.hero.depth+1} time: #{args.state.kronos.world_time.round(1)} seed: #{seed} ",
       size_enum: 0,
       r: 255,
       g: 255,

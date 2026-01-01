@@ -88,7 +88,7 @@ class Lighting
 
   def self.calculate_lighting(level, args)
     if @@lighting_stale
-      printf("calculating lighting...\n")
+      #printf("calculating lighting...\n")
       unless level.lighting
         level.lighting = Array.new(level.height) { Array.new(level.width, 0.0) }
       end

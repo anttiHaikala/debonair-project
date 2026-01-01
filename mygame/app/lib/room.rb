@@ -1,10 +1,16 @@
 class Room
+
   attr_accessor :x, :y, :w, :h
+
   def initialize(x, y, w, h)
     @x = x
     @y = y
     @w = w
     @h = h
+  end
+
+  def name
+    'room'
   end
 
   def center_x

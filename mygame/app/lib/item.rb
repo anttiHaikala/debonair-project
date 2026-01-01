@@ -110,7 +110,7 @@ class Item
   end
 
   def title(args)
-    "#{self.attributes.join(' ')} #{self.kind.to_s.gsub('_',' ')}".trim
+    "#{self.attributes.join(' ')} #{self.kind.to_s}".trim.gsub('_',' ').gsub('  ',' ')
   end
 
   def c 
@@ -160,67 +160,74 @@ class Item
 
   def self.populate_level(level, args)
     level.rooms.each do |room|
+      x_adjustment = args.state.rng.nxt_int(-1,1)
+      y_adjustment = args.state.rng.nxt_int(-1,1)
+      item_x = room.center_x + x_adjustment
+      item_y = room.center_y + y_adjustment
+      # only place item if tile is walkable and no other items are there
+      next unless level.is_walkable?(item_x, item_y, args)
+      next if level.items.any? { |item| item.x == item_x && item.y == item_y }
       case args.state.rng.d20
         when 1
           item = Food.new(:food_ration, args)
           item.depth = level.depth
-          item.x = room.center_x
-          item.y = room.center_y
+          item.x = item_x
+          item.y = item_y
           level.items << item
         when 2
           item = Potion.randomize(level.depth, args)
           item.depth = level.depth
-          item.x = room.center_x
-          item.y = room.center_y
+          item.x = item_x
+          item.y = item_y
           level.items << item
         when 3
           if args.state.rng.d20 < level.depth + 5
             item = Ring.new(Ring.kinds.sample)
             item.depth = level.depth
-            item.x = room.center_x
-            item.y = room.center_y
+            item.x = item_x
+            item.y = item_y
             level.items << item
           else
             item = Potion.new(:potion_of_healing)
             item.depth = level.depth
-            item.x = room.center_x
-            item.y = room.center_y
+            item.x = item_x
+            item.y = item_y
             level.items << item
           end
         when 4
           item = Weapon.randomize(level.depth, args)
-          item.x = room.center_x
-          item.y = room.center_y
+          item.x = item_x
+          item.y = item_y
           level.items << item
         when 5
           item = Scroll.randomize(level.depth, args)
           item.depth = level.depth
-          item.x = room.center_x
-          item.y = room.center_y
+          item.x = item_x
+          item.y = item_y
           level.items << item
         when 7
           item = Valuable.randomize(level.depth, args)
           item.depth = level.depth
-          item.x = room.center_x
-          item.y = room.center_y
+          item.x = item_x
+          item.y = item_y
           level.items << item   
         when 8
           item = Wand.randomize(level.depth, args)
           item.depth = level.depth
-          item.x = room.center_x
-          item.y = room.center_y
+          item.x = item_x
+          item.y = item_y
           level.items << item      
         when 9
             item = Armor.randomize(level.depth, args)
             item.depth = level.depth
-            item.x = room.center_x
-            item.y = room.center_y
+            item.x = item_x
+            item.y = item_y
             level.items << item
         when 10
             item = Tool.randomize(level.depth, args)
             item.depth = level.depth
-            item.x = room.center_x
-            item.y = room.center_y
+            item.x = item_x
+            item.y = item_y
             level.items << item
       end
     end
