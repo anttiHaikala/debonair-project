@@ -213,7 +213,7 @@ class HUD
     args.outputs.labels << {
       x: 10,
       y: 40,
-      text: "depth: #{args.state.hero.depth+1} time: #{args.state.kronos.world_time.round(1)} seed: #{seed} ",
+      text: "depth: #{args.state.hero.depth+1} time: %.2f seed: #{seed} " % args.state.kronos.world_time,
       size_enum: 0,
       r: 255,
       g: 255,

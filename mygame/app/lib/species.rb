@@ -171,6 +171,8 @@ class Species
     ]
   end
 
+  # these are HSL colors
+  # cheat sheet: 0=red, 40=orange, 80=yellow, 120=green, 200=blue, 300=purple
   def self.color_for_species(species)
     case species
     when :goblin, :orc
@@ -180,7 +182,7 @@ class Species
     when :grid_bug
       return [330, 100, 100]
     when :rat
-      return [80, 80, 20]
+      return [20, 80, 20]
     when :wraith
       return [240, 0, 50]
     when :skeleton
