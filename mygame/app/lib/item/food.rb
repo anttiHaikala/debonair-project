@@ -72,6 +72,20 @@ class Food < Item
     FOOD_DATA.keys
   end
 
+  def use(entity, args)
+    return false unless entity.is_a?(Hero)
+    
+    # Reduce hunger
+    entity.hunger -= @nutrition
+    entity.hunger = 0.0 if entity.hunger < 0.0
+
+    # Remove from inventory
+    entity.carried_items.delete(self)
+    
+    HUD.output_message(args, "You eat the #{self.title(args)}. It tastes #{@taste}.")
+    return true
+  end
+  
   # Dynamically calculate the condition based on elapsed ticks
   # NOT IMPLEMENTED: call this method before consumption to get current state
   def current_condition(args)
