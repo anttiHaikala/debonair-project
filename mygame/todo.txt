@@ -69,6 +69,8 @@ TODO LIST
 - chain mail vs pierce damage? chain mail vs blunt damage?
 
 DONE LIST
+- facing indicators for everyone
+- npc's now have facing too
 - leprechauns steal stuff
 - level gen debugger (show rooms and corridors)
 - npc emojis (scared - angry - sad - happy - shock - )
