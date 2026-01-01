@@ -206,6 +206,9 @@ class Trauma
     if speed_modifier < 0.1
       speed_modifier = 0.1
     end
+    if speed_modifier > 1.0
+      speed_modifier = 1.0
+    end
     return speed_modifier
   end
 end

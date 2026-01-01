@@ -2,7 +2,6 @@ PHILOSOPHY
 - make a game that 14 year old me would love
 
 IDEAS
-- pits & boulders
 - sokoban level https://nethackwiki.com/wiki/Sokoban
 - teleport bans: https://nethackwiki.com/wiki/Non-teleport_level
 - teleport disease: https://nethackwiki.com/wiki/Teleportitis
@@ -33,9 +32,9 @@ NOTES ON GAME SYSTEM (the DEBONAIR!)
     - it's really hard to make the combat timescale match with exploration time scale then again the starvation and sleeping timescale
 
 TODO LIST
-- Leprechauns steal gold
-- Raccoon steals drinks
-- Rats steal food
+- pits & boulders
+- raccoon steals drinks
+- rats steal food
 - onsens & geysirs. water temperature!
 - Rats shadow player
 - IMPORTANT: wielded items somehow gets nils now, must fix soon
@@ -70,6 +69,7 @@ TODO LIST
 - chain mail vs pierce damage? chain mail vs blunt damage?
 
 DONE LIST
+- leprechauns steal stuff
 - level gen debugger (show rooms and corridors)
 - npc emojis (scared - angry - sad - happy - shock - )
 - charcter creation screen 

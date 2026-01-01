@@ -13,6 +13,7 @@ class SoundFX
     end
     final_volume = @@fx_volume * volume
     printf "Playing sound: %s at volume %.2f\n" % [kind.to_s, final_volume]
+    args.outputs.audio.delete kind
     args.outputs.audio[kind] = {
         input: "sounds/#{kind}.mp3",
         gain: final_volume

@@ -4,8 +4,8 @@ class Architect
   def initialize
     @settings = {}
     @settings[:levels] ||= 10
-    @settings[:level_width] ||= 58   
-    @settings[:level_height] ||= 34
+    @settings[:level_width] ||= 62   
+    @settings[:level_height] ||= 38
   end
 
   def self.create_seed(args)
@@ -70,8 +70,9 @@ class Architect
   def create_dungeon(args)
     # Code to create the dungeon layout
     dungeon = Dungeon.new
-    staircase_x = rand(@settings[:level_width]-2) + 1
-    staircase_y = rand(@settings[:level_height]-2) + 1
+    staircase_buffer = 5
+    staircase_x = rand(@settings[:level_width]-staircase_buffer*2) + staircase_buffer
+    staircase_y = rand(@settings[:level_height]-staircase_buffer*2) + staircase_buffer
     args.state.dungeon_entrance_x = staircase_x
     args.state.dungeon_entrance_y = staircase_y
     args.state.dungeon = dungeon

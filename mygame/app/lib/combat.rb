@@ -38,6 +38,7 @@ class Combat
     case item.kind
     when :revolver
       inaccuracy_penalty = 0    
+      SoundFX.play_sound(:gunshot, args)
     when :crossbow
       inaccuracy_penalty = 1
     when :bow

@@ -119,6 +119,7 @@ class Behaviour
     if args.state.hero.sees?(@npc, args)
       #printf "Executing behaviour #{@kind} for NPC #{@npc.species} at (#{@npc.x}, #{@npc.y}) - level #{@npc.depth} - time #{args.state.kronos.world_time.round(2)}\n"  
     end
+    printf "Executing behaviour #{@kind} for NPC #{@npc.species} at (#{@npc.x}, #{@npc.y}) - level #{@npc.depth} - time %.2f\n", args.state.kronos.world_time
     @npc.last_behaviour = @kind
     method_name = @kind.to_s
     if self.respond_to?(method_name)
@@ -190,6 +191,10 @@ class Behaviour
       HUD.output_message args, "#{npc.name} glares threateningly at you, hurling insults!"
       args.state.kronos.spend_time(npc, npc.walking_speed*0.5, args)
       return
+    else
+      # cannot see hero, wander instead
+      wander args
+      return
     end  
   end
 
@@ -223,6 +228,7 @@ class Behaviour
             step_y = dy > 0 ? 1 : -1
             step_x = 0
           end
+          npc.apply_new_facing(Utils.direction_from_delta(step_x, step_y)) 
           target_x = npc.x + step_x
           target_y = npc.y + step_y
           #printf "Target x,y: #{target_x}, #{target_y}, hero x,y #{hero.x}, #{hero.y}, npc x,y #{npc.x}, #{npc.y}\n"
@@ -334,6 +340,7 @@ class Behaviour
   end
 
   def steal args
+    printf "NPC #{@npc.species} is attempting to steal.\n"
     npc = @npc
     target = args.state.hero
     if npc.sees?(target, args)    
@@ -399,6 +406,7 @@ class Behaviour
     end
     target_x = npc.x + step_x
     target_y = npc.y + step_y
+    npc.apply_new_facing(Utils.direction_from_delta(step_x, step_y)) 
     level = args.state.dungeon.levels[npc.depth]
     target_tile = level.tiles[target_y][target_x]
     if Tile.is_walkable_type?(target_tile, args) && !Tile.occupied?(target_x, target_y, args)

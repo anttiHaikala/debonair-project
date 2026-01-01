@@ -37,7 +37,7 @@ module Utils
     if dx.abs > dy.abs
       return dx > 0 ? :east : :west
     else
-      return dy > 0 ? :south : :north
+      return dy > 0 ? :north : :south
     end
   end
 

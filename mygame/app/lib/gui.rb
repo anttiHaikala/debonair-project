@@ -449,6 +449,36 @@ class GUI
           }
         end
       end
+      # draw entity facing
+      facing_x = x_offset + entity.visual_x * tile_size
+      facing_y = y_offset + entity.visual_y * tile_size
+      facing_angle = 0
+      case entity.facing
+      when :east
+        facing_angle = 270
+        facing_x += tile_size
+      when :north
+        facing_angle = 0
+        facing_y += tile_size
+      when :west
+        facing_x -= tile_size
+        facing_angle = 90
+      when :south
+        facing_y -= tile_size
+        facing_angle = 180
+      end
+      args.outputs.primitives << {
+        x: facing_x,
+        y: facing_y,
+        w: tile_size,
+        h: tile_size,
+        path: "sprites/gui/facing-arrow.png",
+        angle: facing_angle,
+        r: color[:r],
+        g: color[:g],
+        b: color[:b],
+        a: alpha
+      }
     end
   end
 

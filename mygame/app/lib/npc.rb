@@ -187,7 +187,7 @@ class NPC < Entity
     when :leprechaun
       species_speed = 0.85
     end
-    traumatized_speed = species_speed / Trauma.walking_speed_modifier(self)
+    traumatized_speed = species_speed * Trauma.walking_speed_modifier(self)
     status_modifier = 1.0
     if self.has_status?(:speedy)
       status_modifier *= 0.5
@@ -201,7 +201,7 @@ class NPC < Entity
 
   def take_action args
     behaviour = Behaviour.select_for_npc(self, args)
-    printf "NPC #{@species} at (#{@x}, #{@y}) taking action #{behaviour.kind} at time #{args.state.kronos.world_time.round(2)}\n"
+    printf "NPC #{@species} at (#{@x}, #{@y}) taking action #{behaviour.kind} at time %.2f\n", args.state.kronos.world_time
     behaviour.execute(args) if behaviour
   end
 
