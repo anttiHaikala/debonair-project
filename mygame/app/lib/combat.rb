@@ -98,7 +98,7 @@ class Combat
     verb = "#{hit_kind}s"
     HUD.output_message args, "#{aname} #{verb} #{dname}'s #{body_part.to_s.gsub('_', ' ')} #{hit_severity}ly."
     attacker.apply_exhaustion(0.01, args) if attacker == args.state.hero
-    self.resolve_defender_on_hit_effects(defender, args)
+    self.resolve_defender_on_hit_effects(defender, attacker, args)
   end
 
   def self.resolve_attack(attacker, defender, args)
@@ -183,11 +183,11 @@ class Combat
     verb = "#{hit_kind}s"
     HUD.output_message args, "#{aname} #{verb} #{dname}'s #{body_part.to_s.gsub('_', ' ')} #{hit_severity}ly."
     attacker.apply_exhaustion(0.05, args) if attacker == args.state.hero
-    self.resolve_defender_on_hit_effects(defender, args)
+    self.resolve_defender_on_hit_effects(defender, attacker, args)
   end
 
-  def self.resolve_defender_on_hit_effects(defender, args)
-    aname = args.state.run.hero.name
+  def self.resolve_defender_on_hit_effects(defender, attacker, args)
+    aname = attacker.name
     dname = defender.name
     # check for shock or death
     defender_shocked = Trauma.determine_shock(defender)
