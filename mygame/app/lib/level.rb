@@ -312,6 +312,7 @@ class Level
     printf "  starting digging corridor named %s.\n" % [corridor.name]
     @corridors << corridor
     while current_x != x2 || current_y != y2 do
+      door_exists_previously = false
       safety += 1
       if safety > 500
         printf "  corridor digging aborted due to safety limit.\n"
@@ -398,6 +399,7 @@ class Level
         # check if door already exists here
         if Furniture.furniture_at(current_x, current_y, self, args)
           create_door = false
+          door_exists_previously = true
         end
         if create_door
           printf "  .. creating door at (%d,%d) (current tile: %s direction: %s)\n" % [current_x, current_y, @tiles[current_y][current_x].to_s, direction]
@@ -433,8 +435,11 @@ class Level
       if current_tile == :staircase_up || current_tile == :staircase_down
         new_tile = current_tile # keep the staircase tile
       end
-      # terraform the tile - importat part!!!
-      @tiles[current_y][current_x] = new_tile if new_tile
+      # if there is already a door here, do not terraform the tile! 
+      unless door_exists_previously
+        # terraform the tile - importat part!!!
+        @tiles[current_y][current_x] = new_tile if new_tile
+      end
       # decide direction to next tile
       y_diff = (y2 - current_y).abs
       x_diff = (x2 - current_x).abs      # if we have a direction, keep going that way with some chance
