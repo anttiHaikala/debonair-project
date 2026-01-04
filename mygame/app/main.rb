@@ -71,7 +71,7 @@ require 'app/lib/furniture'
 require 'app/lib/cheats'
 require 'app/lib/item/armor'
 require 'app/lib/create_hero'
-require 'app/lib/tool'
+require 'app/lib/item/tool'
 
 def boot args
   args.state = {}

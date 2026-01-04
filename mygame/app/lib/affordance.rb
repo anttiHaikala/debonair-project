@@ -52,12 +52,12 @@ class Affordance
       if item.category == :wand
         affordances << Affordance.new(level, x, y, :zap, target_entity, item)
       end
-      if Weapon.is_ranged_weapon?(item)
+      if item.is_ranged?
         if target_entity && target_entity != hero
           affordances << Affordance.new(level, x, y, :shoot, target_entity, item)
         end
       end
-      if Weapon.is_throwable_weapon?(item)
+      if item.is_throwable?
         if target_entity && target_entity != hero
           affordances << Affordance.new(level, x, y, :throw, target_entity, item)
         end

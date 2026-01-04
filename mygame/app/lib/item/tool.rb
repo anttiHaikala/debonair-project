@@ -21,7 +21,7 @@ class Tool < Item
     wings: {
       meta: { ui_name: "wings", weight: 3.0, price: 500, rarity: 100, durability: nil, action: :fly }
     },
-    battery: {
+    battery_pack: {
       meta: { ui_name: "battery pack", weight: 3.0, price: 500, rarity: 100, durability: nil, action: :recharge}
     },
     notebook: {

@@ -177,10 +177,53 @@ class Light
 end
 
 class PortableLight < Item
-  def initialize(kind)
+  LIGHT_DATA = {
+    torch:      { illumination: 3, directional: false, damage: 2, defense: 1, melee: 2, hit_kind: :burn, weight: 0.5, price: 5 },
+    lamp:       { illumination: 3, directional: false, damage: 1, defense: 0, melee: 1, hit_kind: :blunt, weight: 1.5, price: 25 },
+    candle:     { illumination: 3, directional: false, damage: 0, defense: 0, melee: 0, hit_kind: :burn, weight: 0.1, price: 1 },
+    flashlight: { illumination: 3, directional: false, damage: 1, defense: 0, melee: 1, hit_kind: :blunt, weight: 0.8, price: 50 }
+  }
+
+  attr_accessor :damage, :defense, :melee, :meta
+  attr_writer :hit_kind
+
+  def initialize(kind, args = nil)
+    # 1. Call super first to prevent Item defaults from overwriting your custom values
     super(kind, :portable_light)
+
+    blueprint = LIGHT_DATA[kind] || { damage: 1, defense: 0, melee: 1, hit_kind: :blunt }
+    
+    # 2. Standardize names to @defense (with an 's') to match Weapon/Armor logic
+    @damage   = blueprint[:damage]
+    @defense  = blueprint[:defense]
+    @melee    = blueprint[:melee]
+    @hit_kind = blueprint[:hit_kind]
+    @weight   = blueprint[:weight] || 0.5
+    
+    # 3. Ensure @meta exists so it doesn't crash UI lookups
+    @meta = { price: blueprint[:price] || 5, material: :mixed }
   end
+
+  # --- Required by Combat System ---
+
+  def hit_kind(args = nil)
+    @hit_kind || :blunt
+  end
+
+  # Fix: Change from self. (class) to instance methods and add the '?'
+  def is_ranged?; false; end
+  def is_throwable?; false; end
+  
+  # Providing the specific method your error is looking for:
+  def is_ranged_weapon?; false; end
+  def is_throwable_weapon?; false; end
+
   def self.kinds
-    [:torch, :lamp, :candle, :flashlight]
+    LIGHT_DATA.keys
+  end
+
+  def use(user, args)
+    # Logic for toggling light source could go here
+    HUD.output_message(args, "You light the #{self.kind}.")
   end
 end

@@ -1,149 +1,153 @@
 class Armor < Item
   # Blueprint data for all armor kinds
-  ARMOR_DATA = {
+  DATA = {
     hat: {
       coverage: { head: 1 },
-      meta: { ui_name: "hat", armor_type: :helmet, material: :fabric, weight: 0.2, rarity: 100, price: 2, can_eat: true }
+      meta: { ui_name: "hat", armor_type: :helmet, material: :organic, weight: 0.2, occurance: 1.0, price: 2, can_eat: true }
     },
     big_helmet: {
       coverage: { head: 4 },
-      meta: { ui_name: "big helmet", armor_type: :helmet_big, material: :metal, weight: 3.5, rarity: 100, price: 15, can_eat: true }
+      meta: { ui_name: "big helmet", armor_type: :helmet_big, material: :metal, weight: 3.5, occurance: 1.0, price: 15, can_eat: true }
     },
     basic_helmet: {
       coverage: { head: 4 },
-      meta: { ui_name: "boring helmet", armor_type: :helmet, material: :metal, weight: 1.8, rarity: 100, price: 25, can_eat: true }
+      meta: { ui_name: "boring helmet", armor_type: :helmet, material: :metal, weight: 1.8, occurance: 1.0, price: 25, can_eat: true }
     },
     corinthian_helmet: {
       coverage: { face: 2, head: 4 },
-      meta: { ui_name: "corinthian helmet", armor_type: :helmet_visor, material: :metal, weight: 2.5, eyesight: -1, rarity: 10, price: 120, can_eat: true }
+      meta: { ui_name: "corinthian helmet", armor_type: :helmet_visor, material: :metal, weight: 2.5, eyesight: -1, occurance: 0.1, price: 120, can_eat: true }
     },
     viking_helmet: {
       coverage: { face: 1, head: 4 },
-      meta: { ui_name: "viking helmet", armor_type: :helmet_visor, material: :metal, weight: 2.0, eyesight: -1, rarity: 50, price: 45, can_eat: true }
+      meta: { ui_name: "viking helmet", armor_type: :helmet_visor, material: :metal, weight: 2.0, eyesight: -1, occurance: 0.2, price: 45, can_eat: true }
     },
     modern_helmet: {
       coverage: { face: 1, head: 5 },
-      meta: { ui_name: "kevlar helmet with goggles", armor_type: :helmet_visor, material: :kevlar, weight: 1.4, eyesight: 2, rarity: 5, price: 200, can_eat: true }
+      meta: { ui_name: "kevlar helmet with goggles", armor_type: :helmet_visor, material: :syntethic, weight: 1.4, eyesight: 2, occurance: 0.05, price: 200, can_eat: true }
     },
     leather_hood: {
       coverage: { head: 1, neck: 1 },
-      meta: { ui_name: "leather hood", armor_type: :hood, material: :leather, weight: 0.5, rarity: 100, price: 12, can_eat: true }
+      meta: { ui_name: "leather hood", armor_type: :hood, material: :organic, weight: 0.5, occurance: 1.0, price: 12, can_eat: true }
     },
     chain_mail_hood: {
       coverage: { head: 3, neck: 3 },
-      meta: { ui_name: "chain hood", armor_type: :hood, material: :metal, weight: 1.2, rarity: 50, price: 40, can_eat: true }
+      meta: { ui_name: "chain hood", armor_type: :hood, material: :metal, weight: 1.2, occurance: 0.5, price: 40, can_eat: true }
     },
     gorget: {
       coverage: { neck: 3 },
-      meta: { ui_name: "gorget", armor_type: :neck, material: :metal, weight: 1.2, rarity: 50, price: 40, can_eat: true }
+      meta: { ui_name: "gorget", armor_type: :neck, material: :metal, weight: 1.2, occurance: 0.5, price: 40, can_eat: true }
     },
     stylish_scarf: {
       coverage: { neck: 0 },
-      meta: { ui_name: "stylish scarf", armor_type: :neck, material: :fabric, weight: 0.3, rarity: 50, price: 200, can_eat: true }
+      meta: { ui_name: "stylish scarf", armor_type: :neck, material: :organic, weight: 0.3, occurance: 0.5, price: 200, can_eat: true }
     },
     leather_armor_shirt: {
       coverage: { upper_torso: 2, right_arm: 2, left_arm: 2 },
-      meta: { ui_name: "leather shirt", armor_type: :shirt, material: :leather, weight: 4.5, rarity: 100, price: 45, can_eat: true }
+      meta: { ui_name: "leather shirt", armor_type: :shirt, material: :organic, weight: 4.5, occurance: 1.0, price: 45, can_eat: true }
     },
     chain_mail_shirt: {
       coverage: { upper_torso: 3, right_arm: 2, left_arm: 2 },
-      meta: { ui_name: "chain shirt", armor_type: :shirt, material: :metal, weight: 10.0, rarity: 50, price: 110, can_eat: true }
+      meta: { ui_name: "chain shirt", armor_type: :shirt, material: :metal, weight: 10.0, occurance: 0.5, price: 110, can_eat: true }
     },
     lamellar_armor_shirt: {
       coverage: { upper_torso: 4, right_arm: 4, left_arm: 4 },
-      meta: { ui_name: "lamellar shirt", armor_type: :shirt, material: :metal, weight: 12.0, rarity: 30, price: 220, can_eat: true }
+      meta: { ui_name: "lamellar shirt", armor_type: :shirt, material: :metal, weight: 12.0, occurance: 0.3, price: 220, can_eat: true }
     },
     breastplate: {
       coverage: { upper_torso: 5 },
-      meta: { ui_name: "breastplate", armor_type: :vest, material: :metal, weight: 12.0, mobility: -2, rarity: 10, price: 450, can_eat: true }
+      meta: { ui_name: "breastplate", armor_type: :vest, material: :metal, weight: 12.0, mobility: -2, occurance: 0.1, price: 450, can_eat: true }
     },
     leather_armor_coat: {
       coverage: { upper_torso: 2, lower_torso: 2, right_arm: 2, left_arm: 2 },
-      meta: { ui_name: "leather armor coat", armor_type: :coat, material: :leather, weight: 6.5, rarity: 100, price: 65, can_eat: true }
+      meta: { ui_name: "leather armor coat", armor_type: :coat, material: :organic, weight: 6.5, occurance: 1.0, price: 65, can_eat: true }
     },
     chain_mail_coat: {
       coverage: { upper_torso: 3, lower_torso: 3, right_arm: 3, left_arm: 3 },
-      meta: { ui_name: "chain coat", armor_type: :coat, material: :metal, weight: 14.0, rarity: 50, price: 140, can_eat: true }
+      meta: { ui_name: "chain coat", armor_type: :coat, material: :metal, weight: 14.0, occurance: 0.5, price: 140, can_eat: true }
     },
     leather_armor_pants: {
       coverage: { lower_torso: 2, right_leg: 2, left_leg: 2 },
-      meta: { ui_name: "leather pants", armor_type: :pants, material: :leather, weight: 4.0, rarity: 100, price: 40, can_eat: true }
+      meta: { ui_name: "leather pants", armor_type: :pants, material: :organic, weight: 4.0, occurance: 1.0, price: 40, can_eat: true }
     },
     chain_mail_pants: {
       coverage: { lower_torso: 2, right_leg: 2, left_leg: 2 },
-      meta: { ui_name: "chain pants", armor_type: :pants, material: :metal, weight: 9.0, rarity: 50, price: 90, can_eat: true }
+      meta: { ui_name: "chain pants", armor_type: :pants, material: :metal, weight: 9.0, occurance: 0.5, price: 90, can_eat: true }
     },
     lamellar_armor_pants: {
       coverage: { lower_torso: 4, right_leg: 4, left_leg: 4 },
-      meta: { ui_name: "lamellar pants", armor_type: :pants, material: :metal, weight: 11.0, rarity: 30, price: 180, can_eat: true }
+      meta: { ui_name: "lamellar pants", armor_type: :pants, material: :metal, weight: 11.0, occurance: 0.3, price: 180, can_eat: true }
     },
     plate_mail_pants: {
       coverage: { lower_torso: 5, right_leg: 5, left_leg: 5 },
-      meta: { ui_name: "plate pants", armor_type: :pants, material: :metal, weight: 11.0, mobility: -2, rarity: 10, price: 350, can_eat: true }
+      meta: { ui_name: "plate pants", armor_type: :pants, material: :metal, weight: 11.0, mobility: -2, occurance: 0.1, price: 350, can_eat: true }
     },
     leather_boots: {
       coverage: { right_leg: 1, left_leg: 1 },
-      meta: { ui_name: "leather boots", armor_type: :footwear, material: :leather, weight: 1.5, rarity: 100, price: 20, can_eat: true }
+      meta: { ui_name: "leather boots", armor_type: :footwear, material: :organic, weight: 1.5, occurance: 1.0, price: 20, can_eat: true }
     },
     plate_shoes: {
       coverage: { right_leg: 5, left_leg: 5 },
-      meta: { ui_name: "plate shoes", armor_type: :footwear, material: :metal, weight: 2.0, stealth: -1, rarity: 10, price: 200, can_eat: true }
+      meta: { ui_name: "plate shoes", armor_type: :footwear, material: :metal, weight: 2.0, stealth: -1, occurance: 0.1, price: 200, can_eat: true }
     },
     greaves: {
       coverage: { right_leg: 2, left_leg: 2 },
-      meta: { ui_name: "greaves", armor_type: :footwear, material: :metal, weight: 3.0, rarity: 50, price: 80, can_eat: true }
+      meta: { ui_name: "greaves", armor_type: :footwear, material: :metal, weight: 3.0, occurance: 0.5, price: 80, can_eat: true }
     },
     leather_gloves: {
       coverage: { right_arm: 1, left_arm: 1 },
-      meta: { ui_name: "leather gloves", armor_type: :gloves, material: :leather, weight: 0.5, rarity: 100, price: 10, can_eat: true }
+      meta: { ui_name: "leather gloves", armor_type: :gloves, material: :organic, weight: 0.5, occurance: 1.0, price: 10, can_eat: true }
     },
     gauntlets: {
       coverage: { right_arm: 2, left_arm: 2 },
-      meta: { ui_name: "gauntlets", armor_type: :gloves, material: :metal, weight: 1.2, rarity: 50, price: 120, can_eat: true }
+      meta: { ui_name: "gauntlets", armor_type: :gloves, material: :metal, weight: 1.2, occurance: 0.5, price: 120, can_eat: true }
     },
     ninja_suit: {
       coverage: { face: 0, head: 0, neck: 0, upper_torso: 0, lower_torso: 0, right_arm: 0, left_arm: 0, right_leg: 0, left_leg: 0 },
-      meta: { ui_name: "ninja suit", armor_type: :stocking_suit, material: :fabric, weight: 1.5, stealth: 1, rarity: 10, price: 500, can_eat: true }
+      meta: { ui_name: "ninja suit", armor_type: :stocking_suit, material: :organic, weight: 1.5, stealth: 1, occurance: 0.1, price: 500, can_eat: true }
     },
     mutant_suit: {
       coverage: { head: 0, neck: 0, upper_torso: 0, lower_torso: 0, right_arm: 0, left_arm: 0, right_leg: 0, left_leg: 0 },
-      meta: { ui_name: "silly stocking suit", armor_type: :stocking_suit, material: :fabric, weight: 1.5, mobility: 2, rarity: 5, price: 750, can_eat: true }
+      meta: { ui_name: "silly stocking suit", armor_type: :stocking_suit, material: :organic, weight: 1.5, mobility: 2, occurance: 0.05, price: 750, can_eat: true }
     },
     fur_shorts: {
       coverage: { lower_torso: 1, right_leg: 1, left_leg: 1 },
-      meta: { ui_name: "fur shorts", armor_type: :shorts, material: :leather, weight: 1.0, rarity: 100, price: 10, can_eat: true }
+      meta: { ui_name: "fur shorts", armor_type: :shorts, material: :organic, weight: 1.0, occurance: 1.0, price: 10, can_eat: true }
     },
     leather_armor_skirt: {
       coverage: { lower_torso: 2, right_leg: 1, left_leg: 1 },
-      meta: { ui_name: "leather skirt", armor_type: :skirt, material: :leather, weight: 2.0, rarity: 100, price: 35, can_eat: true }
+      meta: { ui_name: "leather skirt", armor_type: :skirt, material: :organic, weight: 2.0, occurance: 1.0, price: 35, can_eat: true }
     },
     lamellar_armor_skirt: {
       coverage: { lower_torso: 4, right_leg: 4, left_leg: 4 },
-      meta: { ui_name: "lamellar skirt", armor_type: :skirt, material: :metal, weight: 6.0, rarity: 30, price: 160, can_eat: true }
+      meta: { ui_name: "lamellar skirt", armor_type: :skirt, material: :metal, weight: 6.0, occurance: 0.3, price: 160, can_eat: true }
     },
     cyborg_face: {
       coverage: { face: 1 },
-      meta: { ui_name: "cyborg face", armor_type: :cyborg_part, material: :mixed, weight: 2.0, eyesight: 3.0, rarity: 10, price: 1500, can_eat: false }
+      meta: { ui_name: "cyborg face", armor_type: :cyborg_part, material: :syntethic, weight: 2.0, eyesight: 3.0, occurance: 0.01, price: 1500, can_eat: false }
     },
     cyborg_arm_left: {
       coverage: { left_arm: 3 },
-      meta: { ui_name: "cyborg arm (L)", armor_type: :cyborg_part, material: :hi_tech, weight: 12.0, rarity: 10, price: 2500, can_eat: true }
+      meta: { ui_name: "cyborg arm (L)", armor_type: :cyborg_part, material: :syntethic, weight: 10.0, occurance: 0.01, price: 2500, can_eat: true }
     },
     cyborg_arm_right: {
       coverage: { right_arm: 3 },
-      meta: { ui_name: "cyborg arm (R)", armor_type: :cyborg_part, material: :hi_tech, weight: 12.0, rarity: 10, price: 2500, can_eat: true }
+      meta: { ui_name: "cyborg arm (R)", armor_type: :cyborg_part, material: :syntethic, weight: 10.0, occurance: 0.01, price: 2500, can_eat: true }
     },
     cyborg_leg_left: {
       coverage: { left_leg: 4 },
-      meta: { ui_name: "cyborg leg (L)", armor_type: :cyborg_part, material: :hi_tech, weight: 24.0, rarity: 10, price: 3000, can_eat: true }
+      meta: { ui_name: "cyborg leg (L)", armor_type: :cyborg_part, material: :syntethic, weight: 19.0, occurance: 0.01, price: 3000, can_eat: true }
     },
     cyborg_leg_right: {
       coverage: { right_leg: 4 },
-      meta: { ui_name: "cyborg leg (R)", armor_type: :cyborg_part, material: :hi_tech, weight: 24.0, rarity: 10, price: 3000, can_eat: true }
+      meta: { ui_name: "cyborg leg (R)", armor_type: :cyborg_part, material: :syntethic, weight: 19.0, occurance: 0.01, price: 3000, can_eat: true }
     },
     cyborg_torso: {
       coverage: { upper_torso: 4, lower_torso: 4 },
-      meta: { ui_name: "cyborg torso", armor_type: :cyborg_part, material: :hi_tech, weight: 40.0, rarity: 10, price: 5000, can_eat: true }
+      meta: { ui_name: "cyborg torso", armor_type: :cyborg_part, material: :syntethic, weight: 30.0, occurance: 0.01, price: 5000, can_eat: true }
+    },
+    test_unique_item: {
+      coverage: { upper_torso: 4, lower_torso: 4 },
+      meta: { ui_name: "cyborg torso", armor_type: :cyborg_part, material: :syntethic, weight: 40.0, occurance: 0.0, price: 5000, can_eat: true }
     }
   }
 
@@ -172,7 +176,7 @@ class Armor < Item
   attr_accessor :coverage, :meta
 
   def initialize(kind, args=nil, &block)
-    blueprint = ARMOR_DATA[kind] || { coverage: {}, meta: {} }
+    blueprint = DATA[kind] || { coverage: {}, meta: {} }
     @coverage = blueprint[:coverage].dup
     @meta     = blueprint[:meta].dup
     @weight   = @meta[:weight] || 4.0
@@ -181,19 +185,26 @@ class Armor < Item
     super(kind, :armor, &block)
   end
 
+  def self.data; DATA; end
+
   def self.common_attributes
-    [:rusty, :moldy, :broken, :fine, :crude, :colourful, :shiny, :expensive, :made_in_Mordor, :comfortable]
+    [:rusty, :moldy, :broken, :fine, :crude, :colourful, :shiny, :expensive, :made_in_Mordor, :comfortable, :enchanted, :cursed]
   end
 
   def self.rare_attributes
-    [:masterwork, :enchanted, :alien_made, :mythical, :made_by_Ilmarinen, :holy]
+    [:masterwork, :alien_made, :mythical, :made_by_Ilmarinen, :holy]
   end
 
-  def apply_attribute_modifiers(args, attribute)
+  # apply the effects of an attribute to this armor needs to be in subclass
+  def apply_attribute_modifiers(attribute, args)
     return if @attributes.include?(attribute)
     case attribute
     when :rusty, :moldy, :broken
       @coverage.each { |part, val| @coverage[part] = [0, val - 1].max }
+    when :cursed
+      @coverage.each { |part, val| @coverage[part] -= 3}
+    when :enchanted
+      @coverage.each { |part, val| @coverage[part] += 3}
     when :fine
       @coverage.each { |part, val| @coverage[part] = val + 1 }
     when :crude
@@ -213,46 +224,10 @@ class Armor < Item
     end
   end
 
-  def self.randomize(level_depth, args)
-    kind = self.kinds[args.state.rng.nxt_int(0, self.kinds.length - 1)]
-    armor = self.new(kind)
-    armor.depth = level_depth
-    
-    common_roll = args.state.rng.d6
-    secondary_common_roll = args.state.rng.d8
-    rare_roll = args.state.rng.d20
-    aSample = nil
 
-    if rare_roll == 20
-      rare_attrs = self.rare_attributes
-      aSample = rare_attrs[args.state.rng.nxt_int(0, rare_attrs.length - 1)]
-      armor.apply_attribute_modifiers(args, aSample)
-      armor.add_attribute(aSample)
-    else
-      common_attrs = self.common_attributes
-      aSample = common_attrs[args.state.rng.nxt_int(0, common_attrs.length - 1)]
-      
-      if aSample == :rusty
-        if armor.meta[:material] == :leather || armor.meta[:material] == :fabric
-          aSample = :moldy
-        end
-      end
-
-      if common_roll <= 2
-        armor.apply_attribute_modifiers(args, aSample)
-        armor.add_attribute(aSample)
-      end
-
-      if secondary_common_roll == 1
-        armor.apply_attribute_modifiers(args, aSample)
-        armor.add_attribute(aSample)
-      end
-    end
-    armor
-  end
 
   def self.random(level_depth, args); self.randomize(level_depth, args); end
-  def self.kinds; ARMOR_DATA.keys; end
+  def self.kinds; DATA.keys; end
   def armor_type; @meta[:armor_type]; end
   def body_parts_covered; @coverage.keys; end
 
@@ -266,6 +241,10 @@ class Armor < Item
     matrix_row = COMPATIBILITY_MATRIX[type_a]
     return false unless matrix_row
     matrix_row[type_b] == true
+  end
+
+  def self.randomize(level_depth, args)
+    Item.randomize(level_depth, self, args)
   end
 
   def use(user, args)

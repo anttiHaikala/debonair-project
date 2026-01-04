@@ -31,24 +31,27 @@ class Combat
     end
   end
 
+  def self.resolve_hit_kind(attacker)
+    #should only get the right hand weapon?
+    #and ranged, thrown or melee attack should be taken to avvount here
+    attacker.wielded_items.each do |item|
+      #fix hit kind to portable light or make exception here
+      if item.respond_to?(:hit_kind)
+        return item.hit_kind 
+      end
+    end
+    attacker.natural_attack
+  end
+  
+
+
   def self.resolve_ranged_attack(attacker, item, defender, args)
     aname = attacker.name
     dname = defender.name
-    inaccuracy_penalty = 0
+    inaccuracy_penalty = item.inaccuracy_penalty
     case item.kind
     when :revolver
-      inaccuracy_penalty = 0    
       SoundFX.play_sound(:gunshot, args)
-    when :crossbow
-      inaccuracy_penalty = 1
-    when :bow
-      inaccuracy_penalty = 2
-    when :sling
-      inaccuracy_penalty = 3
-    when :dagger, :spear, :shuriken
-      inaccuracy_penalty = 4
-    else
-      inaccuracy_penalty = 5
     end
     base_attack_roll = args.state.rng.d20
     attack_roll = base_attack_roll - inaccuracy_penalty
@@ -63,6 +66,7 @@ class Combat
         return
       end
     end
+    #should combat role bonus etc come from entity?
     attack_roll += Combat.role_bonus(attacker, args)
     # species bonus
     if attacker.species == :elf || attacker.species == :dark_elf
@@ -77,7 +81,8 @@ class Combat
         # TODO: helmet that decreases accuracy 
       end
     end
-    if defender.has_status?(:shocked)
+    #AH: changed this to attacker - correct??
+    if attacker.has_status?(:shocked)
       to_hit -= 5
     end
     # we are done with the modifiers
@@ -91,7 +96,8 @@ class Combat
     # hit!
     HUD.output_message args, "#{aname} shoots #{item.title(args)} at #{dname} and hits!"
     body_part = defender.random_body_part(args)
-    hit_kind = item.hit_kind(args)
+
+    hit_kind = self.resolve_hit_kind(args)
     hit_severity = self.hit_severity(attacker, defender, hit_kind, body_part, attack_roll, args)
     Trauma.inflict(defender, body_part, hit_kind, hit_severity, args)
     SoundFX.play_sound(:hit, args)
@@ -127,24 +133,14 @@ class Combat
     end
     weapon_modifier = 0
     if attacker.wielded_items
+      # should we do this only for attack weapon - how we know which one it is
+      # should we add 'melee' modifier per weapon type?
       attacker.wielded_items.each do |item|
         if item.category == :weapon
-          weapon_modifier = 3 # base for all weapons
-        end
-        if item.attributes.include?(:fine)
-          weapon_modifier += 2
-        elsif item.attributes.include?(:rusty) 
-          weapon_modifier -= 2
-        elsif item.attributes.include?(:crude)
-          weapon_modifier -= 1
-        elsif item.attributes.include?(:masterwork)
-          weapon_modifier += 4
-        elsif item.attributes.include?(:legendary)
-          weapon_modifier += 6
-        elsif item.attributes.include?(:cursed)
-          weapon_modifier -= 3
-        elsif item.attributes.include?(:broken)
-          weapon_modifier -= 4
+          puts item.kind
+          weapon_modifier = item.melee
+        elsif item.kind == :pickaxe
+          weapon_modifier = 2
         end
       end
     end
@@ -174,9 +170,12 @@ class Combat
         return # dodged
       end
     end
+
+    # AH: how to deal with defensive attributes of the wwapon and/or parry
+    
     # hit!
     body_part = defender.random_body_part(args)
-    hit_kind = attacker.hit_kind(args)
+    hit_kind = self.resolve_hit_kind(attacker)
     hit_severity = self.hit_severity(attacker, defender, hit_kind, body_part, attack_roll, args)
     Trauma.inflict(defender, body_part, hit_kind, hit_severity, args)
     SoundFX.play_sound(:hit, args)
@@ -206,6 +205,7 @@ class Combat
       if defender == args.state.run.hero
         HUD.output_message args, "Press A to continue..."
         args.state.hero.perished = true
+        #aname sometimes returns hero's name. investigate
         args.state.hero.reason_of_death = "in combat against #{aname}"
         return
       else
@@ -231,22 +231,7 @@ class Combat
     if attacker.wielded_items
       attacker.wielded_items.each do |item|
         if item.category == :weapon
-          weapon_modifier = 3 # base for all weapons
-        end
-        if item.attributes.include?(:fine)
-          weapon_modifier += 2
-        elsif item.attributes.include?(:rusty) 
-          weapon_modifier -= 2
-        elsif item.attributes.include?(:crude)
-          weapon_modifier -= 1
-        elsif item.attributes.include?(:masterwork)
-          weapon_modifier += 4
-        elsif item.attributes.include?(:legendary)
-          weapon_modifier += 6
-        elsif item.attributes.include?(:cursed)
-          weapon_modifier -= 3
-        elsif item.attributes.include?(:broken)
-          weapon_modifier -= 4
+          weapon_modifier = item.damage
         end
       end
     end
