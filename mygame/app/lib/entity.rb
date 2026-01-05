@@ -103,6 +103,24 @@ class Entity
     self.name
   end
 
+  def in_a_pit?(args)
+    # if not levitating and standing on a pit furniture
+    levitating = self.has_status?(:levitating)
+    there_is_a_pit = Furniture.furniture_at(self.x, self.y, args.state.dungeon.levels[self.depth], args)&.kind == :pit
+    return !levitating && there_is_a_pit
+  end
+
+  # todo: more fleshed out mechanics (consider character size, strength, agility and wounds)
+  # now we have a super simple mechanism here
+  def climb_out_of_pit(args)
+    roll = args.state.rng.d6
+    if roll > 4
+      return true
+    else
+      return false
+    end
+  end
+    
   def body_parts
     case @species
     when :grid_bug

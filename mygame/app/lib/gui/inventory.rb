@@ -17,7 +17,7 @@ class GUI
       brightness = item.color[2]
       brightness *= lighting
       color = Color::hsl_to_rgb(hue, saturation, brightness)
-      args.outputs.sprites << {
+      args.outputs.primitives << {
         x: x_offset + item.x * tile_size,
         y: y_offset + item.y * tile_size,
         w: tile_size,

@@ -8,6 +8,10 @@ class Food < Item
       nutrition: 0.25, weight: 1.0, price: 20, rarity: 100,
       meta: { ui_name: "food ration", description: "A standard-issue preserved meal. Not tasty, but keeps you alive.", condition: 1.0, spoil_rate: 0.0 }
     },
+    hamburger: {
+      nutrition: 0.20, weight: 0.8, price: 15, rarity: 120,
+      meta: { ui_name: "hamburger", description: "Tasty burger with sesame seed bun.", condition: 1.0, spoil_rate: 0.0 }
+    },
     dried_meat: {
       nutrition: 0.15, weight: 0.5, price: 15, rarity: 80,
       meta: { ui_name: "dried meat", description: "Salty and tough. It'll last forever in your pack.", condition: 1.0, spoil_rate: 0.00001 }

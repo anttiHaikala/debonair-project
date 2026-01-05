@@ -142,7 +142,6 @@ module Utils
       end
     end
 
-
     if entity == args.state.hero
       args.state.current_depth = target_depth
       GUI.mark_tiles_stale

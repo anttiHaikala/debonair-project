@@ -132,8 +132,8 @@ class Architect
 
       level.add_foliage(args)
       Furniture.remove_unsupported_doors(level, args)
+      Furniture.add_boulders_and_pits(level, args)
       Trap.populate_for_level(level, args)
-
     end
     args.state.dungeon = dungeon
   end

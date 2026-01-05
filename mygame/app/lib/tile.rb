@@ -80,14 +80,27 @@ class Tile
     base_walking_speed = entity.walking_speed || 1.0
     random_element = 0.8 + (args.state.rng.nxt_float * 0.4) # 0.8 to 1.2
     time_spent = base_walking_speed * self.terrain_modifier_for_entity(tile, entity, args) * random_element
-    Trap.trigger_trap_at(entity, x, y, args)
+    # check pit first
+    pit = Furniture.furniture_at(x, y, level, args)
+    if pit && pit.kind == :pit && !entity.has_status?(:levitating) 
+      # if hero sees entity
+      if Utils.in_hero_fov?(entity.x, entity.y, args)
+        HUD.output_message(args, "#{entity.name} falls into a pit!")
+      end
+      SoundFX.play_sound_xy(:fall_into_pit, x, y, args)
+    else
+      pit = nil
+    end
     args.state.kronos.spend_time(entity, time_spent, args)
+    unless pit 
+      entity.detect_traps args if entity == args.state.hero
+      entity.detect_secret_doors args if entity == args.state.hero
+      entity.walking_sound(tile, args)
+    end
+    Trap.trigger_trap_at(entity, x, y, args)
     Lighting.mark_lighting_stale
     GUI.mark_tiles_stale
     HUD.mark_minimap_stale
-    entity.detect_traps args if entity == args.state.hero
-    entity.detect_secret_doors args if entity == args.state.hero
-    entity.walking_sound(tile, args)
   end
 
   def self.terrain_modifier_for_entity(tile, entity, args)

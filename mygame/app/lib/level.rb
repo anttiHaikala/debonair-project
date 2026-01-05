@@ -45,6 +45,37 @@ class Level
     return @tiles.size if @tiles
   end
 
+  def is_within_bounds?(x, y) 
+    return false if x < 0 || y < 0
+    return false if y >= @tiles.size
+    return false if x >= @tiles[0].size
+    return true
+  end
+
+  def tight_spot_between?(x1, y1, x2, y2, args)
+    # check if there is a tight spot between (x1,y1) and (x2,y2)
+    # the two tiles must be diagonally adjacent
+    # when there are walls or furniture on both sides of the path 
+    dx = x2 - x1
+    dy = y2 - y1
+    unless (dx.abs == 1 && dy.abs == 1)
+      return false
+    end
+    side1_x = x1 + dx
+    side1_y = y1
+    side2_x = x1
+    side2_y = y1 + dy
+    side1_blocking = false
+    side2_blocking = false
+    if !is_walkable?(side1_x, side1_y, args)
+      side1_blocking = true
+    end
+    if !is_walkable?(side2_x, side2_y, args)  
+      side2_blocking = true 
+    end
+    return side1_blocking && side2_blocking
+  end
+
   def set_colors
     case @vibe
     when :hack

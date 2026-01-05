@@ -44,7 +44,9 @@ class Furniture
     :chair,
     :table,
     :secret_door,
-    :chest
+    :chest,
+    :boulder,
+    :pit
   ]
   end
 
@@ -81,7 +83,10 @@ class Furniture
         return t + " (open)"
       end
     end
-    return t
+    if kind == :boulder || kind == :pit
+      t = t.gsub('stone', '').gsub('rock', '')
+    end
+    return t.gsub('  ',' ').strip
   end
 
   def self.furniture_at(x, y, level, args)
@@ -95,7 +100,9 @@ class Furniture
 
   def blocks_movement? args
     case self.kind
-    when :door, :secret_door
+    when :pit
+      return false
+    when :door, :secret_door, :boulder
       if self.openness > 0.0
         return false
       end
@@ -200,6 +207,56 @@ class Furniture
         end
       else
         false
+      end
+    end
+  end
+
+  def self.add_boulders_and_pits(level, args)
+    num_boulders = args.state.rng.d6
+    num_pits = args.state.rng.d6
+
+    if args.state.rng.d6 > 2
+      num_boulders = 0
+    end
+    if args.state.rng.d6 > 2
+      num_pits = 0
+    end
+
+    num_boulders.times do
+      safety = 0
+      placed = false
+      while !placed do
+        safety += 1
+        if safety > 100
+          printf "Could not place boulder after 100 tries, giving up.\n"
+          break
+        end
+        x = Numeric.rand(1...(level.width - 1)).to_i
+        y = Numeric.rand(1...(level.height - 1)).to_i
+        if level.tile_at(x, y) == :floor && !Furniture.furniture_at(x, y, level, args)
+          boulder = Furniture.new(:boulder, :rock, x, y, level.depth, 0)
+          level.furniture << boulder
+          placed = true
+        end
+      end
+    end
+
+    num_pits.times do
+      safety = 0
+      placed = false
+      while !placed do
+        safety += 1
+        if safety > 100
+          printf "Could not place pit after 100 tries, giving up.\n"
+          break
+        end
+        x = Numeric.rand(1...(level.width - 1)).to_i
+        y = Numeric.rand(1...(level.height - 1)).to_i
+        if level.tile_at(x, y) == :floor && !Furniture.furniture_at(x, y, level, args)
+          pit = Furniture.new(:pit, :rock, x, y, level.depth, 0)
+          level.furniture << pit
+          placed = true
+        end
       end
     end
   end

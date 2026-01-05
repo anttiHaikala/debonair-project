@@ -329,6 +329,12 @@ class Behaviour
         args.state.kronos.spend_time(npc, npc.walking_speed, args)
         return
       end
+      # do not walk into boulders
+      furniture = Furniture.furniture_at(target_coordinates[0], target_coordinates[1], level, args)
+      if furniture && furniture.kind == :boulder
+        args.state.kronos.spend_time(npc, npc.walking_speed, args)
+        return
+      end
       target_tile = level.tiles[target_coordinates[1]][target_coordinates[0]]
       if Tile.is_walkable_type?(target_tile, args) && !Tile.occupied?(target_coordinates[0], target_coordinates[1], args)
         Tile.enter(npc, target_coordinates[0], target_coordinates[1], args)

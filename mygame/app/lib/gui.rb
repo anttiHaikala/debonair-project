@@ -540,12 +540,28 @@ class GUI
           return true
         end
       end
+      # check if there is boulder to push
+      if furniture && furniture.kind == :boulder
+        strafing = @@strafing
+        unless strafing
+          # change facing
+          hero.apply_new_facing(Utils.direction_from_delta(dx, dy))
+        end
+        affordance = Affordance.new(Utils.level(args), hero.x + dx, hero.y + dy, :push_boulder, nil, nil)
+        affordance.execute(hero, args)
+        self.add_input_cooldown 20
+        return true
+      end
       return false
     end
     unless level.is_walkable?(hero.x + dx, hero.y + dy, args)
       @@auto_move = nil
       # add input cooldown
       self.add_input_cooldown 20
+      # change facing even if not moving
+      unless @@strafing
+        hero.apply_new_facing(Utils.direction_from_delta(dx, dy))
+      end
       return false
     end
     if Tile.occupied?(hero.x + dx, hero.y + dy, args)
@@ -589,6 +605,19 @@ class GUI
     end
     # we are cleared to move
     GUI.lock_hero
+    # are we in a pit?
+    if hero.in_a_pit?(args)
+      # hero needs to check if the climb is successful
+      success = hero.climb_out_of_pit(args)
+      unless success
+        args.state.kronos.spend_time(hero, hero.walking_speed * 2, args)
+        GUI.unlock_hero(args)
+        HUD.output_message args, "You fail to climb out of the pit."
+        return true # turn spent
+      else
+        HUD.output_message args, "You climb out of the pit!"
+      end
+    end
     Tile.enter(hero, hero.x + dx, hero.y + dy, args)
     unless @@strafing
       hero.apply_new_facing(Utils.direction_from_delta(dx, dy))

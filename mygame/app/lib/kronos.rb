@@ -29,11 +29,18 @@ class Kronos
     @level_effects_applied_until = 0
   end
 
+  # TODO: question - should we always just use the spend_extra_time method instead of this?
   def spend_time entity, seconds, args
     if seconds < 0
       raise "Cannot spend negative time!"
     end
-    entity.busy_until = @world_time + seconds
+    previous_busy_until = entity.busy_until || 0
+    new_busy_until = @world_time + seconds
+    unless new_busy_until > previous_busy_until
+      # do not reduce busy time of entity if already busier than this
+      return
+    end
+    entity.busy_until = new_busy_until
   end
 
   def spend_extra_time entity, seconds, args
