@@ -6,7 +6,9 @@ class Entity
   attr_accessor :enemies
   attr_accessor :allies
   attr_accessor :needs
-  attr_accessor :carried_items, :worn_items, :wielded_items
+  attr_accessor :carried_items # all items that are carried (inventory)
+  attr_accessor :worn_items # items that are worn (armor, rings, amulets, etc.)
+  attr_accessor :wielded_items   # hand index: 0 = right hand, 1 = left hand, if multiple sets of hands, start from the top
   attr_accessor :behaviours
   attr_accessor :statuses
   attr_accessor :traits
@@ -16,6 +18,7 @@ class Entity
   attr_accessor :feels
   attr_accessor :feel_cooldown
   attr_accessor :last_behaviour
+  attr_accessor :handedness # :right, :left, :ambidextrous
 
   def self.kinds
     [:generic, :item, :pc, :npc, :plant, :furniture]
@@ -44,6 +47,7 @@ class Entity
     @facing = :west
     @mode_of_movement = :normal # :sneaking, :walking, :speeding
     @feel_cooldown = 0
+    @handedness = :right
   end
 
   def all_items(args)
@@ -305,6 +309,17 @@ class Entity
 
   # hand index: 0 = right hand, 1 = left hand, if multiple sets of hands, start from the top
   def wield_item(item, hand_index, args)
+    # remove from other hand if already wielded there
+    self.wielded_items.each_with_index do |wielded_item, index|
+      if wielded_item == item
+        self.wielded_items.delete_at(index)
+      end
+    end
+    # ensure enough hands
+    while self.wielded_items.length <= hand_index
+      self.wielded_items << nil
+    end
+    # wield
     self.wielded_items[hand_index] = item
   end
 

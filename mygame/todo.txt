@@ -32,15 +32,13 @@ NOTES ON GAME SYSTEM (the DEBONAIR!)
     - it's really hard to make the combat timescale match with exploration time scale then again the starvation and sleeping timescale
 
 TODO LIST
-- pits & boulders
+- Rats shadow player
+- onsens & geysirs. water temperature!
 - raccoon steals drinks
 - rats steal food
-- onsens & geysirs. water temperature!
-- Rats shadow player
 - IMPORTANT: wielded items somehow gets nils now, must fix soon
 - wielded items shown double in hand!!
 - tending to wounds
-- scale the lighting items as well (they do not change size now)
 - taming grid bugs / rats with food
 - death is a bit confusing, make it more pronounced and slower
 - keys
@@ -68,6 +66,8 @@ TODO LIST
 - chain mail vs pierce damage? chain mail vs blunt damage?
 
 DONE LIST
+- scale the lighting items as well (they do not change size now)
+- pits & boulders
 - fix the corridor algo (inaccessible squares)
 - architect secret doors
 - facing indicators for everyone

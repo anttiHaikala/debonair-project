@@ -70,6 +70,7 @@ class GUI
         if selected_index >= 0 && selected_index < hero.carried_items.size
           item = hero.carried_items[selected_index]
           hero.wield_item(item, 1, args)
+          args.state.kronos.spend_time(hero, hero.walking_speed * 0.1, args)
           SoundFX.play_sound(:equip_item, args)
           self.add_input_cooldown 10
           return true
@@ -80,6 +81,7 @@ class GUI
         if selected_index >= 0 && selected_index < hero.carried_items.size
           item = hero.carried_items[selected_index]
           hero.wield_item(item, 0, args)
+          args.state.kronos.spend_time(hero, hero.walking_speed * 0.1, args)
           SoundFX.play_sound(:equip_item, args)
           self.add_input_cooldown 10
           return true
