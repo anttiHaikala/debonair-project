@@ -177,10 +177,66 @@ class Light
 end
 
 class PortableLight < Item
-  def initialize(kind)
+  DATA = {
+    torch:      { illumination: 3, directional: false, damage: 2, defense: 1, melee: 2, hit_kind: :burn, meta:{weight: 0.5, price: 5, occurance:100}},
+    lamp:       { illumination: 2, directional: false, damage: 1, defense: 0, melee: 1, hit_kind: :blunt, meta:{weight: 1.5, price: 25, occurance:10}},
+    candle:     { illumination: 1, directional: false, damage: 0, defense: 0, melee: 0, hit_kind: :burn, meta:{weight: 0.1, price: 1, occurance:100}},
+    flashlight: { illumination: 10, directional: true, damage: 1, defense: 0, melee: 1, hit_kind: :blunt, meta:{weight: 0.5, price: 50, occurance:1}}
+  }
+
+  attr_accessor :damage, :defense, :melee, :meta, :hit_kind
+
+  def initialize(kind, args = nil)
+    # 1. Call super first to prevent Item defaults from overwriting your custom values
     super(kind, :portable_light)
+
+    blueprint = DATA[kind] || { damage: 1, defense: 0, melee: 1, hit_kind: :blunt }
+    
+    # 2. init basic item and weapon attrs
+    @meta = blueprint[:meta].dup
+    @damage   = blueprint[:damage]
+    @defense  = blueprint[:defense]
+    @melee    = blueprint[:melee]
+    @inaccuracy_penalty = 5
+    @hit_kind = blueprint[:hit_kind] || :burn
+    @weight   = @meta[:weight] || 0.5
   end
+
+  # --- Required by Combat System ---
+
+  def hit_kind(args = nil)
+    @hit_kind || :blunt
+  end
+
+  # Fix: Change from self. (class) to instance methods and add the '?'
+  def is_ranged?; false; end
+  def is_throwable?; false; end
+  
+  # Providing the specific method your error is looking for:
+  def is_ranged_weapon?; false; end
+  def is_throwable_weapon?; true; end
+
   def self.kinds
-    [:torch, :lamp, :candle, :flashlight]
+    LIGHT_DATA.keys
+  end
+
+  # Maybe some functions to retuen light attrbutes, illmunation & direction
+
+  def use(user, args)
+    # Toggling logic similar to weapons
+    if user.wielded_items.include?(self)
+      user.wielded_items.delete(self)
+      HUD.output_message(args, "You put away the #{self.title(args)}.")
+    else
+      # Add to wielded list (limit to 2 slots)
+      user.wielded_items = ([self] + user.wielded_items).take(2)
+      HUD.output_message(args, "You light and wield the #{self.title(args)}.")
+      
+      # Visual/Audio feedback
+      #SoundFX.play(:light_torch, args)
+    end
+
+    # Spending time to equip
+    args.state.kronos.spend_time(user, user.walking_speed * 0.5, args) if args.state.respond_to?(:kronos)
   end
 end

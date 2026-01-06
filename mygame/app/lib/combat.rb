@@ -31,24 +31,25 @@ class Combat
     end
   end
 
+  def self.resolve_hit_kind(attacker)
+    # should only get the right hand weapon?
+    # and ranged, thrown or melee attack should be taken to account here
+    attacker.wielded_items.each do |item|
+      return item.hit_kind 
+    end
+    # if now weapons, check entity's natural damage type
+    attacker.natural_attack
+  end
+  
+
+
   def self.resolve_ranged_attack(attacker, item, defender, args)
     aname = attacker.name
     dname = defender.name
-    inaccuracy_penalty = 0
+    inaccuracy_penalty = item.inaccuracy_penalty
     case item.kind
     when :revolver
-      inaccuracy_penalty = 0    
       SoundFX.play_sound(:gunshot, args)
-    when :crossbow
-      inaccuracy_penalty = 1
-    when :bow
-      inaccuracy_penalty = 2
-    when :sling
-      inaccuracy_penalty = 3
-    when :dagger, :spear, :shuriken
-      inaccuracy_penalty = 4
-    else
-      inaccuracy_penalty = 5
     end
     base_attack_roll = args.state.rng.d20
     attack_roll = base_attack_roll - inaccuracy_penalty
@@ -63,6 +64,7 @@ class Combat
         return
       end
     end
+    #should the bonus below come from Entity?
     attack_roll += Combat.role_bonus(attacker, args)
     # species bonus
     if attacker.species == :elf || attacker.species == :dark_elf
@@ -72,11 +74,14 @@ class Combat
     if attacker.worn_items
       attacker.worn_items.each do |item|
         if item.kind == :ring_of_accuracy
+          # AH: is it useful to modify both the attac_roll and to_hit as the modification is the same? 
+          # AH it would be if we make modifications to attack roll before checking fumble. Same applies to other attacks. 
           attack_roll += 5
         end
         # TODO: helmet that decreases accuracy 
+        # helmets have attributes for this 
       end
-    end
+    end 
     if defender.has_status?(:shocked)
       to_hit -= 5
     end
@@ -91,7 +96,8 @@ class Combat
     # hit!
     HUD.output_message args, "#{aname} shoots #{item.title(args)} at #{dname} and hits!"
     body_part = defender.random_body_part(args)
-    hit_kind = item.hit_kind(args)
+
+    hit_kind = self.resolve_hit_kind(args)
     hit_severity = self.hit_severity(attacker, defender, hit_kind, body_part, attack_roll, args)
     Trauma.inflict(defender, body_part, hit_kind, hit_severity, args)
     SoundFX.play_sound(:hit, args)
@@ -127,24 +133,14 @@ class Combat
     end
     weapon_modifier = 0
     if attacker.wielded_items
+      # AH: should we do this only for attack weapon - how we know which one it is?
+      # should we add 'melee' modifier per weapon type?
       attacker.wielded_items.each do |item|
         if item.category == :weapon
-          weapon_modifier = 3 # base for all weapons
-        end
-        if item.attributes.include?(:fine)
-          weapon_modifier += 2
-        elsif item.attributes.include?(:rusty) 
-          weapon_modifier -= 2
-        elsif item.attributes.include?(:crude)
-          weapon_modifier -= 1
-        elsif item.attributes.include?(:masterwork)
-          weapon_modifier += 4
-        elsif item.attributes.include?(:legendary)
-          weapon_modifier += 6
-        elsif item.attributes.include?(:cursed)
-          weapon_modifier -= 3
-        elsif item.attributes.include?(:broken)
-          weapon_modifier -= 4
+          puts #{item.kind} has melee value of #{item.melee}"
+          weapon_modifier = item.melee
+        elsif item.kind == :pickaxe
+          weapon_modifier = 2
         end
       end
     end
@@ -158,7 +154,9 @@ class Combat
     attack_roll += weapon_modifier
     attack_roll += Combat.role_bonus(attacker, args)
     # does it even hit?
-    if base_attack_roll < to_hit 
+    # AH: this probably should be attack roll note base_attack_roll
+    #if base_attack_roll < to_hit 
+    if attack_roll < to_hit 
       HUD.output_message args, "#{aname} attacks #{dname} but misses."
       SoundFX.play_sound(:miss, args)
       return # miss
@@ -174,9 +172,13 @@ class Combat
         return # dodged
       end
     end
+
+    # AH: how to deal with defensive attributes of the wwapon and/or parry
+    # there are now defensive value for shiled but didn't impelemnt anything yet
+    
     # hit!
     body_part = defender.random_body_part(args)
-    hit_kind = attacker.hit_kind(args)
+    hit_kind = self.resolve_hit_kind(attacker)
     hit_severity = self.hit_severity(attacker, defender, hit_kind, body_part, attack_roll, args)
     Trauma.inflict(defender, body_part, hit_kind, hit_severity, args)
     SoundFX.play_sound(:hit, args)
@@ -206,6 +208,7 @@ class Combat
       if defender == args.state.run.hero
         HUD.output_message args, "Press A to continue..."
         args.state.hero.perished = true
+        #aname sometimes returns hero's name. investigate
         args.state.hero.reason_of_death = "in combat against #{aname}"
         return
       else
@@ -229,24 +232,11 @@ class Combat
     severity_modifier = 0
     weapon_modifier = 0
     if attacker.wielded_items
+      # AH: what happens if there are two weapons?
       attacker.wielded_items.each do |item|
         if item.category == :weapon
-          weapon_modifier = 3 # base for all weapons
-        end
-        if item.attributes.include?(:fine)
-          weapon_modifier += 2
-        elsif item.attributes.include?(:rusty) 
-          weapon_modifier -= 2
-        elsif item.attributes.include?(:crude)
-          weapon_modifier -= 1
-        elsif item.attributes.include?(:masterwork)
-          weapon_modifier += 4
-        elsif item.attributes.include?(:legendary)
-          weapon_modifier += 6
-        elsif item.attributes.include?(:cursed)
-          weapon_modifier -= 3
-        elsif item.attributes.include?(:broken)
-          weapon_modifier -= 4
+          puts "#{item.kind} has damage of #{item.damage}" 
+          weapon_modifier = item.damage
         end
       end
     end

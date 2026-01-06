@@ -354,15 +354,10 @@ class Entity
     return self.traits.include?(trait)
   end
 
-  def hit_kind(args)
-    hit_kind = :blunt # sensible default for unarmed attacks
-    self.wielded_items.each do |item|
-      if item.category == :weapon
-        hit_kind = item.hit_kind(args)
-        break
-      end
-    end
-    return hit_kind
+  #should this be moved to combat instead?
+  def natural_attack(args=nil)
+    # make species spesific damage types later
+    return :blunt
   end
 
   def apply_new_facing(facing)

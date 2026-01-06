@@ -1,110 +1,171 @@
 class Weapon < Item
-  
-  def initialize(kind, args=nil)
-    super(kind, :weapon)
+  DATA = {
+    dagger: {
+      damage: 4, defense: 1, melee: 3, inaccuracy: 3, hit_kind: :cut,
+      meta: { ui_name: "dagger", break_treshold: 11, material: :metal, weight: 0.4, range: 1, throwable: true, ranged: false, price: 10, occurance: 1.0 }
+    },
+    razor_blade: {
+      damage: 3, defense: 0, melee: 3, inaccuracy: 3,  hit_kind: :cut,
+      meta: { ui_name: "razor blade", break_treshold: 9, material: :metal, weight: 0.1, range: 0, throwable: true, ranged: false, price: 5, occurance: 0.5 }
+    },
+    sword: {
+      damage: 8, defense: 3, melee: 4, inaccuracy: 4, hit_kind: :cut,
+      meta: { ui_name: "sword", break_treshold: 12, material: :metal, weight: 1.5, range: 0, throwable: false, ranged: false, price: 50, occurance: 0.8 }
+    },
+    katana: {
+      damage: 10, defense: 2, melee: 5, inaccuracy: 5, hit_kind: :cut,
+      meta: { ui_name: "katana", break_treshold: 12, material: :metal, weight: 1.3, range: 0, throwable: false, ranged: false, price: 200, occurance: 0.2 }
+    },
+    axe: {
+      damage: 9, defense: 1, melee: 3, inaccuracy: 3, hit_kind: :cut,
+      meta: { ui_name: "axe", break_treshold: 10, material: :metal, weight: 2.0, range: 1, throwable: true, ranged: false, price: 30, occurance: 0.7 }
+    },
+    mace: {
+      damage: 7, defense: 2, melee: 4, inaccuracy: 5, hit_kind: :blunt,
+      meta: { ui_name: "mace", break_treshold: 12, material: :metal, weight: 2.5, range: 0, throwable: false, ranged: false, price: 35, occurance: 0.7 }
+    },
+    club: {
+      damage: 6, defense: 2, melee: 3, inaccuracy: 5, hit_kind: :blunt,
+      meta: { ui_name: "club", break_treshold: 8, material: :organic, weight: 2.2, range: 0, throwable: true, ranged: false, price: 2, occurance: 1.0 }
+    },
+    spear: {
+      damage: 7, defense: 4, melee: 4, inaccuracy: 3, hit_kind: :pierce,
+      meta: { ui_name: "spear", break_treshold: 8, material: :organic, weight: 1.8, range: 2, throwable: true, ranged: false, price: 20, occurance: 0.6 }
+    },
+    staff: {
+      damage: 4, defense: 5, melee: 2, inaccuracy: 5, hit_kind: :blunt,
+      meta: { ui_name: "staff", break_treshold: 8, material: :organic, weight: 1.5, range: 0, throwable: false, ranged: false, price: 5, occurance: 0.8 }
+    },
+    whip: {
+      damage: 5, defense: 0, melee: 1, inaccuracy: 5,  hit_kind: :blunt,
+      meta: { ui_name: "whip", break_treshold: 7, material: :organic, weight: 0.8, range: 2, throwable: false, ranged: false, price: 15, occurance: 0.3 }
+    },
+    selfie_stick: {
+      damage: 2, defense: 1, melee: 1, inaccuracy: 6,  hit_kind: :blunt,
+      meta: { ui_name: "selfie stick", break_treshold: 7, material: :syntethic, weight: 0.3, range: 0, throwable: false, ranged: false, price: 50, occurance: 0.1 }
+    },
+    bow: {
+      damage: 6, defense: 0, melee: 0, inaccuracy: 2,  hit_kind: :pierce,
+      meta: { ui_name: "bow", break_treshold: 11, material: :organic, weight: 1.0, range: 10, ammo: :arrow, throwable: false, ranged: true, price: 80, occurance: 0.5 }
+    },
+    crossbow: {
+      damage: 6, defense: 0, melee: 1, inaccuracy: 1,  hit_kind: :pierce,
+      meta: { ui_name: "crossbow", break_treshold: 11, material: :organic, weight: 1.0, range: 10, ammo: :arrow, throwable: false, ranged: true, price: 80, occurance: 0.5 }
+    },
+    sling: {
+      damage: 4, defense: 0, melee: 0, inaccuracy: 3,  hit_kind: :blunt,
+      meta: { ui_name: "sling", break_treshold: 13, material: :organic, weight: 1.0, range: 10, ammo: :stone, throwable: false, ranged: true, price: 80, occurance: 0.5 }
+    },
+    shuriken: {
+      damage: 3, defense: 0, melee: 0, inaccuracy: 2,   hit_kind: :cut,
+      meta: { ui_name: "shuriken", break_treshold: 10, material: :metal, weight: 0.1, range: 5, throwable: true, ranged: true, price: 2, occurance: 0.4 }
+    },
+    revolver: {
+      damage: 15, defense: 0, melee: 0, inaccuracy: 0,  hit_kind: :pierce,
+      meta: { ui_name: "revolver", break_treshold: 12, material: :metal, weight: 1.2, range: 8, ammo: :bullet, throwable: false, ranged: true, price: 500, occurance: 0.1 }
+    },
+    raygun: {
+      damage: 25, defense: 0, melee: 0, inaccuracy: -1,   hit_kind: :burn,
+      meta: { ui_name: "raygun", break_treshold: 13, material: :synthetic, weight: 1.5, range: 12, ammo: :battery_pack, throwable: false, ranged: true, price: 5000, occurance: 0.01 }
+    },
+    wooden_shield: {
+      damage: 1, defense: 3, melee: 1, inaccuracy: 7,   hit_kind: :burn,
+      meta: { ui_name: "wooden shield", break_treshold: 8, material: :organic, weight: 4, range: 1, throwable: false, ranged: false, price: 10, occurance: 1.0 }
+    },
+    bronze_shield: {
+      damage: 1, defense: 6, melee: 1, inaccuracy: 7,   hit_kind: :burn,
+      meta: { ui_name: "bronze", break_treshold: 13, material: :organic, weight: 8, range: 1, throwable: false, ranged: false, price: 100, occurance: 0.1 }
+    }
+  }
+
+  attr_accessor :damage, :defense, :melee, :inaccuracy, :hit_kind, :meta
+
+  def initialize(kind, args = nil, &block) 
+
+    blueprint = DATA[kind] || {damage: 1, defense: 0, melee: 3, inaccuracy: 3, meta: {} }
+    
+    # Initialize from blueprint
+    @meta = blueprint[:meta].dup
+    
+    @damage  = blueprint[:damage] || 1
+    @defense = blueprint[:defense] || 0
+    @melee = blueprint[:melee] || 3
+    @inaccuracy_penalty = blueprint[:inaccuracy] || 5
+    @hit_kind = blueprint[:hit_kind] || :cut
+    @weight  = @meta[:weight] || 0.6
+    @break_threshold = @meta[:break_threshold] || 11
+    super(kind, :weapon, &block)
+    
   end
 
-  def self.is_ranged_weapon?(item)
-    return [:bow, :crossbow, :sling, :revolver].include?(item.kind)
-  end
-
-  def self.is_throwable_weapon?(item)
-    return [:dagger, :spear, :shuriken].include?(item.kind)
-  end
-
-  def self.kinds
-    return [
-      :dagger, 
-      :sword, 
-      :axe, 
-      :mace, 
-      :spear,
-      :katana,
-      :club,
-      :bow,
-      :crossbow,
-      :sling,
-      :shuriken,
-      :selfie_stick,
-      :razor_blade,
-      :revolver,
-      :raygun,
-      :trident
-    ]
-  end
-
-  def hit_kind(args)
-    case @kind
-    when :dagger, :sword, :katana, :axe, :razor_blade
-      return :cut
-    when :mace, :club, :selfie_stick
-      return :blunt
-    when :spear, :bow, :crossbow, :shuriken, :revolver, :trident
-      return :pierce
-    else
-      return :blunt
-    end
-  end
+  # --- CLASS DATA ACCESS ---
+  def self.data; DATA; end
+  def self.kinds; DATA.keys; end
 
   def self.common_attributes
-    [
-      :rusty,
-      :broken,
-      :fine,
-      :crude
-    ]
+    [:rusty, :moldy, :broken, :fine, :crude, :balanced, :heavy, :light, :expensive, :enchanted, :rotten]
   end
 
   def self.rare_attributes
-    [
-      :masterwork,
-      :holy #has no effect in combat yet
-    ]
+    [:masterwork, :soul_consuming, :mythical, :holy, :demon_slayer, :alien_made]
   end
 
-  def set_weight
-    case @kind
-    when :dagger
-      @weight = 0.4
-    when :sword
-      @weight = 1.5
-    when :axe
-      @weight = 2.0
-    when :mace
-      @weight = 2.5
-    when :spear
-      @weight = 1.8
-    when :katana
-      @weight = 1.3
-    when :club
-      @weight = 2.2
-    when :selfie_stick
-      @weight = 0.3
-    when :razor_blade
-      @weight = 0.1
-    when :raygun
-      @weight = 1.5
-    else
-      @weight = 0.6
-    end 
+  # --- ATTRIBUTE LOGIC ---
+
+  def apply_attribute_modifiers(args, attribute)
+    case attribute
+    when :rusty, :moldy, :rotten
+      @damage = [@damage - 2, 1].max
+      @melee -=2
+      @break_threshold -=2
+    when :broken
+      @damage = (@damage * 0.5).floor
+      @defense -= 2
+      @melee -= 2
+    when :fine, :balanced
+      @damage += 1
+      @defense += 1
+      @melee += 3
+    when :crude
+      @damage = [@damage - 1, 1].max
+      @melee -= 2
+      @break_threshold -=1
+    when :cursed
+      @damage = [@damage - 1, 1].max
+      @melee -= 3
+    when :enchanted
+      @damage += 3
+      @melee += 3
+    when :masterwork, :mythical, :holy, :demon_slayer, :enchanted, :soul_consuming
+      # Increase damage significantly; if args is present, roll for the bonus
+      # Add indiviudal expectional attributes later 
+      bonus = args ? args.state.rng.nxt_int(2, 4) : 3
+      @damage += bonus
+      @defense += 1
+      @melee += 4
+      @break_threshold +=2
+    when :expensive
+      @meta[:price] = (@meta[:price] * 2).to_i
+    when :alien_made
+      @damage += 10
+      @weight *= 0.5
+    end
   end
 
-  def self.randomize(depth, args)
-    weapon = Weapon.new(Weapon.kinds.sample)
-    weapon.depth = depth
-    common_roll = args.state.rng.d6
-    secondary_common_roll = args.state.rng.d8
-    rare_roll = args.state.rng.d20
-    if rare_roll == 20
-      weapon.add_attribute(Weapon.rare_attributes.sample)
-    end
-    if common_roll <= 2
-      weapon.add_attribute(Weapon.common_attributes.sample)
-    end
-    if secondary_common_roll == 1
-      weapon.add_attribute(Weapon.common_attributes.sample)
-    end
-    return weapon
+  # --- ACCESSORS & FLAGS ---
+
+  def weapon_material; @meta[:material]; end
+  
+  def is_ranged?; @meta[:ranged] == true; end
+  def is_throwable?; @meta[:throwable] == true; end
+  
+  def range; @meta[:range] || 0; end
+  def ammo_type; @meta[:ammo]; end
+
+  # --- RAND ENGINE OVERRIDE ---
+
+  def self.randomize(level_depth, args)
+    Item.randomize(level_depth, self, args)
   end
 
   def use(entity, args)
@@ -169,10 +230,5 @@ class Weapon < Item
   end
 end
 
-class UniqueWeapon < Weapon
-  def initialize(kind, args=nil)
-    super(kind, args)
-    @category = :melee_weapon
-  end
-end
+
 

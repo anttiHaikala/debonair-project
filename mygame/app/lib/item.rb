@@ -1,16 +1,23 @@
 class Item
-  attr_accessor :kind, :category, :cursed, :identified, :depth, :x, :y
+  attr_accessor :kind, :category, :cursed, :identified, :depth, :x, :y, :hit_kind, :meta, :inaccuracy_penalty
   attr_reader :attributes, :weight, :traits
   def initialize(kind, category, identified = false)
     @kind = kind
     @category = category
+    #shouold cursed be only inside attrbutes?
     @cursed = false
     @identified = identified
     @depth = nil
     @x = nil
     @y = nil
-    @attributes = []
-    @traits = []    
+    @traits = []
+
+    #hooks - can be removed if implemented in subcasses but maybe useful for random new items?
+    @hit_kind = :blunt if @hit_kind.nil?
+    @meta     = {weight: 0.0, price: 0} if @meta.nil?
+    @attributes = [] if @attribies.nil?
+    @inaccuracy_penalty = 6 if inaccuracy_penalty.nil?
+
     yield(self) if block_given?
   end
 
@@ -28,10 +35,17 @@ class Item
       return target_class.new(kind, args)
     else
       # Fallback for generic items without a specialized class.
-      return Item.new(kind,  :misc)
       puts "Warning: Unknown item kind '#{kind}', created as generic Item."
+      return Item.new(kind,  :misc)
     end
   end
+
+  #empty hooks for subclasses to override
+  def self.common_attributes;[];end
+  def self.rare_attributes;[];end
+  def apply_attribute_modifiers(attribute, args);nil;end
+  def identify(args);nil;end
+  
 
   # AH: 27.12.2025 notes:
   # footwear and helmet, gloves etc should be included in armor? Or is it for sprite sheet purposes only?
@@ -97,10 +111,26 @@ class Item
     end
   end
 
-  def add_attribute(attribute)
+  def add_attribute(attribute, args=nil)
+    return if attribute.nil?
+
+    case attribute 
+      when :rusty
+        if @meta[:material] == :organic  
+            attribute = :rotten
+        elsif @meta[:material] == :glass || @meta[:material] == :syntethic
+            attribute = :moldy
+        end
+      when :moldy, :rotten
+      if @meta[:material] == :metal
+          attribute = :rusty
+      end
+    end
+
+    apply_attribute_modifiers(attribute, args)
     @attributes << attribute unless @attributes.include?(attribute)
   end
-
+  
   def remove_attribute(attribute)
     @attributes.delete(attribute)
   end
@@ -110,7 +140,7 @@ class Item
   end
 
   def title(args)
-    "#{self.attributes.join(' ')} #{self.kind.to_s}".trim.gsub('_',' ').gsub('  ',' ')
+    "#{self.attributes.join(' ')} #{self.kind.to_s}".strip.gsub('_',' ').gsub('  ',' ')
   end
 
   def c 
@@ -195,7 +225,7 @@ class Item
             level.items << item
           end
         when 4
-          item = Weapon.randomize(level.depth, args)
+          item = self.randomize(level.depth, Weapon, args)
           item.x = item_x
           item.y = item_y
           level.items << item
@@ -216,21 +246,78 @@ class Item
           item.depth = level.depth
           item.x = item_x
           item.y = item_y
-          level.items << item      
+          level.items << item
         when 9
-            item = Armor.randomize(level.depth, args)
+            item = self.randomize(level.depth, Tool, args)
             item.depth = level.depth
             item.x = item_x
             item.y = item_y
             level.items << item
         when 10
-            item = Tool.randomize(level.depth, args)
+            item = self.randomize(level.depth, Armor, args)
             item.depth = level.depth
             item.x = item_x
             item.y = item_y
             level.items << item
       end
     end
+  end
+
+  # --- MAIN RANDOMIZATION LOGIC ---
+
+  def self.randomize(level_depth, klass, args)
+    pool = klass.data
+    max_depth = args.state.max_depth || 10
+    progress = [(level_depth - 1.0) / ([max_depth - 1.0, 1.0].max), 1.0].min
+
+    # OPTIMIZED SINGLE PASS:
+    # 1. Iterate through data once to calculate scaled weight AND cumulative threshold
+    running_total = 0.0
+    selection_pool = pool.map do |kind, data|
+      base_occ = data[:meta][:occurance]
+      # Linear scaling for rarity
+      adj_occ = base_occ + (1.0 - base_occ) * progress
+      running_total += adj_occ
+      
+      # We store the "running total" as the item's threshold
+      { kind: kind, threshold: running_total }
+    end
+
+    # 2. Roll a number based on the final running total
+    roll = args.state.rng.nxt_float * running_total
+
+    # 3. Find the first item where our roll is under the threshold
+    winner = selection_pool.find { |entry| roll < entry[:threshold] }
+    kind = winner ? winner[:kind] : :hat
+
+    # 4. Create the item
+    puts "Generated item: #{kind} at level #{level_depth}" 
+    item = klass.new(kind,args)
+    
+    # 5. Roll for Attributes
+    common_roll = args.state.rng.d6
+    secondary_common_roll = args.state.rng.d8
+    rare_roll = args.state.rng.d20
+    aSample = nil
+
+    if rare_roll == 20
+      rare_attrs = self.rare_attributes
+      aSample = rare_attrs[args.state.rng.nxt_int(0, rare_attrs.length - 1)]
+      #armor.apply_attribute_modifiers(args, aSample)
+      item.add_attribute(aSample, args)
+    else
+      common_attrs = self.common_attributes
+      aSample = common_attrs[args.state.rng.nxt_int(0, common_attrs.length - 1)]
+
+      if common_roll <= 2
+        item.add_attribute(aSample,args)
+      end
+
+      if secondary_common_roll == 1
+        item.add_attribute(aSample, args)
+      end
+    end
+    item
   end
 
   # weight in kilograms
@@ -280,7 +367,7 @@ class Item
       return 6.0 # heavy encumbrance
     elsif total_weight <= carrying_capacity * 4.0
       return 8.0 # heavy encumbrance
-    else total_weight <= Item.maximum_carrying_capacity(entity)  
+    else #total_weight <= Item.maximum_carrying_capacity(entity)  
       # heavy encumbrance
       return 12.0
     end
@@ -309,8 +396,8 @@ class Item
     return false
   end
 
-
   # Master list for role-based starting loadouts
+  # randomization is not using occurance rates currently
   def self.setup_items_for_new_hero(hero, args)
      # 1. Common Starting Items: Every hero starts with a torch (wielded) and a food ration.
     #item = Food.new(:food_ration, args) #you want to pass args here to get spoilage tracking working
@@ -608,11 +695,12 @@ class Item
         if Weapon.kinds.include?(entry[:kind])
           noWeapon = false
         end
-        entry << {indentified: true}
+        entry << {identified: true}
       end
       2.times do
         loadout.delete(loadout.sample)
-        loadout << {kind: Scroll.kinds.sample, indentified: true}
+        #maybe identified object are alraedy good enough
+        #loadout << {kind: Scroll.kinds.sample, identified: true}
       end
       if noWeapon
         loadout << {kind: :staff, state: :wielded}
@@ -641,19 +729,13 @@ class Item
       # Count not used in item generation atm
       repeat = entry[:count] || 1
       repeat.times do
-        # If kind isn't specified, pick a random one from the provided pool
-        # Ensure we use the seeded RNG for sampling if pool is provided
         kind = entry[:kind]
-        indentified = entry[:identified] || false
+        identified = entry[:identified] || false
         item = self.create_instance(kind, args)
-        if entry[:attribute]
-          if item.respond_to?(:add_attribute_modfiers)
-            item.add_attribute_modfiers(entry[:attribute], args)
-          end
-          item.add_attribute(entry[:attribute])
-        end
-        if indentified
-          item.identifify
+        item.add_attribute(entry[:attribute],args)
+        
+        if identified
+          item.identify(args)
         end
         hero.carried_items << item
         hero.worn_items << item if entry[:state] == :worn

@@ -5,7 +5,7 @@ class Food < Item
   # nutrition: decimal percentage of hunger bar (0.0 to 1.0)
   FOOD_DATA = {
     food_ration: {
-      nutrition: 0.25, weight: 1.0, price: 20, rarity: 100,
+      nutrition: 0.25, weight: 1.0, price: 20, occurance: 1.0,
       meta: { ui_name: "food ration", description: "A standard-issue preserved meal. Not tasty, but keeps you alive.", condition: 1.0, spoil_rate: 0.0 }
     },
     hamburger: {
@@ -13,39 +13,39 @@ class Food < Item
       meta: { ui_name: "hamburger", description: "Tasty burger with sesame seed bun.", condition: 1.0, spoil_rate: 0.0 }
     },
     dried_meat: {
-      nutrition: 0.15, weight: 0.5, price: 15, rarity: 80,
+      nutrition: 0.15, weight: 0.5, price: 15, occurance: 0.8,
       meta: { ui_name: "dried meat", description: "Salty and tough. It'll last forever in your pack.", condition: 1.0, spoil_rate: 0.00001 }
     },
     apple: {
-      nutrition: 0.05, weight: 0.2, price: 5, rarity: 60,
+      nutrition: 0.05, weight: 0.2, price: 5, occurance: 0.6,
       meta: { ui_name: "apple", description: "A crisp, red apple. Watch out for worms.", condition: 1.0, spoil_rate: 0.0001 }
     },
     lembas: {
-      nutrition: 0.50, weight: 0.1, price: 100, rarity: 10,
+      nutrition: 0.50, weight: 0.1, price: 100, occurance: 0.1,
       meta: { ui_name: "lembas wafer", description: "Elven waybread. One small bite is enough to fill the stomach of a hungry hobbit.", condition: 1.0, spoil_rate: 0.0 }
     },
     vegetables: {
-      nutrition: 0.03, weight: 0.3, price: 3, rarity: 60,
+      nutrition: 0.03, weight: 0.3, price: 3, occurance: 60,
       meta: { ui_name: "leafy greens", description: "Surprisingly fresh-looking vegetables.", condition: 1.0, spoil_rate: 0.0002 }
     },
     canned_food: {
-      nutrition: 0.20, weight: 1.5, price: 30, rarity: 40,
+      nutrition: 0.20, weight: 1.5, price: 30, occurance: 0.4,
       meta: { ui_name: "tin of food", description: "Heavy and sealed tight. You might need a tool to open this.", condition: 1.0, spoil_rate: 0.0 }
     },
     fortune_cookie: {
-      nutrition: 0.01, weight: 0.1, price: 2, rarity: 50,
+      nutrition: 0.01, weight: 0.1, price: 2, occurance: 0.5,
       meta: { ui_name: "fortune cookie", description: "A crunchy snack containing a small, mysterious message.", condition: 1.0, spoil_rate: 0.0 }
     },
     slime_mold: {
-      nutrition: 0.08, weight: 0.4, price: 10, rarity: 30,
+      nutrition: 0.08, weight: 0.4, price: 10, occurance: 0.3,
       meta: { ui_name: "slime mold", description: "An exotic, pulsating growth. It tastes like... purple?", condition: 1.0, spoil_rate: 0.00005 }
     },
     blood_pack: {
-      nutrition: 0.08, weight: 1, price: 100, rarity: 10,
+      nutrition: 0.08, weight: 1, price: 100, occurance: 0.1,
       meta: { ui_name: "blood pack", description: "1 liter of blood.", condition: 1.0, spoil_rate: 0.0001 }
     },
     bird_food: {
-      nutrition: 0.5, weight: 0.1, price: 10, rarity: 30,
+      nutrition: 0.5, weight: 0.1, price: 10, occurance: 0.3,
       meta: { ui_name: "bird food", description: "A small, surprisingly nutritious meal for titmouses.", condition: 1.0, spoil_rate: 0.000001 }
     }
   }
@@ -112,13 +112,13 @@ class Food < Item
   end
 
   def self.randomize(level_depth, args)
-    # Weighted randomization based on rarity
-    total_rarity = FOOD_DATA.values.map { |d| d[:rarity] || 100 }.sum
-    roll = args.state.rng.nxt_int(total_rarity)
+    # Weighted randomization based on occurance
+    total_occurance = FOOD_DATA.values.map { |d| d[:occurance] || 100 }.sum
+    roll = args.state.rng.nxt_int(total_occurance)
     
     current_sum = 0
     FOOD_DATA.each do |kind, data|
-      current_sum += (data[:rarity] || 100)
+      current_sum += (data[:occurance] || 100)
       return self.new(kind, args) if roll < current_sum
     end
     self.new(:food_ration, args)
