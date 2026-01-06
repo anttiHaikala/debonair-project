@@ -1,19 +1,23 @@
 class Item
-  attr_accessor :kind, :category, :cursed, :identified, :depth, :x, :y
+  attr_accessor :kind, :category, :cursed, :identified, :depth, :x, :y, :hit_kind, :meta, :inaccuracy_penalty
   attr_reader :attributes, :weight, :traits
   def initialize(kind, category, identified = false)
     @kind = kind
     @category = category
+    #shouold cursed be only inside attrbutes?
     @cursed = false
     @identified = identified
     @depth = nil
     @x = nil
     @y = nil
-    @attributes = []
-    @traits = [] 
-    @hit_kind = :blunt   
-    #hook for metadata initialization in subclasses
-    @meta = {}
+    @traits = []
+
+    #hooks - can be removed if implemented in subcasses but maybe useful for random new items?
+    @hit_kind = :blunt if @hit_kind.nil?
+    @meta     = {weight: 0.0, price: 0} if @meta.nil?
+    @attributes = [] if @attribies.nil?
+    @inaccuracy_penalty = 6 if inaccuracy_penalty.nil?
+
     yield(self) if block_given?
   end
 
@@ -244,7 +248,7 @@ class Item
           item.y = item_y
           level.items << item
         when 9
-            item = Tool.randomize(level.depth, args)
+            item = self.randomize(level.depth, Tool, args)
             item.depth = level.depth
             item.x = item_x
             item.y = item_y
@@ -262,7 +266,6 @@ class Item
   # --- MAIN RANDOMIZATION LOGIC ---
 
   def self.randomize(level_depth, klass, args)
-    puts 'Inspecting how weighted randomization works for #{klass}'
     pool = klass.data
     max_depth = args.state.max_depth || 10
     progress = [(level_depth - 1.0) / ([max_depth - 1.0, 1.0].max), 1.0].min
@@ -288,8 +291,7 @@ class Item
     kind = winner ? winner[:kind] : :hat
 
     # 4. Create the item
-    puts "Generated item: #{kind}" 
-    puts level_depth
+    puts "Generated item: #{kind} at level #{level_depth}" 
     item = klass.new(kind,args)
     
     # 5. Roll for Attributes

@@ -67,13 +67,21 @@ class Weapon < Item
     raygun: {
       damage: 25, defense: 0, melee: 0, inaccuracy: -1,   hit_kind: :burn,
       meta: { ui_name: "raygun", break_treshold: 13, material: :synthetic, weight: 1.5, range: 12, ammo: :battery_pack, throwable: false, ranged: true, price: 5000, occurance: 0.01 }
+    },
+    wooden_shield: {
+      damage: 1, defense: 3, melee: 1, inaccuracy: 7,   hit_kind: :burn,
+      meta: { ui_name: "wooden shield", break_treshold: 8, material: :organic, weight: 4, range: 1, throwable: false, ranged: false, price: 10, occurance: 1.0 }
+    },
+    bronze_shield: {
+      damage: 1, defense: 6, melee: 1, inaccuracy: 7,   hit_kind: :burn,
+      meta: { ui_name: "bronze", break_treshold: 13, material: :organic, weight: 8, range: 1, throwable: false, ranged: false, price: 100, occurance: 0.1 }
     }
   }
 
   attr_accessor :damage, :defense, :melee, :inaccuracy, :hit_kind, :meta
 
-  def initialize(kind, args = nil) 
-    super(kind, :weapon)
+  def initialize(kind, args = nil, &block) 
+
     blueprint = DATA[kind] || {damage: 1, defense: 0, melee: 3, inaccuracy: 3, meta: {} }
     
     # Initialize from blueprint
@@ -86,10 +94,11 @@ class Weapon < Item
     @hit_kind = blueprint[:hit_kind] || :cut
     @weight  = @meta[:weight] || 0.6
     @break_threshold = @meta[:break_threshold] || 11
+    super(kind, :weapon, &block)
     
   end
 
-  # --- CLASS DATA HOOKS ---
+  # --- CLASS DATA ACCESS ---
   def self.data; DATA; end
   def self.kinds; DATA.keys; end
 
@@ -221,10 +230,5 @@ class Weapon < Item
   end
 end
 
-class UniqueWeapon < Weapon
-  def initialize(kind, args=nil)
-    super(kind, args)
-    @category = :melee_weapon
-  end
-end
+
 

@@ -32,14 +32,12 @@ class Combat
   end
 
   def self.resolve_hit_kind(attacker)
-    #should only get the right hand weapon?
-    #and ranged, thrown or melee attack should be taken to avvount here
+    # should only get the right hand weapon?
+    # and ranged, thrown or melee attack should be taken to account here
     attacker.wielded_items.each do |item|
-      #fix hit kind to portable light or make exception here
-      if item.respond_to?(:hit_kind)
-        return item.hit_kind 
-      end
+      return item.hit_kind 
     end
+    # if now weapons, check entity's natural damage type
     attacker.natural_attack
   end
   
@@ -66,7 +64,7 @@ class Combat
         return
       end
     end
-    #should combat role bonus etc come from entity?
+    #should the bonus below come from Entity?
     attack_roll += Combat.role_bonus(attacker, args)
     # species bonus
     if attacker.species == :elf || attacker.species == :dark_elf
@@ -76,13 +74,15 @@ class Combat
     if attacker.worn_items
       attacker.worn_items.each do |item|
         if item.kind == :ring_of_accuracy
+          # AH: is it useful to modify both the attac_roll and to_hit as the modification is the same? 
+          # AH it would be if we make modifications to attack roll before checking fumble. Same applies to other attacks. 
           attack_roll += 5
         end
         # TODO: helmet that decreases accuracy 
+        # helmets have attributes for this 
       end
-    end
-    #AH: changed this to attacker - correct??
-    if attacker.has_status?(:shocked)
+    end 
+    if defender.has_status?(:shocked)
       to_hit -= 5
     end
     # we are done with the modifiers
@@ -133,11 +133,11 @@ class Combat
     end
     weapon_modifier = 0
     if attacker.wielded_items
-      # should we do this only for attack weapon - how we know which one it is
+      # AH: should we do this only for attack weapon - how we know which one it is?
       # should we add 'melee' modifier per weapon type?
       attacker.wielded_items.each do |item|
         if item.category == :weapon
-          puts item.kind
+          puts #{item.kind} has melee value of #{item.melee}"
           weapon_modifier = item.melee
         elsif item.kind == :pickaxe
           weapon_modifier = 2
@@ -154,7 +154,9 @@ class Combat
     attack_roll += weapon_modifier
     attack_roll += Combat.role_bonus(attacker, args)
     # does it even hit?
-    if base_attack_roll < to_hit 
+    # AH: this probably should be attack roll note base_attack_roll
+    #if base_attack_roll < to_hit 
+    if attack_roll < to_hit 
       HUD.output_message args, "#{aname} attacks #{dname} but misses."
       SoundFX.play_sound(:miss, args)
       return # miss
@@ -172,6 +174,7 @@ class Combat
     end
 
     # AH: how to deal with defensive attributes of the wwapon and/or parry
+    # there are now defensive value for shiled but didn't impelemnt anything yet
     
     # hit!
     body_part = defender.random_body_part(args)
@@ -229,8 +232,10 @@ class Combat
     severity_modifier = 0
     weapon_modifier = 0
     if attacker.wielded_items
+      # AH: what happens if there are two weapons?
       attacker.wielded_items.each do |item|
         if item.category == :weapon
+          puts "#{item.kind} has damage of #{item.damage}" 
           weapon_modifier = item.damage
         end
       end

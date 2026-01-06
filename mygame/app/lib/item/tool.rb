@@ -5,56 +5,65 @@ class Tool < Item
   #   Weight (in lbs)
   #   Price (in game currency)
   # Rarity: Common (100), Uncommon (50), Rare (10)
-  TOOL_DATA = {
-    pickaxe: {
-      meta: { ui_name: "pickaxe", weight: 4.5, price: 50, rarity: 80, durability: 10, action: :dig }
+  DATA = {
+    pickaxe: { durability: 10, action: :dig, is_crafted: nil, 
+      meta: { ui_name: "pickaxe", weight: 4.5, price: 50, occurance: 0.1 }
     },
-    lockpick: {
-      meta: { ui_name: "lockpick set", weight: 0.2, price: 100, rarity: 40, durability: 8, action: :unlock }
+    lockpick: { durability: 8, action: :unlock, is_crafted: nil,
+      meta: { ui_name: "lockpick set", weight: 0.2, price: 100,  occurance: 0.2 }
     },
-    mirror: {
-      meta: { ui_name: "mirror", weight: 0.5, price: 20, rarity: 60, durability: nil, action: :reflect }
+    mirror: { durability: nil, action: :reflect, is_crafted: nil,
+      meta: { ui_name: "mirror", weight: 0.5, price: 20,  occurance: 0.2 }
     },
-    medkit: {
-      meta: { ui_name: "trauma medkit", weight: 1.2, price: 300, rarity: 20, durability: 1, action: :heal }
+    medkit: { durability: 1, action: :heal, is_crafted: nil,
+      meta: { ui_name: "trauma medkit", weight: 1.2, price: 300,  occurance: 0.2 }
     },
-    wings: {
-      meta: { ui_name: "wings", weight: 3.0, price: 500, rarity: 100, durability: nil, action: :fly }
+    wings: { durability: nil, action: :fly, is_crafted: nil,
+      meta: { ui_name: "wings", weight: 3.0, price: 500,  occurance: 0.01 }
     },
-    battery_pack: {
-      meta: { ui_name: "battery pack", weight: 3.0, price: 500, rarity: 100, durability: nil, action: :recharge}
+    battery_pack: { durability: nil, action: :recharge, is_crafted: nil,
+      meta: { ui_name: "battery pack", weight: 3.0, price: 500, occurance: 0.5}
     },
-    notebook: {
-      meta: { ui_name: "notebook", weight: 3.0, price: 10, rarity: 100, durability: 10, action: :copy_scroll }
+    notebook: {  durability: 10, action: :copy_scroll, is_crafted: nil,
+      meta: { ui_name: "notebook", weight: 3.0, price: 10, occurance: 0.05 }
     },
-    camera: {
-      meta: { ui_name: "camera", weight: 0.5, price: 400, rarity: 100, durability: 30, action: :take_photo }
+    air_fryer: { durability: 30, action: :cook, is_crafted: nil,
+      meta: { ui_name: "air fryer", weight: 3, price: 100, occurance: 0.1}
+    },
+    camera: { durability: 30, action: :take_photo, is_crafted: nil,
+      meta: { ui_name: "camera", weight: 0.5, price: 400, occurance: 0.05}
+    },
+    paper_clip: { durability: 30, action: :unlock, is_crafted: nil,
+      meta: { ui_name: "air fryer", weight: 0.01, price: 1, occurance: 1}
     }
   }
 
   attr_accessor :meta, :durability
 
   def initialize(kind, args, &block)
-    blueprint = TOOL_DATA[kind] || { meta: {} }
+      blueprint = DATA[kind] || {durability: nil, action: nil, meta: {} }
+
     @meta = blueprint[:meta].dup
     @weight = @meta[:weight] || 1.0
-    @durability = @meta[:durability] || 5
-    
+    @durability = blueprint[:durability] 
+    @action = blueprint[:action]
+    @is_crafted = blueprint[:is_crafted] 
+
     # Initialize Item parent
     super(kind, :tool, &block)
   end
 
-  def self.kinds
-    TOOL_DATA.keys
-  end
+  # --- CLASS DATA ACCESS ---
+  def self.data; DATA; end
+  def self.kinds; DATA.keys; end
 
   # Seeded randomization based on rarity weights
   def self.randomize(level_depth, args)
-    total_rarity = TOOL_DATA.values.map { |d| d[:meta][:rarity] || 100 }.sum
+    total_rarity = DATA.values.map { |d| d[:meta][:rarity] || 100 }.sum
     roll = args.state.rng.nxt_int(0, total_rarity - 1)
     
     current_sum = 0
-    TOOL_DATA.each do |kind, data|
+    DATA.each do |kind, data|
       current_sum += (data[:meta][:rarity] || 100)
       if roll < current_sum
         tool = self.new(kind, args)
