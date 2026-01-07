@@ -29,8 +29,8 @@ class Combat
   def self.resolve_hit_kind(attacker)
     # should only get the right hand weapon?
     # and ranged, thrown or melee attack should be taken to account here
-    attacker.wielded_items.each do |item|
-      return item.hit_kind 
+    attacker.wielded.each do |item|
+      return item.hit_kind if item && item.hit_kind
     end
     # if now weapons, check entity's natural damage type
     attacker.natural_attack
@@ -130,10 +130,10 @@ class Combat
       # AH: should we do this only for attack weapon - how we know which one it is?
       # should we add 'melee' modifier per weapon type?
       attacker.wielded_items.each do |item|
-        if item.category == :weapon
+        if item && item.category && item.category == :weapon
           puts #{item.kind} has melee value of #{item.melee}"
           weapon_modifier = item.melee
-        elsif item.kind == :pickaxe
+        elsif item && item.kind == :pickaxe
           weapon_modifier = 2
         end
       end
@@ -235,9 +235,9 @@ class Combat
     printf "Calculating hit severity for attack roll %d to body part %s\n" % [attack_roll, body_part.to_s.gsub('_', ' ')]
     severity_modifier = 0
     weapon_modifier = 0
-    if attacker.wielded_items
+    if attacker.wielded
       # AH: what happens if there are two weapons?
-      attacker.wielded_items.each do |item|
+      attacker.wielded.each do |item|
         if item.category == :weapon
           puts "#{item.kind} has damage of #{item.damage}" 
           weapon_modifier = item.damage

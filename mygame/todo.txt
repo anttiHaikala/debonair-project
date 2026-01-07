@@ -33,6 +33,7 @@ NOTES ON GAME SYSTEM (the DEBONAIR!)
     - it's really hard to make the combat timescale match with exploration time scale then again the starvation and sleeping timescale
 
 TODO LIST
+- log item used to attack, and the damage type!
 - Zorkmids aka money
 - NPC behaviour architecture!
 - biome-based level generation (deprecate vibes)

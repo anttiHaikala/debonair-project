@@ -14,7 +14,7 @@ class Lighting
     # iterate through all light sources on the level
     light_level = 0.2
     level.entities.each do |entity|
-      entity.wielded_items.each do |item|
+      entity.wielded.each do |item|
         if item.kind == :torch
           distance = Utils::distance(entity.x, entity.y, x, y)
           if distance < 0.1
@@ -25,7 +25,7 @@ class Lighting
         end
       end
       entity.worn_items.each do |item|
-        if item.kind == :ring_of_illumination
+        if item && item.kind == :ring_of_illumination
           distance = Utils::distance(entity.x, entity.y, x, y)
           if distance < 0.1
             distance = 0.1

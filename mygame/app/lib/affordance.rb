@@ -81,8 +81,10 @@ class Affordance
     if furniture && furniture.kind == :secret_door && furniture.seen_by_hero
       if furniture.openness == 0
         affordances << Affordance.new(level, x, y, :open_door, nil, nil)
+        affordances << Affordance.new(level, x, y, :break_door, nil, nil)
       else
         affordances << Affordance.new(level, x, y, :close_door, nil, nil)
+        affordances << Affordance.new(level, x, y, :break_door, nil, nil)
       end
     end 
     # boulders
@@ -158,6 +160,10 @@ class Affordance
           if furniture.breakable <= 0
             HUD.output_message(args, "The door breaks apart!")
             level.furniture.delete(furniture)
+            if furniture.kind == :secret_door
+              # update tile to a floor tile
+              level.tiles[@y][@x] = :floor # TODO: maybe choose the style from adjacent tiles? dirt floor is ok too...
+            end
             SoundFX.play(:door_break, args) 
           end
         else

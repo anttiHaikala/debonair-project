@@ -17,7 +17,7 @@
 # 
 # BODY PART.              MINOR.           MODERATE.          SEVERE.            CRITICAL.
 # Head                    headache         concussion         unconsciousness    death
-# Upper torso             bruising         cracked ribs       punctured lung     death
+# Upper torso             bruising         cracked ribs                          punctured lung
 # Lower torso             bruising         internal bleeding  organ failure      death
 # Right Arm               pain             limited use        unusable           amputation
 # Left Arm                pain             limited use        unusable           amputation
@@ -27,8 +27,8 @@
 # CUT TRAUMA EFFECT MATRIX
 # 
 # BODY PART.              MINOR.           MODERATE.          SEVERE.            CRITICAL.
-# Head                    bleeding         bleeding           skull fracture     skull fracture
-# Upper torso             bleeding         cracked ribs       punctured lung     death
+# Head                    bleeding         bleeding           minor fracture     major fracture
+# Upper torso             bleeding         bleeding
 # Lower torso             bleeding         internal bleeding  organ failure      death
 # Right Arm               bleeding         limited + bleed    unusable + bleed   amputation
 # Left Arm                bleeding         limited + bleed    unusable + bleed   amputation

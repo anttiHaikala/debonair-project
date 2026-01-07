@@ -37,10 +37,10 @@ class Hero < Entity
       modifier += 2
     when :rogue
       modifier += 1
-    when :warrior, :samurai
+    when :warrior, :samurai, :knight
       modifier -= 2
     when :tourist
-      modifier -= 5
+      modifier -= 4
     end
     case self.trait
     when :undead
@@ -70,6 +70,7 @@ class Hero < Entity
       :ninja, # stealth and combat
       :rogue, # agility and trickery
       :samurai, # combat and honor
+      :knight, # combat and chivalry and plate mail
       :thief, # stealth and deception
       :tourist, # camera and confidence
       :warrior, # strength and bravery
@@ -374,7 +375,7 @@ class Hero < Entity
       modifier += 0.3
     when :thief, :ninja
       modifier += 0.2
-    when :warrior, :tourist
+    when :warrior, :tourist, :knight
       modifier -= 0.1
     end
     case self.species
@@ -456,7 +457,7 @@ class Hero < Entity
   def strength_modifier
     strength = 0
     case self.role
-    when :warrior, :samurai
+    when :warrior, :samurai, :knight
       strength += 3
     when :ninja, :rogue
       strength += 1

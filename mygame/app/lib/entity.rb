@@ -75,6 +75,11 @@ class Entity
     @statuses << status unless @statuses.include?(status)
   end
 
+  # this utility method returns only the actual wielded items, without nils
+  def wielded
+    return @wielded_items.compact
+  end
+
   # eats both status objects and kind symbols
   def remove_status(status)
     @statuses.delete(status) if @statuses.include?(status)
@@ -265,8 +270,8 @@ class Entity
   end
 
   def drop_wielded_items(args)
-    if self.wielded_items
-      self.wielded_items.each do |item|
+    if self.wielded && self.wielded.length > 0
+      self.wielded.each do |item|
         self.drop_item(item, args)
       end
     end 
@@ -356,7 +361,7 @@ class Entity
 
   #should this be moved to combat instead?
   def natural_attack(args=nil)
-    # make species spesific damage types later
+    # make species specific damage types later
     return :blunt
   end
 
