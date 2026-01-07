@@ -189,7 +189,9 @@ class Armor < Item
     super(kind, :armor, &block)
   end
 
+  # --- CLASS DATA ACCESS ---
   def self.data; DATA; end
+  def self.kinds; DATA.keys; end
 
   def self.common_attributes
     [:rusty, :moldy, :broken, :fine, :crude, :colourful, :shiny, :expensive, :made_in_Mordor, :comfortable, :enchanted, :cursed]
@@ -230,8 +232,12 @@ class Armor < Item
 
 
 
-  def self.random(level_depth, args); self.randomize(level_depth, args); end
-  def self.kinds; DATA.keys; end
+  # --- RAND ENGINE OVERRIDE ---
+
+  def self.randomize(level_depth, args)
+    Item.randomize(level_depth, self, args)
+  end
+
   def armor_type; @meta[:armor_type]; end
   def body_parts_covered; @coverage.keys; end
 

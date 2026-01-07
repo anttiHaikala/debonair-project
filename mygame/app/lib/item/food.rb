@@ -3,61 +3,61 @@ class Food < Item
   # condition: 1.0 (fresh) to 0.0 (deadly poisonous)
   # spoil_rate: decimal points lost per tick (e.g., 0.00001 for slow decay)
   # nutrition: decimal percentage of hunger bar (0.0 to 1.0)
-  FOOD_DATA = {
+DATA = {
     food_ration: {
-      nutrition: 0.25, weight: 1.0, price: 20, occurance: 1.0,
-      meta: { ui_name: "food ration", description: "A standard-issue preserved meal. Not tasty, but keeps you alive.", condition: 1.0, spoil_rate: 0.0 }
+      nutrition: 0.25, weight: 1.0, price: 20,
+      meta: { ui_name: "food ration", description: "A standard-issue preserved meal. Not tasty, but keeps you alive.", condition: 1.0, spoil_rate: 0.0, occurance: 1.0 }
     },
     hamburger: {
-      nutrition: 0.20, weight: 0.8, price: 15, rarity: 120,
-      meta: { ui_name: "hamburger", description: "Tasty burger with sesame seed bun.", condition: 1.0, spoil_rate: 0.0 }
+      nutrition: 0.20, weight: 0.8, price: 15,
+      meta: { ui_name: "hamburger", description: "Tasty burger with sesame seed bun.", condition: 1.0, spoil_rate: 0.0, occurance: 0.3 }
     },
     dried_meat: {
-      nutrition: 0.15, weight: 0.5, price: 15, occurance: 0.8,
-      meta: { ui_name: "dried meat", description: "Salty and tough. It'll last forever in your pack.", condition: 1.0, spoil_rate: 0.00001 }
+      nutrition: 0.15, weight: 0.5, price: 15,
+      meta: { ui_name: "dried meat", description: "Salty and tough. It'll last forever in your pack.", condition: 1.0, spoil_rate: 0.00001, occurance: 0.8 }
     },
     apple: {
-      nutrition: 0.05, weight: 0.2, price: 5, occurance: 0.6,
-      meta: { ui_name: "apple", description: "A crisp, red apple. Watch out for worms.", condition: 1.0, spoil_rate: 0.0001 }
+      nutrition: 0.05, weight: 0.2, price: 5,
+      meta: { ui_name: "apple", description: "A crisp, red apple. Watch out for worms.", condition: 1.0, spoil_rate: 0.0001, occurance: 0.6 }
     },
     lembas: {
-      nutrition: 0.50, weight: 0.1, price: 100, occurance: 0.1,
-      meta: { ui_name: "lembas wafer", description: "Elven waybread. One small bite is enough to fill the stomach of a hungry hobbit.", condition: 1.0, spoil_rate: 0.0 }
+      nutrition: 0.50, weight: 0.1, price: 100,
+      meta: { ui_name: "lembas wafer", description: "Elven waybread. One small bite is enough to fill the stomach of a hungry hobbit.", condition: 1.0, spoil_rate: 0.0, occurance: 0.1 }
     },
     vegetables: {
-      nutrition: 0.03, weight: 0.3, price: 3, occurance: 60,
-      meta: { ui_name: "leafy greens", description: "Surprisingly fresh-looking vegetables.", condition: 1.0, spoil_rate: 0.0002 }
+      nutrition: 0.03, weight: 0.3, price: 3,
+      meta: { ui_name: "leafy greens", description: "Surprisingly fresh-looking vegetables.", condition: 1.0, spoil_rate: 0.0002, occurance: 0.6 }
     },
     canned_food: {
-      nutrition: 0.20, weight: 1.5, price: 30, occurance: 0.4,
-      meta: { ui_name: "tin of food", description: "Heavy and sealed tight. You might need a tool to open this.", condition: 1.0, spoil_rate: 0.0 }
+      nutrition: 0.20, weight: 1.5, price: 30,
+      meta: { ui_name: "tin of food", description: "Heavy and sealed tight. You might need a tool to open this.", condition: 1.0, spoil_rate: 0.0, occurance: 0.4 }
     },
     fortune_cookie: {
-      nutrition: 0.01, weight: 0.1, price: 2, occurance: 0.5,
-      meta: { ui_name: "fortune cookie", description: "A crunchy snack containing a small, mysterious message.", condition: 1.0, spoil_rate: 0.0 }
+      nutrition: 0.01, weight: 0.1, price: 2,
+      meta: { ui_name: "fortune cookie", description: "A crunchy snack containing a small, mysterious message.", condition: 1.0, spoil_rate: 0.0, occurance: 0.5 }
     },
     slime_mold: {
-      nutrition: 0.08, weight: 0.4, price: 10, occurance: 0.3,
-      meta: { ui_name: "slime mold", description: "An exotic, pulsating growth. It tastes like... purple?", condition: 1.0, spoil_rate: 0.00005 }
+      nutrition: 0.08, weight: 0.4, price: 10,
+      meta: { ui_name: "slime mold", description: "An exotic, pulsating growth. It tastes like... purple?", condition: 1.0, spoil_rate: 0.00005, occurance: 0.3 }
     },
     blood_pack: {
-      nutrition: 0.08, weight: 1, price: 100, occurance: 0.1,
-      meta: { ui_name: "blood pack", description: "1 liter of blood.", condition: 1.0, spoil_rate: 0.0001 }
+      nutrition: 0.08, weight: 1, price: 100,
+      meta: { ui_name: "blood pack", description: "1 liter of blood.", condition: 1.0, spoil_rate: 0.0001, occurance: 0.1 }
     },
     bird_food: {
-      nutrition: 0.5, weight: 0.1, price: 10, occurance: 0.3,
-      meta: { ui_name: "bird food", description: "A small, surprisingly nutritious meal for titmouses.", condition: 1.0, spoil_rate: 0.000001 }
+      nutrition: 0.5, weight: 0.1, price: 10,
+      meta: { ui_name: "bird food", description: "A small, surprisingly nutritious meal for titmouses.", condition: 1.0, spoil_rate: 0.000001, occurance: 0.3 }
     }
   }
 
-  attr_accessor :nutrition, :meta, :taste, :condition, :spoil_rate, :created_at
+  attr_accessor :nutrition, :weight, :meta, :price, :occurance, :taste, :condition, :spoil_rate, :created_at, :description
 
-  def initialize(kind, args = nil, category = :food)
-    blueprint = FOOD_DATA[kind] || { meta: {} }
+  def initialize(kind, args = nil, category = :food, &block)
+    blueprint = DATA[kind] || {nutrition: 0.5, weight: 0.1, price: 10, meta: {} }
+    @meta = (blueprint[:meta] || {}).dup
     @nutrition = blueprint[:nutrition] || 0.05
     @weight = blueprint[:weight] || 0.5
-    @meta = (blueprint[:meta] || {}).dup
-    
+   
     # Initialize condition (freshness) and spoil rate (how fast it rots)
     @condition = @meta[:condition] || 1.0
     @spoil_rate = @meta[:spoil_rate] || 0.0001
@@ -68,14 +68,15 @@ class Food < Item
     # Taste randomization for flavor
     tastes = [:yummy, :edible, :bland, :disgusting, :kinda_crap]
     @taste = args ? args.state.rng.sample(tastes) : tastes.sample
+    @description = meta[:description]
     
-    super(kind, category)
+    super(kind, category, &block)
   end
 
-  def self.kinds
-    FOOD_DATA.keys
-  end
-
+  # --- CLASS DATA ACCESS ---
+  def self.data; DATA; end
+  def self.kinds; DATA.keys; end
+  
   def use(entity, args)
     return false unless entity.is_a?(Hero)
     
@@ -99,29 +100,20 @@ class Food < Item
     [(@condition - decay), 0.0].max
   end
 
-  def description(args)
+  def describe(args)
     desc = @meta[:description] || "A generic item of food."
     cond = current_condition(args)
     
     status = if cond > 0.8 then "fresh"
-             elsif cond > 0.4 then "stale"
-             elsif cond > 0.1 then "rotten"
-             else "lethally toxic"
+             elsif cond > 0.4 then "that it might be eatable"
+             elsif cond > 0.1 then "better eat it before the maggots?"
+             else "having...pretty funky armonas"
              end
-    "#{desc} It looks #{status}."
+    "#{desc} It seems #{status}."
   end
 
   def self.randomize(level_depth, args)
-    # Weighted randomization based on occurance
-    total_occurance = FOOD_DATA.values.map { |d| d[:occurance] || 100 }.sum
-    roll = args.state.rng.nxt_int(total_occurance)
-    
-    current_sum = 0
-    FOOD_DATA.each do |kind, data|
-      current_sum += (data[:occurance] || 100)
-      return self.new(kind, args) if roll < current_sum
-    end
-    self.new(:food_ration, args)
+    Item.randomize(level_depth, self, args)
   end
 end
 

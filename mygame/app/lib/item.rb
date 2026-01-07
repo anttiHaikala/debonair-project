@@ -207,7 +207,7 @@ class Item
       next if level.items.any? { |item| item.x == item_x && item.y == item_y }
       case args.state.rng.d20
         when 1
-          item = Food.new(:food_ration, args)
+          item = self.randomize(level.depth, Food, args)
           item.depth = level.depth
           item.x = item_x
           item.y = item_y
@@ -283,6 +283,9 @@ class Item
     running_total = 0.0
     selection_pool = pool.map do |kind, data|
       base_occ = data[:meta][:occurance]
+      puts base_occ
+      puts data[:meta]
+      puts 'occ'
       # Linear scaling for rarity
       adj_occ = base_occ + (1.0 - base_occ) * progress
       running_total += adj_occ
