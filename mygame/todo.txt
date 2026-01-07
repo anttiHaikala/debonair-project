@@ -25,6 +25,7 @@ TTRPG LEGACY INSPO
 NOTES ON HACK
 - shopkeepers
 - dragons (blue red green gray black white brown purple)
+ - The name "zorkmid" is a reference to the Infocom text adventure series, Zork; the zorkmid is the currency used by the monarchy of Quendor, and often carries a likeness of the seventh king of the Flathead dynasty, Lord Dimwit Flathead.
 
 NOTES ON GAME SYSTEM (the DEBONAIR!)
 - how long distance is one square?
@@ -32,6 +33,12 @@ NOTES ON GAME SYSTEM (the DEBONAIR!)
     - it's really hard to make the combat timescale match with exploration time scale then again the starvation and sleeping timescale
 
 TODO LIST
+- Zorkmids aka money
+- NPC behaviour architecture!
+- biome-based level generation (deprecate vibes)
+- skeletons vs pierce damage!!!!
+- come up with a measure of kinetic force (speed * weight) -> utilize when resolving piercing/slicing/blunt force
+- make the corridor/wall architecture less messy (corridor digging algo)
 - Rats shadow player
 - onsens & geysirs. water temperature!
 - raccoon steals drinks
@@ -41,14 +48,11 @@ TODO LIST
 - tending to wounds
 - taming grid bugs / rats with food
 - death is a bit confusing, make it more pronounced and slower
-- keys
 - banter!!! all npc's must have some kind of banter!!!
 - chests
 - mimics
 - plots and plot devices
-- make the corridor/wall architecture less messy (corridor digging algo)
 - more monster emotes (textual ones) - when behaviour changes!
-- skeletons vs pierce damage!!!!
 - stealth/hearing mechanics
 - how to communicate hearing to the player (and/or smell)
 - drop weapon when hand is hit, skill modifiers, handedness, wield-hand
@@ -59,6 +63,7 @@ TODO LIST
 - detective should detect secret doors automagically
 - status / emotion markers!!!
 - do undead get shock or do they just crumble to dust?
+- keys
 - grid bug coloring (can we get gradients or something??)
 - fix levels that do not have exit
 - pickaxe cheat / mining bombs / hold down y to dig

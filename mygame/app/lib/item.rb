@@ -21,6 +21,14 @@ class Item
     yield(self) if block_given?
   end
 
+  def is_ranged?
+    false
+  end
+
+  def is_throwable?
+    false
+  end
+  
   # Smart Finder: Automatically creates the correct subclass instance based on the kind.
   # This simplified logic assumes all subclasses (Armor, Weapon, etc.) now accept (kind, args) in their initialize.
   def self.create_instance(kind, args)

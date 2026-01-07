@@ -1,3 +1,64 @@
+# Debonair Trauma System has the following main ideas: 
+# - focus on discrete wounds that tell a story, not on generic hit points
+# - traumas affect character capabilities in a realistic or at least logical fashion
+# - causes of death should be at least quasi-realistic
+# - before death, there are many levels of incapacitation (shock, unconsciousness etc.)
+# - hit location of the trauma matters a lot (concussion to head -> unconsciousness, cut to arm -> dropped weapon etc)
+# - no need to be 100% realistic, emphasis on immersion and storytelling
+# NOTES: 
+# - emotional traumas should possibly be moved to a separate system!
+# - some physical traumas can have emotional side effects (e.g. disfigurement -> depression, loss of limb -> anxiety etc)
+# - some phsyical traumas like head hits have mental effeccts (concussion -> confusion, dizziness etc)
+# - what kind of trauma is lethal? make a list
+# - how to handle bleeding?
+# - no intrisic healing over time, healing only via treatment (time scale of game is too short)
+#
+# BLUNT TRAUMA EFFECT MATRIX
+# 
+# BODY PART.              MINOR.           MODERATE.          SEVERE.            CRITICAL.
+# Head                    headache         concussion         unconsciousness    death
+# Upper torso             bruising         cracked ribs       punctured lung     death
+# Lower torso             bruising         internal bleeding  organ failure      death
+# Right Arm               pain             limited use        unusable           amputation
+# Left Arm                pain             limited use        unusable           amputation
+# Right Leg               pain             limp               cannot walk        amputation
+# Left Leg                pain             limp               cannot walk        amputation
+# 
+# CUT TRAUMA EFFECT MATRIX
+# 
+# BODY PART.              MINOR.           MODERATE.          SEVERE.            CRITICAL.
+# Head                    bleeding         bleeding           skull fracture     skull fracture
+# Upper torso             bleeding         cracked ribs       punctured lung     death
+# Lower torso             bleeding         internal bleeding  organ failure      death
+# Right Arm               bleeding         limited + bleed    unusable + bleed   amputation
+# Left Arm                bleeding         limited + bleed    unusable + bleed   amputation
+# Right Leg               bleeding         limp+bleed         cannot walk        amputation
+# Left Leg                bleeding         limp+bleed         cannot walk        amputation
+#
+# PIERCE TRAUMA EFFECT MATRIX
+# 
+# BODY PART.              MINOR.           MODERATE.          SEVERE.            CRITICAL.
+# Head                    bleeding         bleeding + pain    concussion+bleed   death
+# Upper torso             bruising         cracked ribs       punctured lung     death
+# Lower torso             bruising         internal bleeding  organ failure      death
+# Right Arm               pain             limited use        unusable           amputation
+# Left Arm                pain             limited use        unusable           amputation
+# Right Leg               pain             limp               cannot walk        amputation
+# Left Leg                pain             limp               cannot walk        amputation
+#
+# BURN TRAUMA EFFECT MATRIX
+# 
+# BODY PART.              MINOR.           MODERATE.          SEVERE.            CRITICAL.
+# Head                    headache         concussion         unconsciousness    death
+# Upper torso             bruising         cracked ribs       punctured lung     death
+# Lower torso             bruising         internal bleeding  organ failure      death
+# Right Arm               pain             limited use        unusable           amputation
+# Left Arm                pain             limited use        unusable           amputation
+# Right Leg               pain             limp               cannot walk        amputation
+# Left Leg                pain             limp               cannot walk        amputation
+#
+#
+#
 class Trauma
   attr_reader :kind, :category, :treatments, :body_part, :last_treated, :severity, :entity
   def initialize(kind, body_part, severity, entity)
@@ -46,7 +107,9 @@ class Trauma
       @severity = :moderate
     when :moderate
       @severity = :minor
-    else :minor
+    when :minor
+      @severity = :healed
+    when :cosmetic
       @severity = :healed
     end
     # check for shock recovery
@@ -62,7 +125,9 @@ class Trauma
     case @severity
     when :healed
       return 0
-    when :minor
+    when :cosmetic # just a scratch, but this can be important for magical effects, poisoning, infection etc
+      return 0
+    when :minor # more than just a scratch!
       return 1
     when :moderate
       return 2
@@ -130,7 +195,7 @@ class Trauma
       return false
     end
     shock_score = 0
-    shock_threshold = 3
+    shock_threshold = 3 # TODO: shock threshold should be character specific
     entity.traumas.each do |trauma|
       case trauma.severity
       when :minor
@@ -153,7 +218,7 @@ class Trauma
   def self.determine_morbidity(entity)
     printf "Determining morbidity for entity with %d traumas.\n" % [entity.traumas.size]
     death_score = 0
-    death_threshold = 10
+    death_threshold = 10 # TODO: death threshold should be character specific
     entity.traumas.each do |trauma|     
       case trauma.severity
       when :minor

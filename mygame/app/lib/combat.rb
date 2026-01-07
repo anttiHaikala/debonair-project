@@ -1,6 +1,16 @@
-# never instantiated
+# Debonair Combat System
+# Main ideas:
+# - emphasis on storytelling, not number crunching
+# - inspired by tabletop roleplaying, not video game RPGs
+# - discrete wounds that tell a story, not generic hit points
+# - immersion and fun, multiple strategies and outcomes in any given situation (not just "i hit the orc")
+# - which weapon do you use? in what hand? do u push, kick, tackle, disarm?
+# - discrete damage types (cut, blunt, pierce etc) that affect different body parts differently
+# Notes: 
+# - how could we easily add option to choose hit location?
+# - special moves or skills? parry, riposte, disarm, feint etc
 class Combat
-
+  # ranged attack distance modifier (what about the attacker's vision range?? TODO)
   def self.distance_modifier(attacker, defender, args)
     dx = (attacker.x - defender.x).abs
     dy = (attacker.y - defender.y).abs
@@ -16,21 +26,6 @@ class Combat
     end
   end
 
-  def self.ranged_to_hit_probability(attacker, defender, item, args)
-    dx = (attacker.x - defender.x).abs
-    dy = (attacker.y - defender.y).abs
-    distance = Math.sqrt(dx * dx + dy * dy)
-    if distance <= 3
-      return 0.8
-    elsif distance <= 6
-      return 0.6
-    elsif distance <= 10
-      return 0.4
-    else
-      return 0.2
-    end
-  end
-
   def self.resolve_hit_kind(attacker)
     # should only get the right hand weapon?
     # and ranged, thrown or melee attack should be taken to account here
@@ -40,9 +35,8 @@ class Combat
     # if now weapons, check entity's natural damage type
     attacker.natural_attack
   end
+
   
-
-
   def self.resolve_ranged_attack(attacker, item, defender, args)
     aname = attacker.name
     dname = defender.name
@@ -97,7 +91,7 @@ class Combat
     HUD.output_message args, "#{aname} shoots #{item.title(args)} at #{dname} and hits!"
     body_part = defender.random_body_part(args)
 
-    hit_kind = self.resolve_hit_kind(args)
+    hit_kind = self.resolve_hit_kind(attacker)
     hit_severity = self.hit_severity(attacker, defender, hit_kind, body_part, attack_roll, args)
     Trauma.inflict(defender, body_part, hit_kind, hit_severity, args)
     SoundFX.play_sound(:hit, args)
@@ -227,6 +221,16 @@ class Combat
     end    
   end
 
+  # Notes on determining hit severity:
+  # - strength of the attacker
+  # - mass and speed of the weapon
+  # - quality of the weapon: the part that hits (sharpness)
+  # - durability of the weapon: does it break apart from the force used? giant hitting with a stick can break the stick
+  # - damage absorption capability of the armor (with specific wound type)
+  # - any magical effects that are protecting the body part
+  # - damage tolerance of the body part (with specific wound type)
+  # - discrete effects when possible: blunt damage to limb could break a bone, while to head it might cause concussion 
+
   def self.hit_severity(attacker, defender, hit_kind, body_part, attack_roll, args)
     printf "Calculating hit severity for attack roll %d to body part %s\n" % [attack_roll, body_part.to_s.gsub('_', ' ')]
     severity_modifier = 0
@@ -272,7 +276,9 @@ class Combat
     severity_roll = args.state.rng.d20 + severity_modifier
     printf "Severity roll: %d (modifier %d)\n" % [severity_roll, severity_modifier]
     case severity_roll
-    when 1..10
+    when 1..2
+      return :cosmetic
+    when 3..10
       return :minor
     when 11..15
       return :moderate
@@ -283,6 +289,7 @@ class Combat
     end
   end
 
+  # this is the generic combat/weapon skill bonus for the character's role
   def self.role_bonus(character, args)
     if args.state.hero != character
       return 0

@@ -410,7 +410,7 @@ class Level
           else
             new_tile = :floor 
           end
-          if direction == :north && @tiles[current_y-1][current_x] == :wall || direction == :south && @tiles[current_y+1][current_x] == :wall
+          if direction == :north && @tiles[current_y+1][current_x] == :wall || direction == :south && @tiles[current_y-1][current_x] == :wall
             printf "  .. running into double wall: step back and sidestep!\n"
             if direction == :north
               current_y -= 1
@@ -437,7 +437,10 @@ class Level
           if args.state.rng.d6 > 1
             door_angle = [:east, :west].include?(direction) ? 90 : 0
             secret_roll = args.state.rng.d20
-            if secret_roll > 17
+            if @depth < 5
+              secret_roll -= 1
+            end
+            if secret_roll > 18
               kind = :secret_door
               new_tile = :wall # keep wall tile for secret door
             else
