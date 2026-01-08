@@ -478,4 +478,5 @@ class Hero < Entity
     end
     return strength    
   end
+
 end

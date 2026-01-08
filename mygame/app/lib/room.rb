@@ -13,6 +13,20 @@ class Room
     'room'
   end
 
+  def random_square_inside(args)
+    x_adjustment = args.state.rng.nxt_int(1, @w - 2)
+    y_adjustment = args.state.rng.nxt_int(1, @h - 2)
+    return [@x + x_adjustment, @y + y_adjustment]
+  end
+
+  def width
+    return @w
+  end
+
+  def height
+    return @h
+  end
+
   def center_x
     return (x + (w / 2)).to_i
   end

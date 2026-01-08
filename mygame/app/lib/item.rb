@@ -198,10 +198,7 @@ class Item
 
   def self.populate_level(level, args)
     level.rooms.each do |room|
-      x_adjustment = args.state.rng.nxt_int(-1,1)
-      y_adjustment = args.state.rng.nxt_int(-1,1)
-      item_x = room.center_x + x_adjustment
-      item_y = room.center_y + y_adjustment
+      item_x, item_y = room.random_square_inside(args)
       # only place item if tile is walkable and no other items are there
       next unless level.is_walkable?(item_x, item_y, args)
       next if level.items.any? { |item| item.x == item_x && item.y == item_y }

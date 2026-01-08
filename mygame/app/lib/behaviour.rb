@@ -251,7 +251,8 @@ class Behaviour
               if hero.x == target_x && hero.y == target_y
                 # occupied, attack!
                 hero.become_hostile_to(npc)
-                Combat.resolve_attack(npc, hero, args)
+                weapon = npc.equipped_weapon
+                Combat.resolve_attack(npc, hero, weapon, args)
                 args.state.kronos.spend_time(npc, npc.walking_speed, args)
                 return
               else

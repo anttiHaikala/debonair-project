@@ -388,4 +388,14 @@ class Entity
     return self.wielded_items.include?(item)
   end
 
+  # returns the currently equipped weapon or a default unarmed attack
+  def equipped_weapon
+    self.wielded_items.each do |item|
+      if item.category == :weapon
+        return item # right hand has priority because it is first in the list
+      end
+    end
+    return Weapon.new(:fist) # TODO: make kick and push available as well 
+  end
+
 end

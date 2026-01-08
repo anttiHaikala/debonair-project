@@ -69,12 +69,20 @@ class Weapon < Item
       meta: { ui_name: "raygun", break_treshold: 13, material: :synthetic, weight: 1.5, range: 12, ammo: :battery_pack, throwable: false, ranged: true, price: 5000, occurance: 0.01 }
     },
     wooden_shield: {
-      damage: 1, defense: 3, melee: 1, inaccuracy: 7,   hit_kind: :burn,
+      damage: 1, defense: 3, melee: 1, inaccuracy: 7,   hit_kind: :blunt,
       meta: { ui_name: "wooden shield", break_treshold: 8, material: :organic, weight: 4, range: 1, throwable: false, ranged: false, price: 10, occurance: 1.0 }
     },
     bronze_shield: {
-      damage: 1, defense: 6, melee: 1, inaccuracy: 7,   hit_kind: :burn,
+      damage: 1, defense: 6, melee: 1, inaccuracy: 7,   hit_kind: :blunt,
       meta: { ui_name: "bronze", break_treshold: 13, material: :organic, weight: 8, range: 1, throwable: false, ranged: false, price: 100, occurance: 0.1 }
+    },
+    fist: {
+      damage: 1, defense: 0, melee: 1, inaccuracy: 4,   hit_kind: :blunt,
+      meta: { ui_name: "fist", break_treshold: 100, material: :organic, weight: 0, range: 0, throwable: false, ranged: false, price: 0, occurance: 0 }
+    },
+    foot: {
+      damage: 2, defense: 0, melee: 1, inaccuracy: 5,   hit_kind: :blunt,
+      meta: { ui_name: "foot", break_treshold: 100, material: :organic, weight: 0, range: 0, throwable: false, ranged: false, price: 0, occurance: 0 }
     }
   }
 

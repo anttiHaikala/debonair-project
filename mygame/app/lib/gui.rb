@@ -501,7 +501,7 @@ class GUI
       return true
     end
     if hero.has_status?(:confused)
-      if args.state.rng.d6 <= 4
+      if args.state.rng.d6 <= 2
         # randomize direction
         directions = [[0,1],[0,-1],[-1,0],[1,0]]
         random_direction = directions.sample
@@ -574,7 +574,8 @@ class GUI
       if hero.is_hostile_to?(npc) 
         # check that the direction button was pressed, not just held
         if args.inputs.keyboard.key_down.up || args.inputs.keyboard.key_down.down || args.inputs.keyboard.key_down.left || args.inputs.keyboard.key_down.right || args.inputs.controller_one.key_down.dpad_up || args.inputs.controller_one.key_down.dpad_down || args.inputs.controller_one.key_down.dpad_left || args.inputs.controller_one.key_down.dpad_right
-          Combat.resolve_attack(hero, npc, args)
+          weapon = hero.equipped_weapon
+          Combat.resolve_attack(hero, npc, weapon, args)
           hero.apply_new_facing(Utils.direction_from_delta(dx, dy))
           self.add_input_cooldown 20
           args.state.kronos.spend_time(hero, hero.walking_speed, args) # todo fix speed depending on action
