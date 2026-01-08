@@ -33,7 +33,6 @@ NOTES ON GAME SYSTEM (the DEBONAIR!)
     - it's really hard to make the combat timescale match with exploration time scale then again the starvation and sleeping timescale
 
 TODO LIST
-- log item used to attack, and the damage type!
 - Zorkmids aka money
 - NPC behaviour architecture!
 - biome-based level generation (deprecate vibes)
@@ -72,6 +71,7 @@ TODO LIST
 - chain mail vs pierce damage? chain mail vs blunt damage?
 
 DONE LIST
+- log item used to attack, and the damage type!
 - scale the lighting items as well (they do not change size now)
 - pits & boulders
 - fix the corridor algo (inaccessible squares)

@@ -200,7 +200,7 @@ class Trap
           #draw it
           screen_x = Utils.offset_x(args) + x * tile_size
           screen_y = Utils.offset_y(args) + y * tile_size
-          args.outputs.sprites << {
+          args.outputs.primitives << {
             x: screen_x, y: screen_y, w: tile_size, h: tile_size  , 
             path: "sprites/sm16px.png",
             source_x: sprite_tile_size * 8, source_y: sprite_tile_size * 5, source_w: sprite_tile_size, source_h: sprite_tile_size
