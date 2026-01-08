@@ -286,13 +286,34 @@ class Level
     else
       foliage_types = [:puddle, :lichen]
     end
+    combo = 0
     @tiles.each_index do |y|
       @foliage[y] ||= []
       @tiles[y].each_index do |x|
         @foliage[y][x] ||= []
-        if args.state.rng.d6 >= 6
-          @foliage[y][x] = foliage_types.sample if [:floor, :water].include?(@tiles[y][x])
+        if args.state.rng.d20 + combo > 19 && args.state.rng.d6 + combo > 3
+          # make a circle and fill it with foliage
+          # determine circle radius
+          foliage_kind = foliage_types.sample
+          radius = (args.state.rng.d6 / 2).to_i
+          for fy in (y - radius)..(y + radius)
+            for fx in (x - radius)..(x + radius)
+              # check level boundaries
+              next if fy < 1 || fy >= @tiles.size - 1
+              next if fx < 1 || fx >= @tiles[0].size - 1
+              dy = fy - y
+              dx = fx - x
+              if ((dx * dx) + (dy * dy)) <= (radius * radius)
+                @foliage[fy] ||= []
+                @foliage[fy][fx] ||= []
+                @foliage[fy][fx] = foliage_kind if [:floor, :water].include?(@tiles[fy][fx])
+              end
+            end
+          end
+          combo += 1
+          break if combo >= 5
         end
+        combo = 0
       end
     end
   end
