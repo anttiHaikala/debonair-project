@@ -191,18 +191,18 @@ class Furniture
         case f.rotation
         when 90, 270
           # east-west door, check north and south
-          if level.tile_at(f.x, f.y - 1) == :wall || level.tile_at(f.x, f.y + 1) == :wall
+          if level.tile_at(f.x, f.y - 1) == :wall && level.tile_at(f.x, f.y + 1) == :wall
             supported = true
           end
         when 0, 180
           # north-south door, check east and west
-          if level.tile_at(f.x - 1, f.y) == :wall || level.tile_at(f.x + 1, f.y) == :wall
+          if level.tile_at(f.x - 1, f.y) == :wall && level.tile_at(f.x + 1, f.y) == :wall
             supported = true
           end
         end
         if !supported
           # add foliage where the door was
-          level.foliage[f.y][f.x] = :small_rocks
+          level.foliage[f.y][f.x] = :debris
           printf "Removed unsupported door at %d,%d on level %d\n", f.x, f.y, level.depth
           true
         else

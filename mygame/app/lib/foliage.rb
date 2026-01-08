@@ -5,10 +5,11 @@ class Foliage
   # note: char could be deprecated rn
   FOLIAGE_TYPES = {
     small_rocks: { color: [30, 40, 50], char: [10, 15] },
+    debris: { color: [30, 40, 50], char: [10, 15] },
     lichen: { color: [150, 100, 80], char: [9, 10] },
-    puddle: { color: [30, 100, 50], char: [14, 2] },
+    puddle: { color: [240, 100, 70], char: [14, 2] },
     moss: { color: [120, 100, 70], char: [10, 10] },
-    fungus: { color: [30, 70, 70], char: [9, 10] },
+    fungi: { color: [30, 70, 70], char: [9, 10] },
     small_plant: { color: [100, 100, 70], char: [13,14] }
   }
 
@@ -40,7 +41,7 @@ class Foliage
         angle_index = (y * 3 + x * 6) % angles.length
         alpha = 255
         if foliage_type == :puddle
-          alpha = 150
+          alpha = 200
         end
         if y * 3 % 2 == 0
           flip_vertically = true
@@ -53,6 +54,9 @@ class Foliage
           flip_horizontally = false
         end
         angle = angles[angle_index]
+        # stabilize things for now
+        angle = 0
+        flip_vertically = false
         args.outputs.primitives << {
           path: path,
           x: x * tile_size + x_offset,

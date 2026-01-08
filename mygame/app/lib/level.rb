@@ -274,13 +274,13 @@ class Level
     foliage_types = []
     case @vibe
     when :hack
-      foliage_types = [:small_rocks, :puddle]
+      foliage_types = [:small_rocks, :puddle, :fungi, :lichen, :moss]
     when :lush
-      foliage_types = [:lichen, :moss, :fungus, :small_plant, :puddle]
+      foliage_types = [:lichen, :moss, :fungi, :small_plant, :puddle]
     when :swamp
-      foliage_types = [:moss, :fungus, :small_plant]
+      foliage_types = [:moss, :fungi, :small_plant]
     when :ice
-      foliage_types = [:lichen, :moss, :fungus]
+      foliage_types = [:lichen, :moss, :fungi]
     # water
     # fiery
     else

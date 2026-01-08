@@ -38,9 +38,9 @@ class HUD
         y: y_base - 20 - index * 16,
         text: "#{trauma.severity} #{trauma.kind.to_s.gsub('_',' ')} trauma on #{trauma.body_part.to_s.gsub('_',' ')}",
         size_enum: 0,
-        r: 255,
-        g: 0,
-        b: 0,
+        r: trauma.color[:r],
+        g: trauma.color[:g],
+        b: trauma.color[:b],
         a: 255,
         font: "fonts/olivetti.ttf"
       }
@@ -161,18 +161,19 @@ class HUD
     # exhaustion bar
     exhaust_bar_width = 270
     exhaust_bar_height = 3
-    args.outputs.solids << {
+    exhaustion_width = (hero.exhaustion * exhaust_bar_width).to_i
+    args.outputs.primitives << {
       x: 960,
-      y: 643,
-      w: exhaust_bar_width,
-      h: exhaust_bar_height,
+      y: 643-1,
+      w: exhaustion_width,
+      h: exhaust_bar_height+1,
       r: 0,
       g: 0,
       b: 0,
-      a: 255
+      a: 255,
+      path: :solid
     }
-    exhaustion_width = (hero.exhaustion * exhaust_bar_width).to_i
-    args.outputs.solids << {
+    args.outputs.primitives << {
       x: 960,
       y: 643,
       w: exhaustion_width,
@@ -180,23 +181,25 @@ class HUD
       r: 255,       
       g: 220,
       b: 100,
-      a: 255
+      a: 255,
+      path: :solid
     }
     # hunger bar
     hunger_bar_width = 270
     hunger_bar_height = 3
-    args.outputs.solids << {
+    hunger_width = (hero.hunger * hunger_bar_width).to_i
+    args.outputs.primitives << {
       x: 960,
-      y: 638,
-      w: hunger_bar_width,
-      h: hunger_bar_height,
+      y: 638-1,
+      w: hunger_width,
+      h: hunger_bar_height + 1,
       r: 0,
       g: 0,
       b: 0,
-      a: 255
+      a: 255,
+      path: :solid
     }
-    hunger_width = (hero.hunger * hunger_bar_width).to_i
-    args.outputs.solids << {
+    args.outputs.primitives << {
       x: 960,
       y: 638,
       w: hunger_width,
@@ -204,7 +207,33 @@ class HUD
       r: 100,       
       g: 70,     
       b: 0,
-      a: 255
+      a: 255,
+      path: :solid
+    }
+    # trauma bar (red)
+    trauma_width = (Trauma.trauma_score(args.state.hero, args) * 20).to_i
+    trauma_bar_height = 3
+    args.outputs.primitives << {
+      x: 960,
+      y: 632-1,
+      w: trauma_width,
+      h: trauma_bar_height+1,
+      r: 0,
+      g: 0,
+      b: 0,
+      a: 255,
+      path: :solid
+    } 
+    args.outputs.primitives << {
+      x: 960,
+      y: 632,
+      w: trauma_width,
+      h: trauma_bar_height,
+      r: 255,       
+      g: 0,     
+      b: 0,
+      a: 255,
+      path: :solid
     }
   end
 

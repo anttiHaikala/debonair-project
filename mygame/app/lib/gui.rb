@@ -198,22 +198,7 @@ class GUI
       HUD.output_message args, "Debug mode #{$debug ? 'enabled' : 'disabled'}."
     end
     if $debug
-      if args.inputs.keyboard.key_down.m || args.controller_one.key_down.x
-        Tile.auto_map_whole_level(args)
-      end
-      if args.inputs.keyboard.key_down.t || args.controller_one.key_down.y
-        args.state.hero.teleport(args)
-      end
-      if args.inputs.keyboard.key_down.l || args.controller_one.key_down.r3
-        Debug.press_l(args)
-        return
-      end
-      if args.inputs.keyboard.key_down.r
-        $display_room_debug = !$display_room_debug
-      end
-      if args.inputs.keyboard.key_down.f
-        $display_los_debug = !$display_los_debug
-      end
+      self.handle_debug_input args
     end
     # inventory management can happen in parallel
     self.handle_inventory_input args
@@ -1050,6 +1035,42 @@ class GUI
     else
       args.state.scene = :game_over
     end
+  end
+
+  def self.handle_debug_input args
+      if args.inputs.keyboard.key_down.m || args.controller_one.key_down.x
+        Tile.auto_map_whole_level(args)
+      end
+      if args.inputs.keyboard.key_down.t || args.controller_one.key_down.y
+        args.state.hero.teleport(args)
+      end
+      if args.inputs.keyboard.key_down.l || args.controller_one.key_down.r3
+        Debug.press_l(args)
+        return
+      end
+      if args.inputs.keyboard.key_down.r
+        $display_room_debug = !$display_room_debug
+      end
+      if args.inputs.keyboard.key_down.f
+        $display_los_debug = !$display_los_debug
+      end
+      if args.inputs.keyboard.key_down.d
+        if args.state.hero.depth >= args.state.dungeon.max_depth - 1
+          HUD.output_message args, "You cannot go down any further."
+          return
+        end
+        Utils.move_entity_to_level(args.state.hero, args.state.hero.depth + 1, args)
+        HUD.output_message args, "Debug: Moved down one level."
+      end
+      if args.inputs.keyboard.key_down.e
+        if args.state.hero.depth <= 0
+          HUD.output_message args, "You cannot go up any further."
+          return
+        end
+        Utils.move_entity_to_level(args.state.hero, args.state.hero.depth - 1, args)
+        HUD.output_message args, "Debug: Moved up one level."     
+      end
+
   end
 
 end

@@ -2,6 +2,7 @@
 class Trap
   attr_reader :x, :y, :kind, :level
   attr_accessor :found
+  attr_accessor :knowers # entities that know about this trap. knowers know!
   def initialize(x, y, kind, level)
     @x = x
     @y = y
@@ -10,6 +11,7 @@ class Trap
     @found = false
     @target_x = nil
     @target_y = nil
+    @knowers = []
   end
 
   def self.kinds
@@ -30,12 +32,61 @@ class Trap
     end
   end
 
+  def is_known_by(entity)
+    @knowers.each do |knower|
+      if knower == entity
+        return true
+      end
+    end
+    return false
+  end
+
+  def learn(entity)
+    self.knowers << entity unless self.is_known_by(entity)
+  end
+
   def trigger entity, args
+    # base trigger chance: 80%
+    # TODO: this could also be trap-specific (some traps harder to trigger etc)
+    trigger_chance = 80
+    if args.state.rng.rand(100) >= trigger_chance
+      # trap did not trigger
+      if args.state.hero.sees?(entity, args)
+        HUD.output_message args, "#{entity.name} passes a #{@kind.to_s.gsub('_',' ')} trap but it does not trigger!"
+      end
+      return
+    end
+
+    # avoidance chance if known trap
+    if self.is_known_by(entity)
+      avoidance_chance = 50
+      if args.state.rng.rand(100) < avoidance_chance
+        # avoided the trap
+        HUD.output_message args, "#{entity.name} avoids a #{@kind.to_s.gsub('_',' ')} trap!"
+        return
+      end
+    end
+    
+    # anyone who sees the trap go off, learns about it
+    level = Utils.level_by_depth(entity.depth, args)
+    level.entities.each do |e|
+      if e.sees?(entity, args)
+        self.learn(e)
+      end
+    end
+
+    # and just to make sure, the entity itself always learns about it
+    self.learn(entity)
+
+    # if hero triggered it, add input cooldown
     if entity == args.state.hero
       GUI.add_input_cooldown(30)
     end
     printf "%s triggered a %s trap at (%d,%d)!\n" % [entity.name, @kind.to_s.gsub('_',' '), @x, @y]
-    @found = true
+
+    # hey, only say it's found if the hero sees it!
+    @found = true # deprecate the found attribute later
+
     case @kind
     when :spike
       amount_of_spikes = 1 + (args.state.rng.rand(3))
@@ -51,7 +102,6 @@ class Trap
       Status.new(entity, :poisoned, 10 + args.state.rng.d10, args)
       SoundFX.play_sound(:hero_hurt, args)
       HUD.output_message args, "#{entity.name} is poisoned by a poison dart!"
-
     when :fire
       SoundFX.play("fireball", args)
       level = Utils.level(args)
@@ -161,6 +211,8 @@ class Trap
   end
 
   def self.disarm_trap_at(hero, x, y, level, args)
+    # TODO: needed_to_disarm could depend on trap instance 
+    # TODO: some tools could help disarming traps
     trap_to_disarm = nil
     level.traps.each do |trap|
       if trap.x == x && trap.y == y

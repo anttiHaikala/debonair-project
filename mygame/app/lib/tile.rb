@@ -273,7 +273,7 @@ class Tile
     if visible
       lightness_modifier = 1.0 - (1.0 * (1.0 - lighting.clamp(0.0, 1.0)))
     else
-      lightness_modifier = 0.3
+      lightness_modifier = 0.45
     end
     color = case tile
       when :rock

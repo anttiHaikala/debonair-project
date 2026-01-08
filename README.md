@@ -49,6 +49,8 @@ Double click the ./dragonruby executable to start up the game.
 |6    | equip random potion |
 |7    | equip random ring |
 |0    | equip random weapon |
+|e    | move up one level|
+|d    | move down one level|
 
 
 ## Source code
