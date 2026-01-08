@@ -168,12 +168,24 @@ class Combat
     end
 
     # AH: how to deal with defensive attributes of the wwapon and/or parry
-    # there are now defensive value for shiled but didn't impelemnt anything yet
+    # there are now defensive value for shiled but didn't impelemnt anything yet    
     
-    # hit!
+    # hit! let's resolve hit properties
     body_part = defender.random_body_part(args)
-    hit_kind = self.resolve_hit_kind(attacker)
+    hit_kind = weapon.hit_kind
     hit_severity = self.hit_severity(attacker, defender, hit_kind, body_part, attack_roll, args)
+
+    # special processing: skeletons vs pierce damage
+    if defender.species == :skeleton && weapon.hit_kind == :pierce && body_part != :head
+      passthrough_chance = 50
+      if args.state.rng.rand(100) < passthrough_chance
+        HUD.output_message args, "#{aname}'s #{weapon.title(args)} hit passes through #{dname}'s bones without causing any damage!"
+        SoundFX.play_sound(:miss, args)
+        return # miss
+      end
+    end
+
+
     Trauma.inflict(defender, body_part, hit_kind, hit_severity, args)
     SoundFX.play_sound(:hit, args)
     verb = "#{hit_kind}s"

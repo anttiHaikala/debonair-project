@@ -99,7 +99,7 @@ class Weapon < Item
     @defense = blueprint[:defense] || 0
     @melee = blueprint[:melee] || 3
     @inaccuracy_penalty = blueprint[:inaccuracy] || 5
-    @hit_kind = blueprint[:hit_kind] || :cut
+    @hit_kind = blueprint[:hit_kind] || :blunt
     @weight  = @meta[:weight] || 0.6
     @break_threshold = @meta[:break_threshold] || 11
     super(kind, :weapon, &block)
