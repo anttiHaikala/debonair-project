@@ -1,26 +1,61 @@
 class Potion < Item
+  # --- POTION BLUEPRINT DATA ---
+  DATA = {
+    potion_of_healing: {
+      meta: { ui_name: "healing potion", weight: 0.5, price: 50, occurance: 1.0, description: "A bottle of magical liquid." }
+    },
+    potion_of_strength: {
+      meta: { ui_name: "strength potion", weight: 0.5, price: 80, occurance: 0.4, description: "A bottle of magical liquid." }
+    },
+    potion_of_speed: {
+      meta: { ui_name: "speed potion", weight: 0.5, price: 80, occurance: 0.4, description: "A bottle of magical liquid." }
+    },
+    potion_of_invisibility: {
+      meta: { ui_name: "invisibility potion", weight: 0.5, price: 120, occurance: 0.3, description: "A bottle of magical liquid." }
+    },
+    potion_of_poison: {
+      meta: { ui_name: "poison potion", weight: 0.5, price: 20, occurance: 0.5, description: "A bottle of magical liquid." }
+    },
+    potion_of_telepathy: {
+      meta: { ui_name: "telepathy potion", weight: 0.5, price: 100, occurance: 0.3, description: "A bottle of magical liquid." }
+    },
+    potion_of_extra_healing: {
+      meta: { ui_name: "extra healing potion", weight: 0.5, price: 150, occurance: 0.2, description: "A bottle of magical liquid." }
+    },
+    potion_of_teleportation: {
+      meta: { ui_name: "teleportation potion", weight: 0.5, price: 60, occurance: 0.4, description: "A bottle of magical liquid." }
+    },
+    potion_of_holy_water: {
+      meta: { ui_name: "holy water", weight: 0.5, price: 100, occurance: 0.2, description: "A bottle of magical liquid." }
+    },
+    potion_of_confusion: {
+      meta: { ui_name: "confusion potion", weight: 0.5, price: 30, occurance: 0.4, description: "A bottle of magical liquid." }
+    }
+  }
 
-  def initialize(kind,args=nil)    
+  #to do
+  # :potion_of_fire_resistance,
+  # :potion_of_cold_resistance,
+  # :potion_of_water_breathing,
+  # :potion_of_levitation,
+
+  attr_accessor :meta, :weight, :price, :occurrence, :description
+
+  def initialize(kind, args = nil)
+    blueprint = DATA[kind] || { meta: {} }
+    @meta = (blueprint[:meta] || {}).dup
+    
+    # Extract data from meta hash
+    @weight      = @meta[:weight]      || 0.5
+    @price       = @meta[:price]       || 50
+    @occurrence  = @meta[:occurance]   || 0.5
+    @description = @meta[:description] || "A mysterious potion of unknown origin."
+    
     super(kind, :potion)
   end
 
   def self.kinds
-    [
-    :potion_of_healing,
-    :potion_of_strength,
-    :potion_of_speed,
-    :potion_of_invisibility,
-    # :potion_of_fire_resistance,
-    # :potion_of_cold_resistance,
-    :potion_of_poison,
-    # :potion_of_water_breathing,
-    # :potion_of_levitation,
-    :potion_of_telepathy,
-    :potion_of_extra_healing,
-    :potion_of_teleportation,
-    :potion_of_holy_water,
-    :potion_of_confusion
-    ]
+    DATA.keys
   end
 
   def self.setup_masks(args)
@@ -32,35 +67,22 @@ class Potion < Item
   end
 
   def self.mask_pool
-    [
-      :pink,
-      :blue,
-      :yellow,
-      :brown,
-      :green,
-      :red,
-      :white,
-      :black,
-      :purple,
-      :turquoise,
-      :orange,
-      :gray
-    ]
+    [:pink, :blue, :yellow, :brown, :green, :red, :white, :black, :purple, :turquoise, :orange, :gray]
   end
 
   def title(args)
-    mask_index = Potion.kinds.index(self.kind) % Potion.masks(args).length
-    mask = Potion.masks(args)[mask_index]
+    mask_index = self.class.kinds.index(self.kind) % self.class.masks(args).length
+    mask = self.class.masks(args)[mask_index]
     if args.state.hero.known_potions.include?(self.kind)
-      "#{self.attributes.join(' ')} #{mask} potion (#{self.kind.to_s.gsub('potion_of_','')})".trim
+      "#{self.attributes.join(' ')} #{mask} potion (#{self.kind.to_s.gsub('potion_of_','')})".strip
     else
-      "#{mask} potion".trim
+      "#{mask} potion".strip
     end
   end
 
   def self.randomize(level_depth, args)
     kind = args.state.rng.choice(self.kinds)
-    return Potion.new(kind)
+    return self.new(kind, args)
   end
 
   def identify(args)
@@ -76,7 +98,6 @@ class Potion < Item
     when :potion_of_teleportation
       HUD.output_message(args, "You feel disoriented...")
       entity.teleport(args)
-      self.identify(args)
     when :potion_of_healing, :potion_of_extra_healing
       effect = 0
       Trauma.active_traumas(entity).each do |trauma|
@@ -86,7 +107,6 @@ class Potion < Item
           effect += 1
         end
         if self.kind == :potion_of_extra_healing
-          # extra healing potion heals faster
           roll = args.state.rng.d20
           if roll >= trauma.numeric_severity
             trauma.heal_one_step
@@ -130,6 +150,7 @@ class Potion < Item
       HUD.output_message(args, "You feel strange...")
       identify = false
     end
+    
     self.identify(args) if identify
     entity.carried_items.delete(self)
     args.state.kronos.spend_time(entity, entity.walking_speed, args)

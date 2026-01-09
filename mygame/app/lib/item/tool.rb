@@ -19,7 +19,7 @@ class Tool < Item
       meta: { ui_name: "trauma medkit", weight: 1.2, price: 300,  occurance: 0.2 }
     },
     wings: { durability: nil, action: :fly, is_crafted: nil,
-      meta: { ui_name: "wings", weight: 3.0, price: 500,  occurance: 0.01 }
+      meta: { ui_name: "wings", weight: 3.0, price: 500,  occurance: 0.0 }
     },
     battery_pack: { durability: nil, action: :recharge, is_crafted: nil,
       meta: { ui_name: "battery pack", weight: 3.0, price: 500, occurance: 0.5}

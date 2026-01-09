@@ -283,15 +283,16 @@ class Item
     running_total = 0.0
     selection_pool = pool.map do |kind, data|
       base_occ = data[:meta][:occurance]
-      puts base_occ
-      puts data[:meta]
-      puts 'occ'
       # Linear scaling for rarity
       adj_occ = base_occ + (1.0 - base_occ) * progress
       running_total += adj_occ
       
       # We store the "running total" as the item's threshold
-      { kind: kind, threshold: running_total }
+      if base_occ == 0.0
+        { kind: kind, threshold: -1.0 }
+      else
+        { kind: kind, threshold: running_total }
+      end
     end
 
     # 2. Roll a number based on the final running total
@@ -620,17 +621,12 @@ class Item
         loadout << {kind: Weapon.kinds.sample, attribute: :holy}
       when :cyborg
         loadout.each do |entry|
-          if Armor.kinds.include?(entry[:kind])
+          if Weapon.kinds.include?(entry[:kind])
             loadout.delete(entry)
           end
         end 
-        cyborgParts = []
-        Armor.kinds.each do |armorKind|
-          if armorKind.to_s.include?("cyborg")
-            cyborgParts << armorKind
-          end
-        end
-        loadout << {kind: cyborgParts.sample, state: :worn}
+        loadout << {kind: :cyborg_blade, state: :wielded}
+        loadout << {kind: :cyborg_blade, state: :wielded}
       when :demon
         loadout = []
         loadout << {kind: :wings}

@@ -6,19 +6,19 @@ class Food < Item
 DATA = {
     food_ration: {
       nutrition: 0.25, weight: 1.0, price: 20,
-      meta: { ui_name: "food ration", description: "A standard-issue preserved meal. Not tasty, but keeps you alive.", condition: 1.0, spoil_rate: 0.0, occurance: 1.0 }
+      meta: { ui_name: "food ration", description: "A standard-issue preserved meal. Keeps you alive.", condition: 1.0, spoil_rate: 0.0, occurance: 1.0 }
     },
     hamburger: {
       nutrition: 0.20, weight: 0.8, price: 15,
-      meta: { ui_name: "hamburger", description: "Tasty burger with sesame seed bun.", condition: 1.0, spoil_rate: 0.0, occurance: 0.3 }
+      meta: { ui_name: "hamburger", description: "Tasty burger with sesame seed bun.", condition: 1.0, spoil_rate: 0.000001, occurance: 0.3 }
     },
     dried_meat: {
       nutrition: 0.15, weight: 0.5, price: 15,
-      meta: { ui_name: "dried meat", description: "Salty and tough. It'll last forever in your pack.", condition: 1.0, spoil_rate: 0.00001, occurance: 0.8 }
+      meta: { ui_name: "dried meat", description: "Salty and tough. It'll last forever in your pack.", condition: 1.0, spoil_rate: 0.000001, occurance: 0.8 }
     },
     apple: {
       nutrition: 0.05, weight: 0.2, price: 5,
-      meta: { ui_name: "apple", description: "A crisp, red apple. Watch out for worms.", condition: 1.0, spoil_rate: 0.0001, occurance: 0.6 }
+      meta: { ui_name: "apple", description: "A crisp, red apple. Watch out for worms.", condition: 1.0, spoil_rate: 0.00001, occurance: 0.6 }
     },
     lembas: {
       nutrition: 0.50, weight: 0.1, price: 100,
@@ -26,7 +26,7 @@ DATA = {
     },
     vegetables: {
       nutrition: 0.03, weight: 0.3, price: 3,
-      meta: { ui_name: "leafy greens", description: "Surprisingly fresh-looking vegetables.", condition: 1.0, spoil_rate: 0.0002, occurance: 0.6 }
+      meta: { ui_name: "leafy greens", description: "Nice vegan food option for hungry adventurer.", condition: 1.0, spoil_rate: 0.0002, occurance: 0.6 }
     },
     canned_food: {
       nutrition: 0.20, weight: 1.5, price: 30,
@@ -38,7 +38,7 @@ DATA = {
     },
     slime_mold: {
       nutrition: 0.08, weight: 0.4, price: 10,
-      meta: { ui_name: "slime mold", description: "An exotic, pulsating growth. It tastes like... purple?", condition: 1.0, spoil_rate: 0.00005, occurance: 0.3 }
+      meta: { ui_name: "slime mold", description: "An exotic, pulsating growth. It tastes like... purple?", condition: 1.0, spoil_rate: 0.0005, occurance: 0.3 }
     },
     blood_pack: {
       nutrition: 0.08, weight: 1, price: 100,
@@ -47,6 +47,10 @@ DATA = {
     bird_food: {
       nutrition: 0.5, weight: 0.1, price: 10,
       meta: { ui_name: "bird food", description: "A small, surprisingly nutritious meal for titmouses.", condition: 1.0, spoil_rate: 0.000001, occurance: 0.3 }
+    },
+    brain: {
+    nutrition: 1, weight: 1, price: 10,
+    meta: { ui_name: "brain", description: "Gray and yummy, fills the zombie tommy.", condition: 1.0, spoil_rate: 0.0001, occurance: 0.01 }
     }
   }
 
@@ -81,18 +85,18 @@ DATA = {
     return false unless entity.is_a?(Hero)
     
     # Reduce hunger
-    entity.hunger -= @nutrition
+    entity.hunger -= @nutrition*current_condition(args)
     entity.hunger = 0.0 if entity.hunger < 0.0
 
     # Remove from inventory
     entity.carried_items.delete(self)
     
-    HUD.output_message(args, "You eat the #{self.title(args)}. It tastes #{@taste}.")
+    HUD.output_message(args, "You eat the #{self.title(args)}. It tastes #{@taste} and seems #{describe(args)}.")
     return true
   end
   
   # Dynamically calculate the condition based on elapsed ticks
-  # NOT IMPLEMENTED: call this method before consumption to get current state
+  # NOT IMPLEMENTED: poisoning from food
   def current_condition(args)
     return @condition if @spoil_rate == 0
     elapsed = args.state.tick_count - @created_at
@@ -105,11 +109,11 @@ DATA = {
     cond = current_condition(args)
     
     status = if cond > 0.8 then "fresh"
-             elsif cond > 0.4 then "that it might be eatable"
-             elsif cond > 0.1 then "better eat it before the maggots?"
-             else "having...pretty funky armonas"
+             elsif cond > 0.4 then "that it was still kind of eatable"
+             elsif cond > 0.1 then "it might have contained some extra proteins in a form of maggots!"
+             else "to have...pretty funky armonas"
              end
-    "#{desc} It seems #{status}."
+    status
   end
 
   def self.randomize(level_depth, args)

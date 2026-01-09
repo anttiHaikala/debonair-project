@@ -1,83 +1,86 @@
 class Weapon < Item
-  DATA = {
-    dagger: {
-      damage: 4, defense: 1, melee: 3, inaccuracy: 3, hit_kind: :cut,
-      meta: { ui_name: "dagger", break_treshold: 11, material: :metal, weight: 0.4, range: 1, throwable: true, ranged: false, price: 10, occurance: 1.0 }
-    },
-    razor_blade: {
-      damage: 3, defense: 0, melee: 3, inaccuracy: 3,  hit_kind: :cut,
-      meta: { ui_name: "razor blade", break_treshold: 9, material: :metal, weight: 0.1, range: 0, throwable: true, ranged: false, price: 5, occurance: 0.5 }
-    },
-    sword: {
-      damage: 8, defense: 3, melee: 4, inaccuracy: 4, hit_kind: :cut,
-      meta: { ui_name: "sword", break_treshold: 12, material: :metal, weight: 1.5, range: 0, throwable: false, ranged: false, price: 50, occurance: 0.8 }
-    },
-    katana: {
-      damage: 10, defense: 2, melee: 5, inaccuracy: 5, hit_kind: :cut,
-      meta: { ui_name: "katana", break_treshold: 12, material: :metal, weight: 1.3, range: 0, throwable: false, ranged: false, price: 200, occurance: 0.2 }
-    },
-    axe: {
-      damage: 9, defense: 1, melee: 3, inaccuracy: 3, hit_kind: :cut,
-      meta: { ui_name: "axe", break_treshold: 10, material: :metal, weight: 2.0, range: 1, throwable: true, ranged: false, price: 30, occurance: 0.7 }
-    },
-    mace: {
-      damage: 7, defense: 2, melee: 4, inaccuracy: 5, hit_kind: :blunt,
-      meta: { ui_name: "mace", break_treshold: 12, material: :metal, weight: 2.5, range: 0, throwable: false, ranged: false, price: 35, occurance: 0.7 }
-    },
-    club: {
-      damage: 6, defense: 2, melee: 3, inaccuracy: 5, hit_kind: :blunt,
-      meta: { ui_name: "club", break_treshold: 8, material: :organic, weight: 2.2, range: 0, throwable: true, ranged: false, price: 2, occurance: 1.0 }
-    },
-    spear: {
-      damage: 7, defense: 4, melee: 4, inaccuracy: 3, hit_kind: :pierce,
-      meta: { ui_name: "spear", break_treshold: 8, material: :organic, weight: 1.8, range: 2, throwable: true, ranged: false, price: 20, occurance: 0.6 }
-    },
-    staff: {
-      damage: 4, defense: 5, melee: 2, inaccuracy: 5, hit_kind: :blunt,
-      meta: { ui_name: "staff", break_treshold: 8, material: :organic, weight: 1.5, range: 0, throwable: false, ranged: false, price: 5, occurance: 0.8 }
-    },
-    whip: {
-      damage: 5, defense: 0, melee: 1, inaccuracy: 5,  hit_kind: :blunt,
-      meta: { ui_name: "whip", break_treshold: 7, material: :organic, weight: 0.8, range: 2, throwable: false, ranged: false, price: 15, occurance: 0.3 }
-    },
-    selfie_stick: {
-      damage: 2, defense: 1, melee: 1, inaccuracy: 6,  hit_kind: :blunt,
-      meta: { ui_name: "selfie stick", break_treshold: 7, material: :syntethic, weight: 0.3, range: 0, throwable: false, ranged: false, price: 50, occurance: 0.1 }
-    },
-    bow: {
-      damage: 6, defense: 0, melee: 0, inaccuracy: 2,  hit_kind: :pierce,
-      meta: { ui_name: "bow", break_treshold: 11, material: :organic, weight: 1.0, range: 10, ammo: :arrow, throwable: false, ranged: true, price: 80, occurance: 0.5 }
-    },
-    crossbow: {
-      damage: 6, defense: 0, melee: 1, inaccuracy: 1,  hit_kind: :pierce,
-      meta: { ui_name: "crossbow", break_treshold: 11, material: :organic, weight: 1.0, range: 10, ammo: :arrow, throwable: false, ranged: true, price: 80, occurance: 0.5 }
-    },
-    sling: {
-      damage: 4, defense: 0, melee: 0, inaccuracy: 3,  hit_kind: :blunt,
-      meta: { ui_name: "sling", break_treshold: 13, material: :organic, weight: 1.0, range: 10, ammo: :stone, throwable: false, ranged: true, price: 80, occurance: 0.5 }
-    },
-    shuriken: {
-      damage: 3, defense: 0, melee: 0, inaccuracy: 2,   hit_kind: :cut,
-      meta: { ui_name: "shuriken", break_treshold: 10, material: :metal, weight: 0.1, range: 5, throwable: true, ranged: true, price: 2, occurance: 0.4 }
-    },
-    revolver: {
-      damage: 15, defense: 0, melee: 0, inaccuracy: 0,  hit_kind: :pierce,
-      meta: { ui_name: "revolver", break_treshold: 12, material: :metal, weight: 1.2, range: 8, ammo: :bullet, throwable: false, ranged: true, price: 500, occurance: 0.1 }
-    },
-    raygun: {
-      damage: 25, defense: 0, melee: 0, inaccuracy: -1,   hit_kind: :burn,
-      meta: { ui_name: "raygun", break_treshold: 13, material: :synthetic, weight: 1.5, range: 12, ammo: :battery_pack, throwable: false, ranged: true, price: 5000, occurance: 0.01 }
-    },
-    wooden_shield: {
-      damage: 1, defense: 3, melee: 1, inaccuracy: 7,   hit_kind: :burn,
-      meta: { ui_name: "wooden shield", break_treshold: 8, material: :organic, weight: 4, range: 1, throwable: false, ranged: false, price: 10, occurance: 1.0 }
-    },
-    bronze_shield: {
-      damage: 1, defense: 6, melee: 1, inaccuracy: 7,   hit_kind: :burn,
-      meta: { ui_name: "bronze", break_treshold: 13, material: :organic, weight: 8, range: 1, throwable: false, ranged: false, price: 100, occurance: 0.1 }
-    }
+DATA = {
+  dagger: {
+    damage: 4, defense: 1, melee: 3, inaccuracy: 3, hit_kind: :cut,
+    meta: { ui_name: "dagger", description: "A small, sharp blade for quick strikes.", break_treshold: 11, material: :metal, weight: 0.4, range: 1, throwable: true, ranged: false, price: 10, occurance: 1.0 }
+  },
+  razor_blade: {
+    damage: 3, defense: 0, melee: 3, inaccuracy: 3, hit_kind: :cut,
+    meta: { ui_name: "razor blade", description: "Incredibly sharp, but tiny blade.", break_treshold: 9, material: :metal, weight: 0.1, range: 0, throwable: true, ranged: false, price: 5, occurance: 0.5 }
+  },
+  sword: {
+    damage: 8, defense: 3, melee: 4, inaccuracy: 4, hit_kind: :cut,
+    meta: { ui_name: "sword", description: "A versatile blade for balanced combat.", break_treshold: 12, material: :metal, weight: 1.5, range: 0, throwable: false, ranged: false, price: 50, occurance: 0.8 }
+  },
+  katana: {
+    damage: 10, defense: 2, melee: 5, inaccuracy: 5, hit_kind: :cut,
+    meta: { ui_name: "katana", description: "An well crafted, razor-sharp curved blade.", break_treshold: 12, material: :metal, weight: 1.3, range: 0, throwable: false, ranged: false, price: 200, occurance: 0.2 }
+  },
+  axe: {
+    damage: 9, defense: 1, melee: 3, inaccuracy: 3, hit_kind: :cut,
+    meta: { ui_name: "axe", description: "A heavy blade designed for chopping wood or bone.", break_treshold: 10, material: :metal, weight: 2.0, range: 1, throwable: true, ranged: false, price: 30, occurance: 0.7 }
+  },
+  mace: {
+    damage: 7, defense: 2, melee: 4, inaccuracy: 5, hit_kind: :blunt,
+    meta: { ui_name: "mace", description: "A heavy, metal-headed weapon meant for crushing armor.", break_treshold: 12, material: :metal, weight: 2.5, range: 0, throwable: false, ranged: false, price: 35, occurance: 0.7 }
+  },
+  club: {
+    damage: 6, defense: 2, melee: 3, inaccuracy: 5, hit_kind: :blunt,
+    meta: { ui_name: "club", description: "A crude, heavy wooden stick. Simple but effective.", break_treshold: 8, material: :organic, weight: 2.2, range: 0, throwable: true, ranged: false, price: 2, occurance: 1.0 }
+  },
+  spear: {
+    damage: 7, defense: 4, melee: 4, inaccuracy: 3, hit_kind: :pierce,
+    meta: { ui_name: "spear", description: "A long-reaching polearm.", break_treshold: 8, material: :organic, weight: 1.8, range: 2, throwable: true, ranged: false, price: 20, occurance: 0.6 }
+  },
+  staff: {
+    damage: 4, defense: 5, melee: 2, inaccuracy: 5, hit_kind: :blunt,
+    meta: { ui_name: "staff", description: "A sturdy wooden pole.", break_treshold: 8, material: :organic, weight: 1.5, range: 0, throwable: false, ranged: false, price: 5, occurance: 0.8 }
+  },
+  whip: {
+    damage: 5, defense: 0, melee: 1, inaccuracy: 5, hit_kind: :blunt,
+    meta: { ui_name: "whip", description: "A flexible cord that strikes with a loud crack from a distance.", break_treshold: 7, material: :organic, weight: 0.8, range: 2, throwable: false, ranged: false, price: 15, occurance: 0.3 }
+  },
+  selfie_stick: {
+    damage: 2, defense: 1, melee: 1, inaccuracy: 6, hit_kind: :blunt,
+    meta: { ui_name: "selfie stick", description: "An unlikely weapon from a more narcissistic age.", break_treshold: 7, material: :syntethic, weight: 0.3, range: 0, throwable: false, ranged: false, price: 50, occurance: 0.1 }
+  },
+  bow: {
+    damage: 6, defense: 0, melee: 0, inaccuracy: 2, hit_kind: :pierce,
+    meta: { ui_name: "bow", description: "A classic ranged weapon for firing arrows.", break_treshold: 11, material: :organic, weight: 1.0, range: 10, ammo: :arrow, throwable: false, ranged: true, price: 80, occurance: 0.5 }
+  },
+  crossbow: {
+    damage: 6, defense: 0, melee: 1, inaccuracy: 1, hit_kind: :pierce,
+    meta: { ui_name: "crossbow", description: "A mechanical bow designed for high-precision bolts.", break_treshold: 11, material: :organic, weight: 1.0, range: 10, ammo: :crossbow_bolt, throwable: false, ranged: true, price: 80, occurance: 0.5 }
+  },
+  sling: {
+    damage: 4, defense: 0, melee: 0, inaccuracy: 3, hit_kind: :blunt,
+    meta: { ui_name: "sling", description: "A simple cord used for hurling stones at high velocity.", break_treshold: 13, material: :organic, weight: 1.0, range: 10, ammo: :stone, throwable: false, ranged: true, price: 80, occurance: 0.5 }
+  },
+  shuriken: {
+    damage: 3, defense: 0, melee: 0, inaccuracy: 2, hit_kind: :cut,
+    meta: { ui_name: "shuriken", description: "Small, overrated and throwable metal stars favored by assassins.", break_treshold: 10, material: :metal, weight: 0.1, range: 5, throwable: true, ranged: true, price: 2, occurance: 0.4 }
+  },
+  revolver: {
+    damage: 15, defense: 0, melee: 0, inaccuracy: 0, hit_kind: :pierce,
+    meta: { ui_name: "revolver", description: "A classic six-shooter with significant stopping power.", break_treshold: 12, material: :metal, weight: 1.2, range: 8, ammo: :bullet, throwable: false, ranged: true, price: 500, occurance: 0.1 }
+  },
+  raygun: {
+    damage: 25, defense: 0, melee: 0, inaccuracy: -1, hit_kind: :burn,
+    meta: { ui_name: "raygun", description: "Advanced weaponry firing concentrated beams of pure energy.", break_treshold: 13, material: :synthetic, weight: 1.5, range: 12, ammo: :battery_pack, throwable: false, ranged: true, price: 5000, occurance: 0.01 }
+  },
+  wooden_shield: {
+    damage: 1, defense: 3, melee: 1, inaccuracy: 7, hit_kind: :burn,
+    meta: { ui_name: "wooden shield", description: "A simple defensive tool made of reinforced planks.", break_treshold: 8, material: :organic, weight: 4, range: 1, throwable: false, ranged: false, price: 10, occurance: 1.0 }
+  },
+  bronze_shield: {
+    damage: 1, defense: 6, melee: 1, inaccuracy: 7, hit_kind: :burn,
+    meta: { ui_name: "bronze shield", description: "A heavy, sturdy shield made of polished bronze.", break_treshold: 13, material: :organic, weight: 8, range: 1, throwable: false, ranged: false, price: 100, occurance: 0.1 }
+  },
+    cyborg_blade: {
+    damage: 8, defense: 1, melee: 4, inaccuracy: 7, hit_kind: :cut,
+    meta: { ui_name: "cybernetic hand blades", description: "Cybernetic hand blades that shoot out from forearms.", break_treshold: 13, material: :metal, weight: 4, range: 1, throwable: false, ranged: false, price: 1000, occurance: 0.0 }
   }
-
+}
   attr_accessor :damage, :defense, :melee, :inaccuracy, :hit_kind, :meta
 
   def initialize(kind, args = nil, &block) 
