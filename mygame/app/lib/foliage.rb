@@ -13,6 +13,10 @@ class Foliage
     small_plant: { color: [100, 100, 70], char: [13,14] }
   }
 
+  def title
+    self.kind.to_s.gsub('_', ' ')
+  end
+
   def self.draw args, level
     tile_size = Utils.tile_size(args)
     x_offset = Utils.offset_x(args)

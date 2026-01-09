@@ -3,18 +3,23 @@
 
 class Room
 
-  attr_accessor :x, :y, :w, :h, :traits
+  attr_accessor :x, :y, :w, :h, :traits, :name
 
   def initialize(x, y, w, h)
     @x = x
     @y = y
     @w = w
     @h = h
-    @traits = []
+    @traits = [] 
+    @name = random_name
   end
 
-  def name
-    'room'
+  def random_name
+    prefixes = ["Shadow", "Whispering", "Silent", "Dark", "Hidden", "Misty", "Ancient", "Forgotten", "Creeping", "Twisted", 'Glowing', "Minstrel's", 'Dwarven', 'Orcish', 'Elven', 'Goblin', 'Haunted', 'Crystal', 'Golden', 'Silver', 'Bronze', 'Iron', 'Copper', 'Rainbow', 'Silent', 'Noisy']
+    suffixes = ["Chamber", 'Nest', "Hall", "Room", "Sanctum", "Lair", "Den", "Vault", "Crypt", "Catacomb", 'Boudoir', 'Parlor', 'Salon', 'Study', 'Library', 'Armory', 'Barracks', 'Dormitory', 'Gallery', 'Observatory', 'Shrine', 'Temple', 'Workshop', 'Laboratory', 'Forge']
+    prefix = prefixes.sample
+    suffix = suffixes.sample
+    return "#{prefix} #{suffix}"
   end
 
   def random_square_inside(args)
@@ -42,6 +47,10 @@ class Room
 
   def height
     return @h
+  end
+
+  def center
+    return [center_x, center_y]
   end
 
   def center_x

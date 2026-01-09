@@ -42,9 +42,7 @@ class Behaviour
       # npc.behaviours << Behaviour.new(:attack, npc)
       npc.behaviours << Behaviour.new(:flee, npc)
     when :grid_bug
-      npc.behaviours << Behaviour.new(:wander, npc)
-      # npc.behaviours << Behaviour.new(:escape, npc)
-      # npc.behaviours << Behaviour.new(:forage, npc)
+      npc.setup_behaviours
     when :rat, :newt
       npc.behaviours << Behaviour.new(:wander, npc)
       # npc.behaviours << Behaviour.new(:forage, npc)

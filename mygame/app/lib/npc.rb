@@ -16,6 +16,7 @@ class NPC < Entity
     super(x, y)
     initialize_needs
     @behaviours = []
+    @behavior = nil # the currently active behaviour
     Behaviour.setup_for_npc(self)
     self.setup_traits
   end

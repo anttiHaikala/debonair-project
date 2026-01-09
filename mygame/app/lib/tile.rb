@@ -1,6 +1,6 @@
 class Tile
 
-  attr_accessor :type, :hue, :mossiness
+  attr_accessor :type, :hue
 
   @@tile_memory_per_level = []
   @@tile_visibility_per_level = []
@@ -39,6 +39,11 @@ class Tile
 
   def self.is_walkable_type?(tile_type, args)
     return [:floor, :staircase_up, :staircase_down, :water, :ice, :open_door].include?(tile_type)
+  end
+
+  def self.is_walkable_type_for_entity?(entity, tile_type, args)
+    # TODO: consider entity abilities here (eg. can fly, can swim, can levitate, survives lava etc.
+    return self.is_walkable_type?(tile_type, args)
   end
 
   def self.occupied?(x, y, args)

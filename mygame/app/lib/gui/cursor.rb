@@ -137,6 +137,10 @@ class GUI
         description << trap.title(args)
       end
     end
+    # describe foliage
+    if level.foliage[y][x]
+      description << level.foliage[y][x]
+    end
     # describe lights
     level.lights.each do |light|
       if light.x == x && light.y == y

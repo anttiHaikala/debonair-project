@@ -269,6 +269,13 @@ class Level
     return false
   end
 
+  def considered_path_for_entity?(entity, x, y, args)
+    tile = tile_at(x, y)
+    return false if tile.nil?
+    return true if Tile.is_walkable_type_for_entity?(entity, tile, args)
+    return false
+  end
+
   def add_foliage(args)
     # add some foliage to the level based on vibe
     foliage_types = []
@@ -290,7 +297,7 @@ class Level
     @tiles.each_index do |y|
       @foliage[y] ||= []
       @tiles[y].each_index do |x|
-        @foliage[y][x] ||= []
+        @foliage[y][x] ||= nil
         if args.state.rng.d20 + combo > 19 && args.state.rng.d6 + combo > 3
           # make a circle and fill it with foliage
           # determine circle radius
@@ -305,7 +312,7 @@ class Level
               dx = fx - x
               if ((dx * dx) + (dy * dy)) <= (radius * radius)
                 @foliage[fy] ||= []
-                @foliage[fy][fx] ||= []
+                @foliage[fy][fx] ||= nil
                 @foliage[fy][fx] = foliage_kind if [:floor, :water].include?(@tiles[fy][fx])
               end
             end

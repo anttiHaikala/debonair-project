@@ -52,6 +52,8 @@ SPECIAL ROOM LIST
 - ancient dwarf outpost - either abandoned or occupied (dwarves or others)
 
 TODO LIST
+- item that gives hints about the closeness of staircase down (use dijkstra)
+- make level 0 be the dungeon entrance (out of doors)
 - the bigger trauma inflicted to player, bigger cooldown and also visual effect!
 - Zorkmids aka money
 - going unconscious (from hunger and head trauma)

@@ -223,31 +223,45 @@ module Utils
     return points
   end
 
-  def self.dijkstra(start_x, start_y, end_x, end_y, level)
+  def self.dijkstra(entity, start_x, start_y, end_x, end_y, level, args)
+    printf "Calculating Dijkstra path from (%d,%d) to (%d,%d) on level depth %d\n", start_x, start_y, end_x, end_y, level.depth
     # simple Dijkstra implementation for pathfinding
-    visited = {}
     distances = {}
     previous = {}
     queue = []    
+    start_is_walkable = level.considered_path_for_entity?(entity, start_x, start_y, args)
+    end_is_walkable = level.considered_path_for_entity?(entity, end_x, end_y, args)
+    printf "Start is walkable: %s, end is walkable: %s\n", start_is_walkable, end_is_walkable
     for y in 0...level.height
       for x in 0...level.width
-        distances["#{x},#{y}"] = Float::INFINITY
-        previous["#{x},#{y}"] = nil
-        queue << {:x => x, :y => y}
+        if level.considered_path_for_entity?(entity, x, y, args)
+          distances["#{x},#{y}"] = Float::INFINITY
+          previous["#{x},#{y}"] = nil
+          queue << {:x => x, :y => y}
+        end
       end
     end
+    # we start from this tile:
     distances["#{start_x},#{start_y}"] = 0
+    printf "Dijkstra: starting main loop with queue size %d\n", queue.size
+    printf distances.inspect + "\n"
     while queue.size > 0 do
       # get node in queue with smallest distance
       current = nil
       current_distance = Float::INFINITY
       queue.each do |node|
         dist = distances["#{node[:x]},#{node[:y]}"]
+        printf "Checking node (%d,%d) with distance %f\n", node[:x], node[:y], dist
         if dist < current_distance
           current_distance = dist
           current = node
         end
       end
+      if current.nil?
+        printf "ANOMALITY: Dijkstra: current node is nil, breaking out of loop! no path to target exists\n"
+        return []
+      end
+      printf "Dijkstra: current node is (%d,%d) with distance %f\n", current[:x], current[:y], current_distance
       if current[:x] == end_x && current[:y] == end_y
         break
       end
@@ -259,7 +273,7 @@ module Utils
         {:x => current[:x], :y => current[:y] - 1}
       ]
       neighbors.each do |neighbor|
-        next unless level.is_walkable?(neighbor[:x], neighbor[:y], args)
+        next unless level.considered_path_for_entity?(entity, neighbor[:x], neighbor[:y], args)
         alt = distances["#{current[:x]},#{current[:y]}"] + 1
         if alt < distances["#{neighbor[:x]},#{neighbor[:y]}"]
           distances["#{neighbor[:x]},#{neighbor[:y]}"] = alt

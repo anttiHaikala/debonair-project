@@ -253,13 +253,12 @@ class Item
           item.x = item_x
           item.y = item_y
           level.items << item
-        # when 20
-        else
+        when 20
           # rare loot room
           printf "Generating loot room at depth %d\n" % [level.depth]
           room.traits << :loot
           loot_classes = [Weapon, Armor, Ring, Wand, Scroll, Potion, Valuable]
-          die_roll = args.state.rng.d6
+          die_roll = args.state.rng.d8
           loot_amount = die_roll + 3
           loot_amount.times do
             item_klass = loot_classes.sample
