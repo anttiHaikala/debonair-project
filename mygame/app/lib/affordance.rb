@@ -1,5 +1,12 @@
-# these are actions that can be performed on tiles or objects 
-# usually these actions are accessed via the "look mode"
+# these are actions that can be performed on tiles or objects, available through cursor interaction
+# 
+# this is a very key class, any new interactions are generally added here first
+# 
+# this game offers a VERY wide variety of actions that can be performed, so this class
+# is very central to the gameplay experience
+# 
+# TODO: should we start subclassing all this stuff? Like ShootAffordance, OpenDoorAffordance, etc?
+# that might make the code cleaner, or messier, depending on who you ask.
 class Affordance
   attr_reader :level, :x, :y, :kind, :target_entity, :item
 

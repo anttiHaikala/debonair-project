@@ -39,19 +39,25 @@ Double click the ./dragonruby executable to start up the game.
 |Input          | Function |
 |:----------------|:-------------------------------------------------------------------------------|
 |ESC  | toggle debug mode |
+|D    | move down one level|
+|E    | move up one level|
 |F   | toggle field of vision and lighting layer|
 |R   | toggle map generation layer|
-|1             | change hero species |
-|2     | change hero role |
+|1   | change hero species |
+|2    | change hero role |
 |3    | change hero trait |
 |4    | equip random scroll |
 |5    | equip random want |
 |6    | equip random potion |
 |7    | equip random ring |
 |0    | equip random weapon |
-|e    | move up one level|
-|d    | move down one level|
 
+### Glossary
+
+| Term   | Explanation |
+| depth | measure of depth in the dungeon (as levels) |
+| level | a floor of the dungeon, bigger number means deeper in the dungeon |
+| tile   | one square location on the map |
 
 ## Source code
 

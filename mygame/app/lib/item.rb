@@ -1,6 +1,8 @@
 class Item
+
   attr_accessor :kind, :category, :cursed, :identified, :depth, :x, :y, :hit_kind, :meta, :inaccuracy_penalty
   attr_reader :attributes, :weight, :traits
+
   def initialize(kind, category, identified = false)
     @kind = kind
     @category = category
@@ -53,7 +55,6 @@ class Item
   def self.rare_attributes;[];end
   def apply_attribute_modifiers(attribute, args);nil;end
   def identify(args);nil;end
-  
 
   # AH: 27.12.2025 notes:
   # footwear and helmet, gloves etc should be included in armor? Or is it for sprite sheet purposes only?
@@ -252,25 +253,38 @@ class Item
           item.x = item_x
           item.y = item_y
           level.items << item
-        when 9
-            item = self.randomize(level.depth, Tool, args)
+        # when 20
+        else
+          # rare loot room
+          printf "Generating loot room at depth %d\n" % [level.depth]
+          room.traits << :loot
+          loot_classes = [Weapon, Armor, Ring, Wand, Scroll, Potion, Valuable]
+          die_roll = args.state.rng.d6
+          loot_amount = die_roll + 3
+          loot_amount.times do
+            item_klass = loot_classes.sample
+            item = item_klass.randomize(level.depth, args)
             item.depth = level.depth
-            item.x = item_x
-            item.y = item_y
-            level.items << item
-        when 10
-            item = self.randomize(level.depth, Armor, args)
-            item.depth = level.depth
-            item.x = item_x
-            item.y = item_y
-            level.items << item
-      end
+            item.x, item.y = room.random_square_inside(args)
+            level.items << item   
+          end
+          trap_roll = args.state.rng.d6
+          traps = trap_roll / 2
+          traps += level.depth / 3
+          trapps = traps.to_i
+          trapps.times do
+            trap_x, trap_y = room.random_square_inside(args)
+            kind = Trap.kinds.sample
+            trap = Trap.new(trap_x, trap_y, kind, level)
+            level.traps << trap
+          end
+        end
     end
   end
 
   # --- MAIN RANDOMIZATION LOGIC ---
 
-  def self.randomize(level_depth, klass, args)
+  def self.randomize(level_depth, klass=Item, args)
     pool = klass.data
     max_depth = args.state.max_depth || 10
     progress = [(level_depth - 1.0) / ([max_depth - 1.0, 1.0].max), 1.0].min
@@ -297,7 +311,7 @@ class Item
 
     # 4. Create the item
     puts "Generated item: #{kind} at level #{level_depth}" 
-    item = klass.new(kind,args)
+    item = klass.new(kind, args)
     
     # 5. Roll for Attributes
     common_roll = args.state.rng.d6

@@ -143,11 +143,11 @@ class Armor < Item
     },
     cyborg_leg_right: {
       coverage: { right_leg: 4 },
-      meta: { ui_name: "cyborg leg (R)", armor_type: :cyborg_part, material: :syntethic, weight: 19.0, occurance: 0.01, price: 3000, can_eat: true, vision: 0 }
+      meta: { ui_name: "cyborg leg (R)", armor_type: :cyborg_part, material: :syntethic, weight: 19.0, occurance: 0.01, price: 3000, can_eat: false, vision: 0 }
     },
     cyborg_torso: {
       coverage: { upper_torso: 4, lower_torso: 4 },
-      meta: { ui_name: "cyborg torso", armor_type: :cyborg_part, material: :syntethic, weight: 30.0, occurance: 0.01, price: 5000, can_eat: true, vision: 0 }
+      meta: { ui_name: "cyborg torso", armor_type: :cyborg_part, material: :syntethic, weight: 30.0, occurance: 0.01, price: 5000, can_eat: false, vision: 0 }
     },
     test_unique_item: {
       coverage: { upper_torso: 100, lower_torso: 100 },

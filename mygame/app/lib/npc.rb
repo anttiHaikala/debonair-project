@@ -135,7 +135,7 @@ class NPC < Entity
         end
       when 2
         if level.depth < 4
-          npc = NPC.new(:grid_bug, room.center_x, room.center_y, level.depth)
+          npc = GridBug.new(room.center_x, room.center_y, level.depth)
           level.entities << npc
         elsif level.depth < 8
           npc = NPC.new(:skeleton, room.center_x, room.center_y, level.depth)

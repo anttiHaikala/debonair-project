@@ -1,3 +1,4 @@
+# this file contains code related to the look mode cursor and inspector functionality
 class GUI
 
   @@inspector_active = false

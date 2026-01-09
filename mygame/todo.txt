@@ -1,5 +1,8 @@
 PHILOSOPHY
 - make a game that 14 year old me would love
+- stories over numbers
+- grim, horrible stories and destinies
+- always keep a lighthearted "good air" twinkle in the eye, like a charming old storyteller
 
 IDEAS
 - sokoban level https://nethackwiki.com/wiki/Sokoban
@@ -18,6 +21,7 @@ IDEAS
 - wetting items and heroes: https://nethackwiki.com/wiki/Wet
 - crypts: https://nethackwiki.com/wiki/Graveyard
 - acid blobs: https://nethackwiki.com/wiki/Acid_blob
+- giant spider + spider webs
 
 TTRPG LEGACY INSPO
 - Tomb Of Horrors (original D&D book)
@@ -32,14 +36,34 @@ NOTES ON GAME SYSTEM (the DEBONAIR!)
 - how many seconds is the time unit? (maybe 10?) should we assume the 10 second unit?
     - it's really hard to make the combat timescale match with exploration time scale then again the starvation and sleeping timescale
 
+SPECIAL ROOM LIST
+- megatrap (the whole room is a big trap)
+- mana room (big ball of magical energy inside)
+- inventor welho's workshop (welho could be there or already gone / killed - did imps kill her?)
+- chaos cesspit (pool of mutation inducing warp porridge)
+- krypta
+- shopkeeper's shop
+- Hackbucks (franchise store)
+- throne room
+- goblin lair (aka brigand's lair)
+- garden 
+- dragon's nest
+- leprechaun's cottage
+- ancient dwarf outpost - either abandoned or occupied (dwarves or others)
+
 TODO LIST
+- the bigger trauma inflicted to player, bigger cooldown and also visual effect!
 - Zorkmids aka money
+- going unconscious (from hunger and head trauma)
+- sleeping
+- sleep deprivation
 - NPC behaviour architecture!
 - biome-based level generation (deprecate vibes)
 - skeletons vs pierce damage!!!!
+- grid bugs can pass through secret doors and thus hint at them
 - come up with a measure of kinetic force (speed * weight) -> utilize when resolving piercing/slicing/blunt force
 - make the corridor/wall architecture less messy (corridor digging algo)
-- Rats shadow player
+- rats shadow player
 - onsens & geysirs. water temperature!
 - raccoon steals drinks
 - rats steal food

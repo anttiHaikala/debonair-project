@@ -1,12 +1,16 @@
+# even though final levels consist of tiles, room objects are used during level generation
+# and can remain available during the game in case they are needed
+
 class Room
 
-  attr_accessor :x, :y, :w, :h
+  attr_accessor :x, :y, :w, :h, :traits
 
   def initialize(x, y, w, h)
     @x = x
     @y = y
     @w = w
     @h = h
+    @traits = []
   end
 
   def name
@@ -17,6 +21,19 @@ class Room
     x_adjustment = args.state.rng.nxt_int(1, @w - 2)
     y_adjustment = args.state.rng.nxt_int(1, @h - 2)
     return [@x + x_adjustment, @y + y_adjustment]
+  end
+
+  def empty_square(args)
+    max_attempts = 100
+    attempts = 0
+    while attempts < max_attempts
+      candidate_x, candidate_y = random_square_inside(args)
+      if args.state.map.is_empty_at?(candidate_x, candidate_y)
+        return [candidate_x, candidate_y]
+      end
+      attempts += 1
+    end
+    return nil
   end
 
   def width
@@ -40,6 +57,7 @@ class Room
              @y + @h < other.y || other.y + other.h < @y)
   end
 
+  # used for debugging purposes only
   def color
     hue_seed = @x * 37 + @y * 57 + @w * 23 + @h * 43 # random for each room
     hue = hue_seed % 360
@@ -48,7 +66,6 @@ class Room
     rgb = Color.hsl_to_rgb(hue, saturation, lightness)
     return rgb
   end
-
 end
 
 class Corridor
@@ -70,6 +87,7 @@ class Corridor
     return "#{prefix} #{suffix}"
   end
 
+  # used for debugging purposes only
   def color
     hue_seed = @x1 * 37 + @y1 * 57 + @x2 * 23 + @y2 * 43 # random for each room
     hue = hue_seed % 360
