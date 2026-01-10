@@ -32,6 +32,10 @@ class Behaviour
     @target = nil           # object of the behaviour
   end
 
+  def title
+    @kind.to_s.capitalize
+  end
+
   def self.setup_for_npc(npc)
     species = npc.species
     case species

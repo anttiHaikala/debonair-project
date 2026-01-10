@@ -3,6 +3,7 @@ PHILOSOPHY
 - stories over numbers
 - grim, horrible stories and destinies
 - always keep a lighthearted "good air" twinkle in the eye, like a charming old storyteller
+- monster interactions based on their motives and internal states, not number crunching
 
 IDEAS
 - sokoban level https://nethackwiki.com/wiki/Sokoban

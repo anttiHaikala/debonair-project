@@ -2,7 +2,7 @@ class NPC < Entity
 
   include Needy
 
-  attr_accessor :char, :species, :has_been_seen, :depth, :status, :behaviours, :carried_items
+  attr_accessor :char, :species, :has_been_seen, :depth, :status, :behaviours, :carried_items, :behaviour
 
   def initialize(species, x = 0, y = 0, depth = 0)
     @kind = :npc
@@ -16,7 +16,7 @@ class NPC < Entity
     super(x, y)
     initialize_needs
     @behaviours = []
-    @behavior = nil # the currently active behaviour
+    @behaviour = nil # the currently active behaviour
     Behaviour.setup_for_npc(self)
     self.setup_traits
   end
@@ -200,6 +200,7 @@ class NPC < Entity
     return statuzed_speed
   end
 
+  # THIS IS A KEY METHOD! NPC TAKES ITS TURN HERE
   def take_action args
     behaviour = Behaviour.select_for_npc(self, args)
     printf "NPC #{@species} at (#{@x}, #{@y}) taking action #{behaviour.kind} at time %.2f\n", args.state.kronos.world_time

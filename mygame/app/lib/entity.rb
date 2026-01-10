@@ -398,4 +398,34 @@ class Entity
     return Weapon.new(:fist) # TODO: make kick and push available as well 
   end
 
+  def move(direction, args)
+    level = Utils.level_by_depth(@depth, args)
+    new_x = @x
+    new_y = @y
+    case direction
+    when :north
+      new_y += 1
+    when :south
+      new_y -= 1
+    when :west
+      new_x -= 1
+    when :east
+      new_x += 1
+    else
+      printf "ERROR: Unknown move direction: %s\n" % direction.to_s
+      return
+    end
+    if level.is_walkable?(new_x, new_y, args)
+      @x = new_x
+      @y = new_y
+      @facing = direction
+      SoundFX.play_sound(:walk, args)
+      GUI.mark_tiles_stale
+      Tile.observe_tiles args
+      Lighting.mark_lighting_stale
+      HUD.mark_minimap_stale
+      Lighting.calculate_lighting(level, args)
+    end
+  end
+
 end

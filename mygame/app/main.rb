@@ -82,6 +82,7 @@ def boot args
   if $enable_music
     Music.setup(args)
   end
+  GTK.hide_cursor
 end
 
 def reset args

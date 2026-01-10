@@ -1008,7 +1008,7 @@ class GUI
         y: y_offset + (entity.y + 0.7) * tile_size,
         w: tile_size,
         h: tile_size,
-        text: "#{entity.last_behaviour} #{entity.facing}",
+        text: "#{entity.name} #{entity.behaviour && entity.behaviour.title} #{entity.facing}",
         size_enum: 0,
         r: 255,
         g: 200,

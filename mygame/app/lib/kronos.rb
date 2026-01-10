@@ -61,13 +61,13 @@ class Kronos
     relevant_entities += args.state.dungeon.levels[args.state.hero.depth].entities
 
     min_busy_until = nil
-    idle_entity = nil
+    entity_whose_turn_it_is_now = nil # THE IMPORTANT ENTITY!
     relevant_entities.each do |entity|
       min_busy_until ||= entity.busy_until || 0
       this_busy_until = entity.busy_until || 0
       if this_busy_until <= min_busy_until 
         min_busy_until = this_busy_until
-        idle_entity = entity
+        entity_whose_turn_it_is_now = entity
       end
     end
     # THE MIGHTY PASSAGE OF TIME
@@ -79,7 +79,7 @@ class Kronos
     if self.should_level_effects_be_applied?
       self.apply_effects args
     end
-    idle_entity.take_action args
+    entity_whose_turn_it_is_now.take_action args
     HUD.mark_minimap_stale
   end
 
