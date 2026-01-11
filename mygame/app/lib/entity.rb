@@ -399,6 +399,7 @@ class Entity
   end
 
   def move(direction, args)
+    printf "Entity #{@name} (#{@species}) at (#{@x}, #{@y}) moving #{direction}\n"
     level = Utils.level_by_depth(@depth, args)
     new_x = @x
     new_y = @y
@@ -415,7 +416,7 @@ class Entity
       printf "ERROR: Unknown move direction: %s\n" % direction.to_s
       return
     end
-    if level.is_walkable?(new_x, new_y, args)
+    if level.is_walkable_for_entity?(self, new_x, new_y, args)
       @x = new_x
       @y = new_y
       @facing = direction

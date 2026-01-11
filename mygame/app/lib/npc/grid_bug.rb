@@ -30,11 +30,12 @@
 
 class GridBug < NPC
 
-  attr_accessor :behaviour
+  attr_accessor :behaviour, :social_battery, :energy_level, :name
 
   def initialize(x, y, depth)
     super(:grid_bug, x, y, depth)
     @energy_level = 0.5 # range 0.0 to 1.0
+    @social_battery = 0.5 # range 0.0 to 1.0
     @path = nil
     @name = ["John", "Ziggy", "Bugsy", "Glimmer", "Spark", "Peter", 'Julie', 'Sarah'].sample 
   end
@@ -45,11 +46,9 @@ class GridBug < NPC
     @behaviours << ZigZag.new(self)
   end
 
-  # key method!
+  # key method! TODO: move to Entity
   def take_action args
     printf "GridBug %s at (%d,%d) taking action at timestamp %.2f\n", @name, @x, @y, args.state.kronos.world_time
-    # debug behaviour item
-    printf behaviour.inspect + "\n"
     # if no current behaviour, choose one
     if @behaviour.nil?
       self.choose_behaviour args
@@ -60,6 +59,7 @@ class GridBug < NPC
     end
   end
   
+  # TODO: move to Entity
   def set_current_behaviour behaviour, args
     printf "GridBug %s at (%d,%d) switching to behaviour %s\n", @name, @x, @y, behaviour && behaviour.title
     # end current behaviour if any
@@ -70,13 +70,16 @@ class GridBug < NPC
     @behaviour.start args if @behaviour
   end
 
+  # KEY METHOD! this belongs here, as every npc chooses it's behaviour differently
   def choose_behaviour args
     level = Utils.level_by_depth(@depth, args)
     # if close to another grid bug, do zig-zag dance
     nearby_bugs = Utils.entities_within_radius(@x, @y, 3, level).select { |e| e.is_a?(GridBug) && e != self }
     if nearby_bugs.any?
-      set_current_behaviour(ZigZag.new(self), args)
-      return
+      if self.social_battery > 0.4
+        set_current_behaviour(ZigZag.new(self), args)
+        return
+      end
     end
     # otherwise, go to a random room
     set_current_behaviour(ReachRoom.new(self), args)
@@ -97,15 +100,19 @@ class Chill < Behaviour
 
   def finish args
     # do nothing special on finish
-    @npc.set_current_behaviour(nil, args)
   end
 
   def execute(args)
     if @chill_amount >= @chill_max
       # finished chilling
-      self.finish args
+      args.state.kronos.spend_time(@npc, @npc.walking_speed, args)
+      @npc.set_current_behaviour(nil, args)
     else 
     # do nothing for a while
+      @npc.social_battery += 0.03
+      if @npc.social_battery > 1.0
+        @npc.social_battery = 1.0
+      end
       args.state.kronos.spend_time(@npc, @npc.walking_speed, args)
       @chill_amount += 1
     end
@@ -133,12 +140,13 @@ class ReachRoom < Behaviour
     @target_room = rooms.sample
     printf "GridBug %s at (%d,%d) starting ReachRoom behaviour to room %s at (%d,%d)\n", @npc.name, @npc.x, @npc.y, @target_room.name, @target_room.center[0], @target_room.center[1]
     # set destination to center of the room
-    @destination = @target_room.center[0], @target_room.center[1], @npc.depth
     target_x, target_y = @target_room.center
+    @destination = [target_x, target_y, @npc.depth]
     @path = Utils.dijkstra(@npc, @npc.x, @npc.y, target_x, target_y, level, args)
   end
 
   def finish args
+    printf "GridBug %s at (%d,%d) finishing ReachRoom behaviour\n", @npc.name, @npc.x, @npc.y
     @target_room = nil
     @path = nil
   end
@@ -178,6 +186,7 @@ class ReachRoom < Behaviour
     printf next_step.inspect + "\n"
     dx = next_step[:x] - @npc.x
     dy = next_step[:y] - @npc.y
+    printf "DX: %d, DY: %d\n", dx, dy    
     if dx.abs > dy.abs
       if dx > 0
         @npc.move(:east, args)
@@ -185,19 +194,26 @@ class ReachRoom < Behaviour
         @npc.move(:west, args)
       end
     else
-      if dy > 0
+      if dy < 0 
         @npc.move(:south, args)
       else
         @npc.move(:north, args)
       end
     end
-    # @npc.x = next_step[0]
-    # @npc.y = next_step[1] 
-    # if reached target room, finish behaviour
-    
-    
+    # recharge social battery
+    nearby_bugs = Utils.entities_within_radius(@npc.x, @npc.y, 3, level).select { |e| e.is_a?(GridBug) && e != @npc }
+    if !nearby_bugs.any?
+      @npc.social_battery += 0.01
+      if @npc.social_battery > 1.0
+        @npc.social_battery = 1.0
+      end
+    end
+    # spend time - important!!!
     args.state.kronos.spend_time(@npc, @npc.walking_speed, args)
-    
+    # if reached target room, finish behaviour
+    if @npc.x == target_x && @npc.y == target_y
+      @npc.set_current_behaviour(Chill.new(@npc), args)
+    end
   end
 end
 # zig-zag goes east-north-east-north
@@ -211,6 +227,9 @@ end
 class ZigZag < Behaviour
   def initialize(npc)
     super(:zig_zag, npc)
+    @steps = [:east, :north, :east, :north, :west, :south, :west, :south]
+    @current_step = 0
+    @repetitions = 0
   end
 
   def title
@@ -218,14 +237,28 @@ class ZigZag < Behaviour
   end
 
   def execute(args)
-    # move in zig-zag pattern
-    # placeholder logic
-    if args.state.rng.d2 == 1
-      #@npc.move(:up, args)
-    else
-      #@npc.move(:down, args)
+    if @npc.social_battery < 0.2
+      # too tired to dance
+      args.state.kronos.spend_time(@npc, @npc.walking_speed, args)
+      @npc.set_current_behaviour(nil, args)
+      return
     end
-    #ehav@npc.move(:right, args)
+    if @repetitions >= 3
+      # finished dancing
+      args.state.kronos.spend_time(@npc, @npc.walking_speed, args)
+      @npc.set_current_behaviour(nil, args)
+      return
+    end
+    # perform next step
+    direction = @steps[@current_step]
+    @npc.move(direction, args)
+    @current_step += 1
+    if @current_step >= @steps.length
+      @current_step = 0
+      @repetitions += 1
+      @npc.social_battery -= 0.03
+    end
+    # spend time for the step
     args.state.kronos.spend_time(@npc, @npc.walking_speed, args)
   end
 end

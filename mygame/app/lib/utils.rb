@@ -240,13 +240,13 @@ module Utils
     # simple Dijkstra implementation for pathfinding
     distances = {}
     previous = {}
-    queue = []    
-    start_is_walkable = level.considered_path_for_entity?(entity, start_x, start_y, args)
-    end_is_walkable = level.considered_path_for_entity?(entity, end_x, end_y, args)
+    queue = []
+    start_is_walkable = level.is_walkable_for_entity?(entity, start_x, start_y, args)
+    end_is_walkable = level.is_walkable_for_entity?(entity, end_x, end_y, args)
     printf "Start is walkable: %s, end is walkable: %s\n", start_is_walkable, end_is_walkable
     for y in 0...level.height
       for x in 0...level.width
-        if level.considered_path_for_entity?(entity, x, y, args)
+        if level.is_walkable_for_entity?(entity, x, y, args)
           distances["#{x},#{y}"] = Float::INFINITY
           previous["#{x},#{y}"] = nil
           queue << {:x => x, :y => y}
@@ -284,7 +284,7 @@ module Utils
         {:x => current[:x], :y => current[:y] - 1}
       ]
       neighbors.each do |neighbor|
-        next unless level.considered_path_for_entity?(entity, neighbor[:x], neighbor[:y], args)
+        next unless level.is_walkable_for_entity?(entity, neighbor[:x], neighbor[:y], args)
         alt = distances["#{current[:x]},#{current[:y]}"] + 1 # TODO: instead of 1 use the terrain movement cost
         if alt < distances["#{neighbor[:x]},#{neighbor[:y]}"]
           distances["#{neighbor[:x]},#{neighbor[:y]}"] = alt

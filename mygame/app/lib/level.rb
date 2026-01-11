@@ -269,8 +269,10 @@ class Level
     return false
   end
 
-  def considered_path_for_entity?(entity, x, y, args)
+  def is_walkable_for_entity?(entity, x, y, args)
     tile = tile_at(x, y)
+    furniture = Furniture.furniture_at(x, y, self, args)
+    return false if furniture && furniture.blocks_movement_for_entity?(entity, args)
     return false if tile.nil?
     return true if Tile.is_walkable_type_for_entity?(entity, tile, args)
     return false

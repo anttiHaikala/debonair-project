@@ -438,4 +438,12 @@ class Behaviour
     args.state.kronos.spend_time(npc, npc.walking_speed, args)
   end
  
+  def start args
+    # do nothing special on start
+  end
+
+  def finish args
+    # do nothing special on finish
+  end
+
 end

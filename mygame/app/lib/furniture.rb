@@ -110,6 +110,21 @@ class Furniture
     return true
   end
 
+  def blocks_movement_for_entity?(entity, args)
+    case self.kind
+    when :pit
+      return false
+    when :door, :secret_door, :boulder
+      if self.openness > 0.0
+        return false
+      end
+      if entity.species == :grid_bug
+        return false
+      end
+    end
+    return true
+  end
+
   def self.blocks_movement?(x, y, level, args)
     furniture = Furniture.furniture_at(x, y, level, args)
     if furniture && furniture.blocks_movement?(args) 
