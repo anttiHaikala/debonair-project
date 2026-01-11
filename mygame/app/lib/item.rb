@@ -213,7 +213,7 @@ class Item
           item.y = item_y
           level.items << item
         when 2
-          item = Potion.randomize(level.depth, args)
+          item = self.randomize(level.depth, Potion, args)
           item.depth = level.depth
           item.x = item_x
           item.y = item_y

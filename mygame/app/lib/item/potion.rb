@@ -1,34 +1,34 @@
 class Potion < Item
   # --- POTION BLUEPRINT DATA ---
   DATA = {
-    potion_of_healing: {
+    potion_of_healing: { base_duration: 0,
       meta: { ui_name: "healing potion", weight: 0.5, price: 50, occurance: 1.0, description: "A bottle of magical liquid." }
     },
-    potion_of_strength: {
+    potion_of_strength: { base_duration: 70,
       meta: { ui_name: "strength potion", weight: 0.5, price: 80, occurance: 0.4, description: "A bottle of magical liquid." }
     },
-    potion_of_speed: {
+    potion_of_speed: { base_duration: 100,
       meta: { ui_name: "speed potion", weight: 0.5, price: 80, occurance: 0.4, description: "A bottle of magical liquid." }
     },
-    potion_of_invisibility: {
+    potion_of_invisibility: { base_duration: 70,
       meta: { ui_name: "invisibility potion", weight: 0.5, price: 120, occurance: 0.3, description: "A bottle of magical liquid." }
     },
-    potion_of_poison: {
+    potion_of_poison: { base_duration: 0,
       meta: { ui_name: "poison potion", weight: 0.5, price: 20, occurance: 0.5, description: "A bottle of magical liquid." }
     },
-    potion_of_telepathy: {
+    potion_of_telepathy: { base_duration: 50,
       meta: { ui_name: "telepathy potion", weight: 0.5, price: 100, occurance: 0.3, description: "A bottle of magical liquid." }
     },
-    potion_of_extra_healing: {
+    potion_of_extra_healing: { base_duration: 0,
       meta: { ui_name: "extra healing potion", weight: 0.5, price: 150, occurance: 0.2, description: "A bottle of magical liquid." }
     },
-    potion_of_teleportation: {
+    potion_of_teleportation: { base_duration: 0,
       meta: { ui_name: "teleportation potion", weight: 0.5, price: 60, occurance: 0.4, description: "A bottle of magical liquid." }
     },
-    potion_of_holy_water: {
+    potion_of_holy_water: { base_duration: 100,
       meta: { ui_name: "holy water", weight: 0.5, price: 100, occurance: 0.2, description: "A bottle of magical liquid." }
     },
-    potion_of_confusion: {
+    potion_of_confusion: { base_duration: 50,
       meta: { ui_name: "confusion potion", weight: 0.5, price: 30, occurance: 0.4, description: "A bottle of magical liquid." }
     }
   }
@@ -39,10 +39,11 @@ class Potion < Item
   # :potion_of_water_breathing,
   # :potion_of_levitation,
 
-  attr_accessor :meta, :weight, :price, :occurrence, :description
+  attr_accessor :base_duration, :meta
 
   def initialize(kind, args = nil)
-    blueprint = DATA[kind] || { meta: {} }
+    blueprint = DATA[kind] || { base_duration:70, meta: {} }
+    @base_duration = blueprint[:base_duration]
     @meta = (blueprint[:meta] || {}).dup
     
     # Extract data from meta hash
@@ -54,9 +55,9 @@ class Potion < Item
     super(kind, :potion)
   end
 
-  def self.kinds
-    DATA.keys
-  end
+  # --- CLASS DATA ACCESS ---
+  def self.data; DATA; end
+  def self.kinds; DATA.keys; end
 
   def self.setup_masks(args)
     self.mask_pool.shuffle
@@ -81,8 +82,7 @@ class Potion < Item
   end
 
   def self.randomize(level_depth, args)
-    kind = args.state.rng.choice(self.kinds)
-    return self.new(kind, args)
+    Item.randomize(level_depth, self, args)
   end
 
   def identify(args)
@@ -93,7 +93,6 @@ class Potion < Item
 
   def use(entity, args)
     identify = true
-    base_duration = 70
     case self.kind
     when :potion_of_teleportation
       HUD.output_message(args, "You feel disoriented...")
@@ -127,24 +126,24 @@ class Potion < Item
       Status.new(entity, :poison, 20 + args.state.rng.d10, args)
     when :potion_of_strength
       HUD.output_message(args, "You feel stronger!")
-      Status.new(entity, :strenghtened, base_duration + args.state.rng.d20 * 2, args)
+      Status.new(entity, :strenghtened, @base_duration + args.state.rng.d20 * 2, args)
     when :potion_of_speed
       HUD.output_message(args, "You feel world around you slowing down!")
-      Status.new(entity, :speedy, base_duration + args.state.rng.d20 * 2, args)
+      Status.new(entity, :speedy, @base_duration + args.state.rng.d20 * 2, args)
     when :potion_of_invisibility
       HUD.output_message(args, "You become invisible!")
-      Status.new(entity, :invisible, base_duration + args.state.rng.d20 * 2, args)
+      Status.new(entity, :invisible, @base_duration + args.state.rng.d20 * 2, args)
     when :potion_of_telepathy
       HUD.output_message(args, "You feel more connected to other beings!")
-      Status.new(entity, :telepathic, base_duration + args.state.rng.d20 * 2, args)
+      Status.new(entity, :telepathic, @base_duration + args.state.rng.d20 * 2, args)
       SoundFX.play(:telepathy, args)
     when :potion_of_holy_water
       HUD.output_message(args, "You feel holy!")
-      Status.new(entity, :holy_water, base_duration + args.state.rng.d20 * 2, args)
+      Status.new(entity, :holy_water, @base_duration + args.state.rng.d20 * 2, args)
       SoundFX.play(:holy_water, args)
     when :potion_of_confusion
       HUD.output_message(args, "You feel confused!")
-      Status.new(entity, :confused, base_duration + args.state.rng.d20 * 2, args)
+      Status.new(entity, :confused, @base_duration + args.state.rng.d20 * 2, args)
       SoundFX.play(:confusion, args)
     else
       HUD.output_message(args, "You feel strange...")
