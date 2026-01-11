@@ -1,5 +1,8 @@
-class Architect
   #  class that creates the dungeon and populates it with entities
+  #  TODO: is this class really necessary? could the dungeon creation logic be moved to Dungeon class?
+  #  TODO: also the seed generation could happen in the Run class?
+
+class Architect
   
   def initialize
     @settings = {}

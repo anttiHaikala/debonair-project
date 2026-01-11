@@ -1,3 +1,4 @@
+# this file contains code related to the look mode cursor and inspector functionality
 class GUI
 
   @@inspector_active = false
@@ -135,6 +136,10 @@ class GUI
       if trap.x == x && trap.y == y && trap.found
         description << trap.title(args)
       end
+    end
+    # describe foliage
+    if level.foliage[y][x]
+      description << level.foliage[y][x]
     end
     # describe lights
     level.lights.each do |light|

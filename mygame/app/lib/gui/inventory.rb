@@ -1,3 +1,4 @@
+# this file contains the logic for drawing and interacting with items in the inventory
 class GUI
 
   def self.draw_items args

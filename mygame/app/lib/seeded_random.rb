@@ -9,6 +9,14 @@ class SeededRandom
     @seed / 4294967296.0
   end
 
+  def d2
+    nxt_int(1, 2)
+  end
+
+  def d4
+    nxt_int(1, 4)
+  end
+
   def d6
     nxt_int(1, 6)
   end

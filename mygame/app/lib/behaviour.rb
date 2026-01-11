@@ -32,6 +32,10 @@ class Behaviour
     @target = nil           # object of the behaviour
   end
 
+  def title
+    @kind.to_s.capitalize
+  end
+
   def self.setup_for_npc(npc)
     species = npc.species
     case species
@@ -42,9 +46,7 @@ class Behaviour
       # npc.behaviours << Behaviour.new(:attack, npc)
       npc.behaviours << Behaviour.new(:flee, npc)
     when :grid_bug
-      npc.behaviours << Behaviour.new(:wander, npc)
-      # npc.behaviours << Behaviour.new(:escape, npc)
-      # npc.behaviours << Behaviour.new(:forage, npc)
+      npc.setup_behaviours
     when :rat, :newt
       npc.behaviours << Behaviour.new(:wander, npc)
       # npc.behaviours << Behaviour.new(:forage, npc)
@@ -251,7 +253,8 @@ class Behaviour
               if hero.x == target_x && hero.y == target_y
                 # occupied, attack!
                 hero.become_hostile_to(npc)
-                Combat.resolve_attack(npc, hero, args)
+                weapon = npc.equipped_weapon
+                Combat.resolve_attack(npc, hero, weapon, args)
                 args.state.kronos.spend_time(npc, npc.walking_speed, args)
                 return
               else

@@ -72,6 +72,9 @@ require 'app/lib/cheats'
 require 'app/lib/item/armor'
 require 'app/lib/create_hero'
 require 'app/lib/item/tool'
+require 'app/lib/npc/grid_bug'
+require 'app/lib/npc/goblin'
+require 'app/lib/npc/leprechaun'
 
 def boot args
   args.state = {}
@@ -79,6 +82,7 @@ def boot args
   if $enable_music
     Music.setup(args)
   end
+  GTK.hide_cursor
 end
 
 def reset args

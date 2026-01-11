@@ -198,22 +198,7 @@ class GUI
       HUD.output_message args, "Debug mode #{$debug ? 'enabled' : 'disabled'}."
     end
     if $debug
-      if args.inputs.keyboard.key_down.m || args.controller_one.key_down.x
-        Tile.auto_map_whole_level(args)
-      end
-      if args.inputs.keyboard.key_down.t || args.controller_one.key_down.y
-        args.state.hero.teleport(args)
-      end
-      if args.inputs.keyboard.key_down.l || args.controller_one.key_down.r3
-        Debug.press_l(args)
-        return
-      end
-      if args.inputs.keyboard.key_down.r
-        $display_room_debug = !$display_room_debug
-      end
-      if args.inputs.keyboard.key_down.f
-        $display_los_debug = !$display_los_debug
-      end
+      self.handle_debug_input args
     end
     # inventory management can happen in parallel
     self.handle_inventory_input args
@@ -501,7 +486,7 @@ class GUI
       return true
     end
     if hero.has_status?(:confused)
-      if args.state.rng.d6 <= 4
+      if args.state.rng.d6 <= 2
         # randomize direction
         directions = [[0,1],[0,-1],[-1,0],[1,0]]
         random_direction = directions.sample
@@ -574,7 +559,8 @@ class GUI
       if hero.is_hostile_to?(npc) 
         # check that the direction button was pressed, not just held
         if args.inputs.keyboard.key_down.up || args.inputs.keyboard.key_down.down || args.inputs.keyboard.key_down.left || args.inputs.keyboard.key_down.right || args.inputs.controller_one.key_down.dpad_up || args.inputs.controller_one.key_down.dpad_down || args.inputs.controller_one.key_down.dpad_left || args.inputs.controller_one.key_down.dpad_right
-          Combat.resolve_attack(hero, npc, args)
+          weapon = hero.equipped_weapon
+          Combat.resolve_attack(hero, npc, weapon, args)
           hero.apply_new_facing(Utils.direction_from_delta(dx, dy))
           self.add_input_cooldown 20
           args.state.kronos.spend_time(hero, hero.walking_speed, args) # todo fix speed depending on action
@@ -1022,7 +1008,7 @@ class GUI
         y: y_offset + (entity.y + 0.7) * tile_size,
         w: tile_size,
         h: tile_size,
-        text: "#{entity.last_behaviour} #{entity.facing}",
+        text: "#{entity.name} #{entity.behaviour && entity.behaviour.title} #{entity.facing}",
         size_enum: 0,
         r: 255,
         g: 200,
@@ -1049,6 +1035,42 @@ class GUI
     else
       args.state.scene = :game_over
     end
+  end
+
+  def self.handle_debug_input args
+      if args.inputs.keyboard.key_down.m || args.controller_one.key_down.x
+        Tile.auto_map_whole_level(args)
+      end
+      if args.inputs.keyboard.key_down.t || args.controller_one.key_down.y
+        args.state.hero.teleport(args)
+      end
+      if args.inputs.keyboard.key_down.l || args.controller_one.key_down.r3
+        Debug.press_l(args)
+        return
+      end
+      if args.inputs.keyboard.key_down.r
+        $display_room_debug = !$display_room_debug
+      end
+      if args.inputs.keyboard.key_down.f
+        $display_los_debug = !$display_los_debug
+      end
+      if args.inputs.keyboard.key_down.d
+        if args.state.hero.depth >= args.state.dungeon.max_depth - 1
+          HUD.output_message args, "You cannot go down any further."
+          return
+        end
+        Utils.move_entity_to_level(args.state.hero, args.state.hero.depth + 1, args)
+        HUD.output_message args, "Debug: Moved down one level."
+      end
+      if args.inputs.keyboard.key_down.e
+        if args.state.hero.depth <= 0
+          HUD.output_message args, "You cannot go up any further."
+          return
+        end
+        Utils.move_entity_to_level(args.state.hero, args.state.hero.depth - 1, args)
+        HUD.output_message args, "Debug: Moved up one level."     
+      end
+
   end
 
 end

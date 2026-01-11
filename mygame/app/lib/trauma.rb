@@ -247,6 +247,23 @@ class Trauma
     return entity.traumas.select { |trauma| trauma.severity != :healed }
   end
 
+  def color
+    case @severity
+    when :healed
+      return {r: 200, g: 200, b: 200}
+    when :minor
+      return {r: 150, g: 255, b: 150}
+    when :moderate
+      return {r: 255, g: 255, b: 100}
+    when :severe
+      return {r: 255, g: 150, b: 150}
+    when :critical
+      return {r: 255, g: 50, b: 50}
+    else
+      return {r: 200, g: 200, b: 200}
+    end
+  end
+
   def title(args)
     "#{@severity.to_s.capitalize} #{@kind.to_s.gsub('_',' ')} on #{@body_part.to_s.gsub('_',' ')}"
   end

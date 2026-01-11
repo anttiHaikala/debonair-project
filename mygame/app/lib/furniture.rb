@@ -184,23 +184,26 @@ class Furniture
 
   def self.remove_unsupported_doors(level, args)
     level.furniture.delete_if do |f|
-      if f.kind == :door
+      printf "Checking door support on level %d at %d,%d: rotation %d\n", level.depth, f.x, f.y, f.rotation
+      if f.kind == :door || f.kind == :secret_door
         # check if the door is unsupported (no walls beside it at right angles)
         supported = false
         case f.rotation
         when 90, 270
           # east-west door, check north and south
-          if level.tile_at(f.x, f.y - 1) == :wall || level.tile_at(f.x, f.y + 1) == :wall
+          if level.tile_at(f.x, f.y - 1) == :wall && level.tile_at(f.x, f.y + 1) == :wall
             supported = true
           end
         when 0, 180
           # north-south door, check east and west
-          if level.tile_at(f.x - 1, f.y) == :wall || level.tile_at(f.x + 1, f.y) == :wall
+          if level.tile_at(f.x - 1, f.y) == :wall && level.tile_at(f.x + 1, f.y) == :wall
             supported = true
           end
         end
-        unless supported
-          #level.add_effect(:debris, f.x, f.y, args)
+        if !supported
+          # add foliage where the door was
+          level.foliage[f.y][f.x] = :debris
+          printf "Removed unsupported door at %d,%d on level %d\n", f.x, f.y, level.depth
           true
         else
           false

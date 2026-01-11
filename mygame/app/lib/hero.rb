@@ -242,6 +242,10 @@ class Hero < Entity
     # hero is controlled by player, so no AI here
   end 
 
+  def behaviour
+    nil
+  end
+
   def pick_up_item(item, level, args)
     @carried_items << item
     level.items.delete(item)
@@ -478,4 +482,5 @@ class Hero < Entity
     end
     return strength    
   end
+
 end

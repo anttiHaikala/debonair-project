@@ -52,7 +52,7 @@ class Combat
     if base_attack_roll == 1
       fumble_roll = args.state.rng.d10
       if fumble_roll < 3
-        HUD.output_message args, "#{aname} attempts to attack but fumbles!"
+        HUD.output_message args, "#{aname} attempts to attack with #{item.title(args)} but fumbles!"
         SoundFX.play_sound(:fumble, args)
         item.break_check(args)
         return
@@ -101,7 +101,7 @@ class Combat
     self.resolve_defender_on_hit_effects(defender, attacker, args)
   end
 
-  def self.resolve_attack(attacker, defender, args)
+  def self.resolve_attack(attacker, defender, weapon, args)
     aname = attacker.name
     dname = defender.name
     # simple attack logic
@@ -111,7 +111,7 @@ class Combat
     if base_attack_roll == 1
       base_attack_roll = args.state.rng.d10
       if base_attack_roll < 3
-        HUD.output_message args, "#{aname} attempts to attack but fumbles!"
+        HUD.output_message args, "#{aname} attempts to attack with #{weapon.title(args)} but fumbles!"
         SoundFX.play_sound(:fumble, args)
         attacker.wielded_items.each do |item|
           if item.category == :weapon
@@ -151,7 +151,7 @@ class Combat
     # AH: this probably should be attack roll note base_attack_roll
     #if base_attack_roll < to_hit 
     if attack_roll < to_hit 
-      HUD.output_message args, "#{aname} attacks #{dname} but misses."
+      HUD.output_message args, "#{aname} attacks #{dname} with #{weapon.title(args)} but misses."
       SoundFX.play_sound(:miss, args)
       return # miss
     end
@@ -161,23 +161,35 @@ class Combat
       dodge_roll = args.state.rng.d20
       dodge_roll -= 3 # just to make it a bit less likely to dodge  
       if dodge_roll > attack_roll
-        HUD.output_message args, "#{aname} attacks #{dname} but #{dname} dodges."
+        HUD.output_message args, "#{aname} attacks #{dname} with #{weapon.title(args)} but #{dname} dodges."
         SoundFX.play_sound(:miss, args)
         return # dodged
       end
     end
 
     # AH: how to deal with defensive attributes of the wwapon and/or parry
-    # there are now defensive value for shiled but didn't impelemnt anything yet
+    # there are now defensive value for shiled but didn't impelemnt anything yet    
     
-    # hit!
+    # hit! let's resolve hit properties
     body_part = defender.random_body_part(args)
-    hit_kind = self.resolve_hit_kind(attacker)
+    hit_kind = weapon.hit_kind
     hit_severity = self.hit_severity(attacker, defender, hit_kind, body_part, attack_roll, args)
+
+    # special processing: skeletons vs pierce damage
+    if defender.species == :skeleton && weapon.hit_kind == :pierce && body_part != :head
+      passthrough_chance = 50
+      if args.state.rng.rand(100) < passthrough_chance
+        HUD.output_message args, "#{aname}'s #{weapon.title(args)} hit passes through #{dname}'s bones without causing any damage!"
+        SoundFX.play_sound(:miss, args)
+        return # miss
+      end
+    end
+
+
     Trauma.inflict(defender, body_part, hit_kind, hit_severity, args)
     SoundFX.play_sound(:hit, args)
     verb = "#{hit_kind}s"
-    HUD.output_message args, "#{aname} #{verb} #{dname}'s #{body_part.to_s.gsub('_', ' ')} #{hit_severity}ly."
+    HUD.output_message args, "#{aname} #{hit_severity}ly #{verb} #{dname}'s #{body_part.to_s.gsub('_', ' ')} with #{weapon.title(args)}."
     attacker.apply_exhaustion(0.05, args) if attacker == args.state.hero
     self.resolve_defender_on_hit_effects(defender, attacker, args)
   end
