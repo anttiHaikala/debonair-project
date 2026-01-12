@@ -19,6 +19,8 @@ class Entity
   attr_accessor :feel_cooldown
   attr_accessor :last_behaviour
   attr_accessor :handedness # :right, :left, :ambidextrous
+  attr_accessor :weight
+  attr_accessor :is_eatable
 
   def self.kinds
     [:generic, :item, :pc, :npc, :plant, :furniture]
@@ -48,6 +50,8 @@ class Entity
     @mode_of_movement = :normal # :sneaking, :walking, :speeding
     @feel_cooldown = 0
     @handedness = :right
+    @weight = 72.0 #kilograms, alter layer by species
+    @is_eatable = 0.8 # nil = not eatable at all, 0 = poisonous for sure
   end
 
   def all_items(args)
@@ -299,7 +303,7 @@ class Entity
       HUD.output_message(args, "#{self.name.capitalize} is destroyed!")
     else
       kind = (self.species.to_s + "_corpse").to_sym
-      corpse = Item.new(kind, :corpse)
+      corpse = Corpse.create_from_npc(self, args)
       corpse.depth = self.depth
       corpse.x = self.x
       corpse.y = self.y

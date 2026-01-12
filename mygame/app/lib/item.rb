@@ -205,13 +205,13 @@ class Item
       next if level.items.any? { |item| item.x == item_x && item.y == item_y }
       case args.state.rng.d20
         when 1
-          item = Food.new(:food_ration, args)
+          item = self.randomize(level.depth, Food, args)
           item.depth = level.depth
           item.x = item_x
           item.y = item_y
           level.items << item
         when 2
-          item = Potion.randomize(level.depth, args)
+          item = self.randomize(level.depth, Potion, args)
           item.depth = level.depth
           item.x = item_x
           item.y = item_y
@@ -298,7 +298,11 @@ class Item
       running_total += adj_occ
       
       # We store the "running total" as the item's threshold
-      { kind: kind, threshold: running_total }
+      if base_occ == 0.0
+        { kind: kind, threshold: -1.0 }
+      else
+        { kind: kind, threshold: running_total }
+      end
     end
 
     # 2. Roll a number based on the final running total
@@ -627,17 +631,12 @@ class Item
         loadout << {kind: Weapon.kinds.sample, attribute: :holy}
       when :cyborg
         loadout.each do |entry|
-          if Armor.kinds.include?(entry[:kind])
+          if Weapon.kinds.include?(entry[:kind])
             loadout.delete(entry)
           end
         end 
-        cyborgParts = []
-        Armor.kinds.each do |armorKind|
-          if armorKind.to_s.include?("cyborg")
-            cyborgParts << armorKind
-          end
-        end
-        loadout << {kind: cyborgParts.sample, state: :worn}
+        loadout << {kind: :cyborg_blade, state: :wielded}
+        loadout << {kind: :cyborg_blade, state: :wielded}
       when :demon
         loadout = []
         loadout << {kind: :wings}
