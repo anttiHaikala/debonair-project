@@ -278,4 +278,14 @@ class Furniture
       end
     end
   end
+
+  def self.reveal_all_secret_doors(level, args)
+    level.furniture.each do |f|
+      if f.kind == :secret_door
+        f.seen_by_hero = true
+      end
+    end
+    GUI.mark_tiles_stale
+    HUD.mark_minimap_stale
+  end
 end

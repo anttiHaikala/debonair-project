@@ -197,7 +197,18 @@ class ReachRoom < Behaviour
         @npc.move(:north, args)
       end
     end
-    # suck energy from nearby hero
+    # check furniture in the new location
+    furniture = Furniture.furniture_at(@npc.x, @npc.y, level, args)
+    if furniture
+      if [:door, :secret_door].include?(furniture.kind) && furniture.openness < 0.5
+        # grid bug can pass through doors by collapsing to 2D sheet
+        if args.state.hero.sees?(@npc, args)
+          HUD.add_message(args, "GridBug #{@npc.name} at (#{@npc.x},#{@npc.y}) collapses to a thin sheet and slides under #{furniture.name}!")
+        end
+      end
+    end
+
+        # suck energy from nearby hero
     nearby_heroes = Utils.entities_within_radius(@npc.x, @npc.y, 2, level).select { |e| e.is_a?(Hero) }
     nearby_heroes.each do |hero|
       if hero.exhaustion < 0.9

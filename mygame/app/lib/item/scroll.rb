@@ -106,6 +106,7 @@ class Scroll < Item
     when :scroll_of_mapping
       HUD.output_message args, "You gain knowledge of the level layout! The scroll crumbles to dust."
       Tile.auto_map_whole_level args
+      Furniture.reveal_all_secret_doors(Utils.level(args), args)
     when :scroll_of_digging
       Scroll.dig_around_entity user, effective_roll/4, args
       HUD.output_message args, "Spell of digging is launched around you. The scroll crumbles to dust."
