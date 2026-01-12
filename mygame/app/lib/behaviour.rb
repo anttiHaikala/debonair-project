@@ -3,6 +3,10 @@
 # interaction behaviours like attack, escape
 # movement behaviours like patrol, wander, follow, flee
 # 
+# instances have a short lifecycle: they are created, execute for a while and are destroyed
+# 
+# new subclasses are defined in npc files, e.g., grid_bug.rb
+# 
 # flee or fight decision making
 # love / hate relationships
 # ally / enemy relationships
@@ -34,6 +38,14 @@ class Behaviour
 
   def title
     @kind.to_s.capitalize
+  end
+
+  def start args
+    # do nothing special on start
+  end
+
+  def finish args
+    # do nothing special on finish
   end
 
   def self.setup_for_npc(npc)
@@ -438,12 +450,4 @@ class Behaviour
     args.state.kronos.spend_time(npc, npc.walking_speed, args)
   end
  
-  def start args
-    # do nothing special on start
-  end
-
-  def finish args
-    # do nothing special on finish
-  end
-
 end

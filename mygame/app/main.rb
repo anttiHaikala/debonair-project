@@ -99,6 +99,7 @@ def reset args
 end
 
 def tick args
+  GTK.hide_cursor
   # if (!args.inputs.keyboard.has_focus &&
   #     Kernel.tick_count != 0)
   #   args.outputs.background_color = [0, 0, 0]
@@ -197,7 +198,12 @@ def staircase_tick args
   Lighting.calculate_lighting(args.state.dungeon.levels[args.state.current_depth], args) if $dynamic_light_system
   GUI.draw_background args
   GUI.draw_tiles args
+  GUI.draw_foliage args
+  Trap.draw_traps args
+  Light.draw_lights args
+  GUI.draw_furniture args
   GUI.draw_items args
+  GUI.draw_effects args
   GUI.draw_entities args
   GUI.staircase_animation args
   GUI.pan_to_player args

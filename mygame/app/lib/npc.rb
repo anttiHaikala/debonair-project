@@ -180,7 +180,7 @@ class NPC < Entity
     when :goblin
       species_speed = 1.2 # seconds per tile
     when :grid_bug
-      species_speed = 0.2
+      species_speed = 0.3
     when :rat, :newt, :minotaur
       species_speed = 0.8
     when :gelatinous_cube # these guys keep the dungeon clean??

@@ -12,6 +12,9 @@
 # - light value of grid bug is dependent on its energy level
 # - heal any other entity if their energy level is high and the other entity has wounds
 # 
+# TODO list: 
+# - notify player when grid bug 2D:s itself
+# - suck energy
 # note on behaviour system:
 # - behaviours have start, execution and finish methods
 # - if npc has no behaviour, it will choose and start one
@@ -61,13 +64,9 @@ class GridBug < NPC
   
   # TODO: move to Entity
   def set_current_behaviour behaviour, args
-    printf "GridBug %s at (%d,%d) switching to behaviour %s\n", @name, @x, @y, behaviour && behaviour.title
-    # end current behaviour if any
-    if @behaviour
-      @behaviour.finish args
-    end 
     @behaviour = behaviour
     @behaviour.start args if @behaviour
+    printf "GridBug %s at (%d,%d) switched to behaviour %s\n", @name, @x, @y, behaviour && behaviour.title
   end
 
   # KEY METHOD! this belongs here, as every npc chooses it's behaviour differently
@@ -91,15 +90,7 @@ class Chill < Behaviour
   def initialize npc
     super(:chill, npc)
     @chill_amount = 0
-    @chill_max = 5
-  end
-
-  def start args
-    # do nothing special on start
-  end
-
-  def finish args
-    # do nothing special on finish
+    @chill_max = 50
   end
 
   def execute(args)
@@ -113,6 +104,13 @@ class Chill < Behaviour
       if @npc.social_battery > 1.0
         @npc.social_battery = 1.0
       end
+      turn_roll = args.state.rng.d20
+      if turn_roll == 1
+        @npc.face_random_direction(args)
+      end
+      if turn_roll == 2
+        @npc.move_to_random_direction(args)
+      end
       args.state.kronos.spend_time(@npc, @npc.walking_speed, args)
       @chill_amount += 1
     end
@@ -122,6 +120,7 @@ end
 class ReachRoom < Behaviour
   def initialize npc
     super(:reach_room, npc)
+    @safety = 0 # safety counter
   end
 
   def title
@@ -182,11 +181,9 @@ class ReachRoom < Behaviour
       self.finish args
       return
     end
-    printf "NEXT STEP: "
-    printf next_step.inspect + "\n"
     dx = next_step[:x] - @npc.x
     dy = next_step[:y] - @npc.y
-    printf "DX: %d, DY: %d\n", dx, dy    
+    printf "Grid bug dx: %d, dy: %d\n", dx, dy    
     if dx.abs > dy.abs
       if dx > 0
         @npc.move(:east, args)
@@ -200,6 +197,18 @@ class ReachRoom < Behaviour
         @npc.move(:north, args)
       end
     end
+    # suck energy from nearby hero
+    nearby_heroes = Utils.entities_within_radius(@npc.x, @npc.y, 2, level).select { |e| e.is_a?(Hero) }
+    nearby_heroes.each do |hero|
+      if hero.exhaustion < 0.9
+        hero.apply_exhaustion(0.08, args)
+        @npc.energy_level += 0.08
+        if @npc.energy_level > 1.0
+          @npc.energy_level = 1.0
+        end
+        printf "GridBug %s at (%d,%d) drained energy from Hero at (%d,%d)\n", @npc.name, @npc.x, @npc.y, hero.x, hero.y
+      end
+    end
     # recharge social battery
     nearby_bugs = Utils.entities_within_radius(@npc.x, @npc.y, 3, level).select { |e| e.is_a?(GridBug) && e != @npc }
     if !nearby_bugs.any?
@@ -211,7 +220,7 @@ class ReachRoom < Behaviour
     # spend time - important!!!
     args.state.kronos.spend_time(@npc, @npc.walking_speed, args)
     # if reached target room, finish behaviour
-    if @npc.x == target_x && @npc.y == target_y
+    if (@npc.x == target_x && @npc.y == target_y) || @safety > 1000
       @npc.set_current_behaviour(Chill.new(@npc), args)
     end
   end

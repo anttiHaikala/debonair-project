@@ -373,6 +373,17 @@ class Entity
     @facing = facing
   end
 
+  def face_random_direction(args)
+    directions = [:north, :south, :east, :west]
+    @facing = directions[args.state.rng.rand(directions.length)]
+  end
+
+  def move_to_random_direction(args)
+    directions = [:north, :south, :east, :west]
+    direction = directions[args.state.rng.rand(directions.length)]
+    self.move(direction, args)
+  end
+  
   def set_depth(new_depth, args)
     @depth = new_depth
   end
@@ -395,7 +406,7 @@ class Entity
   # returns the currently equipped weapon or a default unarmed attack
   def equipped_weapon
     self.wielded_items.each do |item|
-      if item.category == :weapon
+      if item && item.category == :weapon
         return item # right hand has priority because it is first in the list
       end
     end

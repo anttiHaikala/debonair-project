@@ -8,6 +8,8 @@
 # SHADOW SHANK are the merchants and traders, good at bartering and negotiation (blue)
 # 
 # TODO: all tribes, or at least one of them, has a nest in the dungeon
+# surnames Bubblybutt, Fartnose, Longtoes, Farthammer,
+# firstnames Jean-Pierre, Steven, Bob, Andy, Shelia, Fanny
 
 GOBLIN_TRIBES = [:black_claw, :footwork, :shadow_shank]
 
