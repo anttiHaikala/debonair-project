@@ -4,9 +4,15 @@
 class Run
   attr_accessor :dungeon, :hero
   attr_accessor :potion_masks
+  attr_accessor :ring_masks
+  attr_accessor :wand_masks
+  attr_accessor :scroll_masks
 
   def initialize args
     @potion_masks = Potion.setup_masks(args)
+    @ring_masks = Ring.setup_masks(args)
+    @wand_masks = []
+    @scroll_masks = []
   end
 
   def setup args, hero

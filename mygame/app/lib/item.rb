@@ -218,7 +218,7 @@ class Item
           level.items << item
         when 3
           if args.state.rng.d20 < level.depth + 5
-            item = Ring.new(Ring.kinds.sample)
+            item = self.randomize(level.depth, Ring, args)
             item.depth = level.depth
             item.x = item_x
             item.y = item_y

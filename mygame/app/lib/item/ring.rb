@@ -1,75 +1,108 @@
 class Ring < Item
+  # DATA contains metadata and usage configuration
+  # occurance is set to 1.0 and weight to 0.01 across all types
+  DATA = {
+    ring_of_endurance:       { meta: { occurance: 1.0, weight: 0.01, price: 100 }, max_usage: 1000 },
+    ring_of_fire_resistance: { meta: { occurance: 1.0, weight: 0.01, price: 150 }, max_usage: 1200 },
+    ring_of_cold_resistance: { meta: { occurance: 1.0, weight: 0.01, price: 150 }, max_usage: 1200 },
+    ring_of_invisibility:    { meta: { occurance: 0.5, weight: 0.01, price: 500 }, max_usage: 500  },
+    ring_of_protection:      { meta: { occurance: 0.5, weight: 0.01, price: 200 }, max_usage: 1500 },
+    ring_of_strength:        { meta: { occurance: 1.0, weight: 0.01, price: 250 }, max_usage: 1000 },
+    ring_of_illumination:    { meta: { occurance: 1.0, weight: 0.01, price: 80  }, max_usage: 2000 },
+    ring_of_regeneration:    { meta: { occurance: 0.2, weight: 0.01, price: 600 }, max_usage: 800  },
+    ring_of_teleportation:   { meta: { occurance: 1.0, weight: 0.01, price: 300 }, max_usage: 1000 },
+    ring_of_accuracy:        { meta: { occurance: 1.0, weight: 0.01, price: 180 }, max_usage: 1500 },
+    ring_of_warning:         { meta: { occurance: 1.0, weight: 0.01, price: 400 }, max_usage: 1200 },
+    ring_of_telepathy:       { meta: { occurance: 1.0, weight: 0.01, price: 450 }, max_usage: 700  }
+  }
 
-  @@mask_index_seed = nil
-  attr_accessor :usage, :max_usage, :cursed
+  # implement these later 
+  # :ring_of_night_vision,
+  # :ring_of_adornment,
+  # :ring_of_stealth, 
 
-  def initialize(kind,args=nil)
-    super(kind, :ring)
+  attr_accessor :kind, :max_usage, :cursed, :meta, :description, :usage
+
+    def initialize(kind, args=nil, &block)
+    @kind = kind
+    #@attributes = attributes || []
     @usage = 0
-    if Numeric.rand(1..6) == 1
-      @cursed = true
-    else
-      @cursed = false
-    end
-    @max_usage = Numeric.rand(0..3000)
+    
+    blueprint = DATA[kind] || { meta: { occurance: 1.0, weight: 0.01, price: 100 }, max_usage: 1000 }
+    # TODO seed for rand?
+    @max_usage = blueprint[:max_usage] + Numeric.rand(1..1000) #+ args.state.rng.rand(1..1000)
+    @meta =  blueprint[:meta].dup
+    @description = "a ring wearable on any finger as long as you don't lose them in combat"
+    @weight      = @meta[:weight]      
+    @price       = @meta[:price]       
+    @occurance  = @meta[:occurance] 
+    @usage = 0  
+    
+    # Logic from original class: 1 in 6 chance to be cursed. TODO: make rand seeded
+    # maybe remove the attribute and add cursed to attributes list
+    @cursed = (Numeric.rand(1..6) == 1)
+    super(kind, :ring, &block)
   end
 
+  #are these used?
   def self.traits
     return [
       :heavy, :lightweight, :ornate, :engraved
     ]
   end
 
-  def self.kinds
-    return [
-    :ring_of_endurance, 
-    :ring_of_fire_resistance, 
-    :ring_of_cold_resistance,
-    :ring_of_invisibility,
-    :ring_of_protection, 
-    :ring_of_strength, 
-    :ring_of_illumination,
-    # :ring_of_stealth, 
-    :ring_of_regeneration, 
-    # :ring_of_adornment,
-    :ring_of_teleportation,
-    :ring_of_accuracy,
-    # :ring_of_night_vision,
-    :ring_of_warning,
-    :ring_of_telepathy]
-  end
+  # --- CLASS DATA ACCESS ---
+  def self.data; DATA; end
+  def self.kinds; DATA.keys; end
 
-  def self.masks
+  def self.mask_pool
     [
-      :sapphire,
-      :emerald,
-      :ruby,
-      :diamond,
-      :onyx,
-      :topaz,
-      :amethyst,
-      :garnet,
-      :opal,
-      :turquoise,
-      :quartz,
-      :jade,
-      :pearl
+      :sapphire, :emerald, :ruby, :diamond, :onyx, :topaz, 
+      :amethyst, :garnet, :opal, :turquoise, :quartz, :jade, :pearl
     ]
   end
 
-  def self.randomize(depth, args)
-    kind = Ring.kinds[args.state.rng.rand(Ring.kinds.size)]
-    ring = Ring.new(kind)
-    return ring
+  # Setup masks by shuffling the available list into the game state
+  def self.setup_masks(args)
+    self.mask_pool.shuffle
   end
 
-  def name
-    mask_index = Ring.kinds.index(self.kind) % Ring.masks.length
-    mask = Ring.masks[mask_index]
-    "#{self.attributes.join(' ')} #{mask} ring (#{self.kind.to_s.gsub('_',' ')})".trim
+  def self.masks(args)
+    args.state.run.ring_masks
   end
 
-  def use(entity, args)
+  def self.randomize(level_depth, args)
+    Item.randomize(level_depth, self, args)
+  end
+
+  def identify(args)
+    unless args.state.hero.known_rings.include?(self.kind)
+      args.state.hero.known_rings << self.kind
+    end
+  end
+
+  def title(args)
+    mask_index = self.class.kinds.index(self.kind) % self.class.masks(args).length
+    mask = self.class.masks(args)[mask_index]
+    if args.state.hero.known_rings.include?(self.kind)
+      "#{self.attributes.join(' ')} #{mask} ring (#{self.kind.to_s.gsub('ring_of_','')})".strip
+    else
+      "#{mask} ring".strip
+    end
+  end
+
+  def name(args)
+    # Fetch the shuffled mask pool from the specific path provided
+    mask_pool = args.state.run.ring_masks || self.class.masks
+    
+    kind_idx = self.class.kinds.index(@kind) || 0
+    mask_index = kind_idx % mask_pool.length
+    mask = mask_pool[mask_index]
+    
+    "#{@attributes.join(' ')} #{mask} ring (#{@kind.to_s.gsub('_', ' ')})".strip
+  end
+
+   def use(entity, args)
     # TODO: check that we have enough fingers free to wear the ring
     # TODO: maybe have a dexterity penalty if too many rings are being worn!!!
     if entity.worn_items.include?(self)
@@ -131,5 +164,4 @@ class Ring < Item
     end
     return false
   end
-
 end

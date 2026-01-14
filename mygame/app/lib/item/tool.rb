@@ -40,9 +40,8 @@ class Tool < Item
 
   attr_accessor :meta, :durability
 
-  def initialize(kind, args, &block)
-      blueprint = DATA[kind] || {durability: nil, action: nil, meta: {} }
-
+  def initialize(kind, args=nil, &block)
+    blueprint = DATA[kind] || {durability: nil, action: nil, meta: {} }
     @meta = blueprint[:meta].dup
     @weight = @meta[:weight] || 1.0
     @durability = blueprint[:durability] 

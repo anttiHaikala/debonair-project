@@ -39,20 +39,22 @@ class Potion < Item
   # :potion_of_water_breathing,
   # :potion_of_levitation,
 
-  attr_accessor :base_duration, :meta
+  attr_accessor :base_duration, :weight, :price, :occurance, :description, :meta
 
-  def initialize(kind, args = nil)
-    blueprint = DATA[kind] || { base_duration:70, meta: {} }
+  def initialize(kind, args = nil, &block)
+    blueprint = DATA[kind] || { base_duration:70, meta: { ui_name: "unkown potion", weight: 0.5, price: 30, occurance: 0.4, description: "A bottle of magical liquid." } }
     @base_duration = blueprint[:base_duration]
     @meta = (blueprint[:meta] || {}).dup
     
-    # Extract data from meta hash
+    # Extract data from meta hash - TO DO: UNIFY THE LOGIC FOR ALL ITEMS
     @weight      = @meta[:weight]      || 0.5
     @price       = @meta[:price]       || 50
     @occurrence  = @meta[:occurance]   || 0.5
-    @description = @meta[:description] || "A mysterious potion of unknown origin."
     
-    super(kind, :potion)
+    #could be taken OUT of from DATA[:meta] as it's same for each :kind
+    @description = @meta[:description] 
+    
+    super(kind, :potion, &block)
   end
 
   # --- CLASS DATA ACCESS ---

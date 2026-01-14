@@ -2,7 +2,7 @@ class NPC < Entity
 
   include Needy
 
-  attr_accessor :char, :species, :has_been_seen, :depth, :status, :behaviours, :carried_items, :behaviour
+  attr_accessor :char, :species, :has_been_seen, :depth, :status, :behaviours, :carried_items, :behaviour, :first_name
 
   def initialize(species, x = 0, y = 0, depth = 0)
     @kind = :npc
@@ -19,6 +19,7 @@ class NPC < Entity
     @behaviour = nil # the currently active behaviour
     Behaviour.setup_for_npc(self)
     self.setup_traits
+    @first_name = self.generate_first_name
   end
 
   def name
@@ -208,6 +209,45 @@ class NPC < Entity
   end
 
   def title(args)
-    self.name
+    "#{@first_name} the #{@species}"
   end
+
+  def generate_first_name
+    # TODO: make rnd seeded
+    # TODO: move species specific name to sub class
+    
+    name_parts = [] 
+    case @species
+    when :goblin
+      syllables = [
+        "zum", "urg", "arg", "zarg", "nogh", "murs", "ghar", "yrg", "ram", "pat", "myrg", "zy", 
+        "za", "gra", "gry", "yrh", "mor", "zug"
+      ]
+      # Use rand(range) or Random.rand(range)
+      length = Numeric.rand(2..3)
+      length.times do
+        random_index = Numeric.rand(0...syllables.length)
+        name_parts << syllables[random_index]
+      end
+    end
+
+    if name_parts.empty?
+      syllables = [
+        "ju", "ha", "ni", "jo", "han", "nes", "o", "la", "vi", "an", "te", "ro", 
+        "ta", "pa", "mat", "ti", "mik", "ko", "heik", "ki", "sep", "po", "ka", "ri",
+        "ma", "ri", "a", "he", "le", "na", "li", "sa", "ee", "va", "pir", "jo", 
+        "rit", "va", "tuu", "la", "ai", "no", "lu", "mi", "su", "vi", "hel", "mi", 
+        "pih", "la", "va", "na", "mo", "ot", "so", "ha", "vu", "py", "ry", "ki", "vi",
+        "väi", "nö", "il", "ma", "ri", "ta", "pi", "o", "tel", "ler", "vo", "sam", "po",
+        "kyl", "lik", "ki", "on", "ni", "al", "var", "ven", "la", "lil", "ja", "aa", "da"
+      ]
+      length = Numeric.rand(2..4)
+      length.times do
+        random_index = Numeric.rand(0...syllables.length)
+        name_parts << syllables[random_index]
+      end
+    end
+    name_parts.join.capitalize
+  end
+
 end

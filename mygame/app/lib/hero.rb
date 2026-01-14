@@ -3,7 +3,7 @@ class Hero < Entity
   include Needy
 
   attr_reader :trait, :name, :exhaustion, :sleep_deprivation, :insanity, :carried_items, :max_depth
-  attr_accessor :role, :species, :age, :hunger, :hunger_level, :stress, :perished, :reason_of_death, :known_potions, :known_scrolls, :known_wands
+  attr_accessor :role, :species, :age, :hunger, :hunger_level, :stress, :perished, :reason_of_death, :known_potions, :known_scrolls, :known_wands, :known_rings
 
   def initialize(age, trait, species, role)
     super(nil, nil) # we don't know the location yet 
@@ -23,6 +23,8 @@ class Hero < Entity
     @max_depth = 0
     @known_potions = []
     @known_scrolls = []
+    @known_rings = []
+    @known_wands = []
   end
 
   # modifies a d20 roll to resist theft attempts
