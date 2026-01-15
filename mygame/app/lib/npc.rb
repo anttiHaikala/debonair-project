@@ -2,7 +2,7 @@ class NPC < Entity
 
   include Needy
 
-  attr_accessor :char, :species, :has_been_seen, :depth, :status, :behaviours, :carried_items, :behaviour, :first_name
+  attr_accessor :char, :species, :has_been_seen, :depth, :status, :behaviours, :carried_items, :behaviour
 
   def initialize(species, x = 0, y = 0, depth = 0)
     @kind = :npc
@@ -19,7 +19,6 @@ class NPC < Entity
     @behaviour = nil # the currently active behaviour
     Behaviour.setup_for_npc(self)
     self.setup_traits
-    @first_name = self.generate_first_name
   end
 
   def name
@@ -209,10 +208,10 @@ class NPC < Entity
   end
 
   def title(args)
-    "#{@first_name} the #{@species}"
+    self.name
   end
 
-  def generate_first_name
+    def generate_first_name
     # TODO: make rnd seeded
     # TODO: move species specific name to sub class
     
@@ -249,5 +248,4 @@ class NPC < Entity
     end
     name_parts.join.capitalize
   end
-
 end
